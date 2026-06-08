@@ -18,6 +18,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from systems.index.geohash_index import GeohashPrefixIndex
+from systems.index.h3_index import H3Index
 from systems.index.workload import generate_workload
 from systems.index.benchmark import (
     run_benchmark,
@@ -75,8 +76,8 @@ def main():
     parser.add_argument(
         "--strategies",
         nargs="+",
-        default=["geohash_p3", "geohash_p4", "geohash_p5"],
-        help="Index strategies to benchmark (default: geohash at precision 3, 4, 5)",
+        default=["geohash_p3", "geohash_p4", "geohash_p5", "h3_r3", "h3_r4", "h3_r5"],
+        help="Index strategies to benchmark",
     )
     parser.add_argument(
         "--log-level",
@@ -115,6 +116,10 @@ def main():
         "geohash_p3": lambda: GeohashPrefixIndex(prefix_precision=3),
         "geohash_p4": lambda: GeohashPrefixIndex(prefix_precision=4),
         "geohash_p5": lambda: GeohashPrefixIndex(prefix_precision=5),
+        "h3_r3": lambda: H3Index(resolution=3),
+        "h3_r4": lambda: H3Index(resolution=4),
+        "h3_r5": lambda: H3Index(resolution=5),
+        "h3_r6": lambda: H3Index(resolution=6),
     }
 
     results = []

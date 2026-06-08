@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from systems.index.base import BBox, TimeWindow, SpatiotemporalQuery
 from systems.index.geohash_index import GeohashPrefixIndex, _geohash_prefixes_for_bbox
+from systems.index.h3_index import H3Index, _h3_cells_for_bbox
 from systems.index.workload import generate_workload
 
 
@@ -92,6 +93,46 @@ class TestGeohashIndex(unittest.TestCase):
         self.assertEqual(len(res_broad), 2)
         icao_set = {r["icao24"] for r in res_broad}
         self.assertEqual(icao_set, {"111111", "222222"})
+
+
+class TestH3Index(unittest.TestCase):
+    def setUp(self):
+        self.records = [
+            {
+                "icao24": "111111",
+                "lon": 4.7638,
+                "lat": 52.3080, # Amsterdam
+                "event_ts": "2024-06-03T12:00:00+00:00",
+                "h3_r7": "8719694b5ffffff" 
+            },
+            {
+                "icao24": "222222",
+                "lon": 8.5706,
+                "lat": 50.0333, # Frankfurt
+                "event_ts": "2024-06-03T12:05:00+00:00",
+                "h3_r7": "871fa1b13ffffff"
+            }
+        ]
+
+    def test_h3_cells_for_bbox(self):
+        bbox = BBox(4.7, 4.8, 52.3, 52.4)
+        cells_r4 = _h3_cells_for_bbox(bbox, 4)
+        self.assertTrue(len(cells_r4) >= 1)
+
+    def test_build_and_query(self):
+        index = H3Index(resolution=4)
+        index.build(self.records)
+
+        stats = index.stats()
+        self.assertEqual(stats["record_count"], 2)
+
+        q = SpatiotemporalQuery(
+            bbox=BBox(4.7, 4.8, 52.3, 52.4),
+            time_window=TimeWindow("2024-06-03T11:00:00+00:00", "2024-06-03T13:00:00+00:00")
+        )
+        res = index.query(q)
+        self.assertEqual(len(res), 1)
+        self.assertEqual(res[0]["icao24"], "111111")
 
 
 class TestWorkloadGenerator(unittest.TestCase):
