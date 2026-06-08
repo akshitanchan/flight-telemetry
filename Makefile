@@ -65,8 +65,8 @@ data-local-gold: data-local-silver ## Transform local silver to gold aggregates
 	$(PYTHON) -m data.transforms.cli_gold --input data/processed/silver_flight_state.jsonl
 
 .PHONY: data-refresh-experiment-small
-data-refresh-experiment-small: ## Run incremental-vs-recompute experiment (small)
-	@echo "→ data-refresh-experiment-small: not yet implemented (target for W2.4)"
+data-refresh-experiment-small: data-local-silver ## Run incremental-vs-recompute experiment (small)
+	$(PYTHON) data/experiments/refresh_strategy.py --sizes 10000,100000,1000000 --inc-pct 0.1
 
 .PHONY: test-data
 test-data: ## Run data-layer tests
