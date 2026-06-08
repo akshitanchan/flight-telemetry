@@ -216,3 +216,35 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ===========================================================
+# Flight Telemetry Platform — project-specific ignores
+# ===========================================================
+
+# Local data outputs (never commit bulk data)
+data/raw/
+data/interim/
+data/processed/
+outputs/
+artifacts/
+.tmp/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Model weights and checkpoints
+*.pt
+*.pth
+*.onnx
+*.pkl
+*.joblib
+mlruns/
+
+# Parquet / large data files
+*.parquet
+*.avro
+
+# Local database files
+*.duckdb
+*.duckdb.wal

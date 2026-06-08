@@ -1,0 +1,40 @@
+# ===========================================================
+# Flight Telemetry Platform — CI
+# ===========================================================
+# Basic GitHub Actions workflow for lint and smoke checks.
+# Expand per-layer as implementation lands.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify scaffold
+        run: |
+          echo "--- Checking required files ---"
+          test -f .env.example   && echo "✓ .env.example"
+          test -f Makefile       && echo "✓ Makefile"
+          test -f README.md      && echo "✓ README.md"
+          test -d docs           && echo "✓ docs/"
+          test -d shared/contracts && echo "✓ shared/contracts/"
+          test -d systems        && echo "✓ systems/"
+          test -d data           && echo "✓ data/"
+          test -d ml             && echo "✓ ml/"
+          test -d ai             && echo "✓ ai/"
+          test -d infra          && echo "✓ infra/"
+
+      - name: Make help
+        run: make help
+
+      # Future: add per-layer test jobs as implementation lands
+      # - name: Test contracts
+      #   run: make test-contracts

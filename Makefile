@@ -1,0 +1,115 @@
+# ===========================================================
+# Flight Telemetry Intelligence Platform — Makefile
+# ===========================================================
+# One-command entrypoints per layer.
+# Run `make help` to see available targets.
+
+.DEFAULT_GOAL := help
+SHELL := /bin/bash
+
+# ---- Directories (generated outputs — gitignored) ---------
+DATA_RAW     := data/raw
+DATA_INTERIM := data/interim
+DATA_PROCESSED := data/processed
+OUTPUTS      := outputs
+ARTIFACTS    := artifacts
+
+# ---- Help -------------------------------------------------
+.PHONY: help
+help: ## Show available targets
+	@echo ""
+	@echo "Flight Telemetry Intelligence Platform"
+	@echo "======================================"
+	@echo ""
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@echo ""
+
+# ---- Setup ------------------------------------------------
+.PHONY: setup
+setup: ## Create local output directories (gitignored)
+	@mkdir -p $(DATA_RAW) $(DATA_INTERIM) $(DATA_PROCESSED) $(OUTPUTS) $(ARTIFACTS)
+	@echo "✓ Local output directories created."
+
+.PHONY: check-env
+check-env: ## Verify .env exists (does not validate contents)
+	@if [ ! -f .env ]; then \
+		echo "⚠ .env not found. Copy .env.example → .env and fill in values."; \
+		exit 1; \
+	fi
+	@echo "✓ .env file found."
+
+# ---- Contracts / Schemas ----------------------------------
+.PHONY: test-contracts
+test-contracts: ## Validate shared schemas and fixtures
+	@echo "→ test-contracts: not yet implemented (target for W1.2)"
+
+# ---- Data -------------------------------------------------
+.PHONY: data-sample
+data-sample: ## Download / generate a tiny development data subset
+	@echo "→ data-sample: not yet implemented (target for W1.3)"
+
+.PHONY: data-local-silver
+data-local-silver: ## Run local bronze → silver transform on sample data
+	@echo "→ data-local-silver: not yet implemented (target for W1.5)"
+
+.PHONY: data-local-gold
+data-local-gold: ## Run local silver → gold transform on sample data
+	@echo "→ data-local-gold: not yet implemented (target for W2.3)"
+
+.PHONY: data-refresh-experiment-small
+data-refresh-experiment-small: ## Run incremental-vs-recompute experiment (small)
+	@echo "→ data-refresh-experiment-small: not yet implemented (target for W2.4)"
+
+.PHONY: test-data
+test-data: ## Run data-layer tests
+	@echo "→ test-data: not yet implemented (target for W1.5)"
+
+# ---- Systems ----------------------------------------------
+.PHONY: systems-replay-sample
+systems-replay-sample: ## Replay historical sample through ingestion
+	@echo "→ systems-replay-sample: not yet implemented (target for W1.4)"
+
+.PHONY: systems-benchmark-small
+systems-benchmark-small: ## Run spatiotemporal index benchmark (small)
+	@echo "→ systems-benchmark-small: not yet implemented (target for W2.1)"
+
+.PHONY: test-systems
+test-systems: ## Run systems-layer tests
+	@echo "→ test-systems: not yet implemented (target for W1.4)"
+
+# ---- ML ---------------------------------------------------
+.PHONY: ml-baseline-small
+ml-baseline-small: ## Reproduce ML baseline on sample data
+	@echo "→ ml-baseline-small: not yet implemented (target for W2.5)"
+
+.PHONY: ml-serve-smoke
+ml-serve-smoke: ## Start serving endpoint and run smoke test
+	@echo "→ ml-serve-smoke: not yet implemented (target for W2.6)"
+
+# ---- AI ---------------------------------------------------
+.PHONY: ai-eval-fixtures
+ai-eval-fixtures: ## Validate AI golden question set and fixtures
+	@echo "→ ai-eval-fixtures: not yet implemented (target for W3.1)"
+
+.PHONY: ai-eval-small
+ai-eval-small: ## Run AI eval harness on small golden set
+	@echo "→ ai-eval-small: not yet implemented (target for W3.2)"
+
+.PHONY: ai-compare-small
+ai-compare-small: ## Compare AI answer strategies on golden set
+	@echo "→ ai-compare-small: not yet implemented (target for W3.3)"
+
+# ---- Cross-cutting ----------------------------------------
+.PHONY: smoke
+smoke: ## Run cross-layer smoke test (all layers, bounded data)
+	@echo "→ smoke: not yet implemented (target for W3.4)"
+
+.PHONY: docs-check
+docs-check: ## Lint / check documentation
+	@echo "→ docs-check: not yet implemented (target for W3.5)"
+
+.PHONY: clean
+clean: ## Remove generated local outputs (not source)
+	rm -rf $(DATA_RAW) $(DATA_INTERIM) $(DATA_PROCESSED) $(OUTPUTS) $(ARTIFACTS)
+	@echo "✓ Generated output directories removed."
