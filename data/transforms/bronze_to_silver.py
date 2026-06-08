@@ -17,16 +17,38 @@ This is the local development version. Production would run as a
 Databricks/Spark job or dbt model.
 """
 
+import h3
 import json
 import logging
-import sys
-import time
-from pathlib import Path
-
-import h3
+import math
 import pygeohash
+import time
+from dataclasses import dataclass, asdict
+from pathlib import Path
+from typing import Any
+
+# JSON schema validators (optional but recommended if jsonschema is installed)
+try:
+    import jsonschema
+    HAS_JSONSCHEMA = True
+except ImportError:
+    HAS_JSONSCHEMA = False
 
 logger = logging.getLogger(__name__)
+
+def haversine_dist_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    R = 6371.0 # Earth radius in km
+    phi1, phi2 = math.radians(lat1), math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlambda = math.radians(lon2 - lon1)
+    a = math.sin(dphi / 2)**2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2)**2
+    return 2 * R * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+def load_airports_reference(ref_path: Path) -> list[dict]:
+    if not ref_path.exists():
+        return []
+    with open(ref_path) as f:
+        return json.load(f)
 
 # Resolve project root
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -116,7 +138,7 @@ def transform_record(record: dict) -> dict | None:
         # --- Derived fields ---
         "geohash7": geohash7,
         "h3_r7": h3_r7,
-        # --- Enrichment stubs (will be populated when reference joins are added) ---
+        # --- Enrichment stubs ---
         "nearest_airport": None,
         "metar_wind_kt": None,
         "metar_vis_m": None,
@@ -146,12 +168,14 @@ def run_transform(
 
     # Optional: use jsonschema for full contract validation
     validator = None
-    if validate:
-        try:
-            import jsonschema
-            validator = jsonschema.Draft202012Validator(schema)
-        except ImportError:
-            logger.warning("jsonschema not installed — skipping full contract validation")
+    if validate and HAS_JSONSCHEMA:
+        validator = jsonschema.Draft202012Validator(schema)
+    elif validate:
+        logger.warning("jsonschema not installed — skipping full contract validation")
+
+    # Load airports reference
+    airports_ref_path = input_path.parent.parent / "reference" / "airports.json"
+    airports = load_airports_reference(airports_ref_path)
 
     seen_keys: set[str] = set()
     total_read = 0
@@ -188,6 +212,19 @@ def run_transform(
             if silver is None:
                 total_dropped += 1
                 continue
+
+            # Spatial Enrichment: Nearest Airport
+            if airports:
+                closest_dist = float("inf")
+                closest_icao = None
+                for ap in airports:
+                    dist = haversine_dist_km(silver["lat"], silver["lon"], ap["lat"], ap["lon"])
+                    if dist < closest_dist:
+                        closest_dist = dist
+                        closest_icao = ap["icao"]
+                # Only associate if within 50km
+                if closest_dist <= 50.0:
+                    silver["nearest_airport"] = closest_icao
 
             # Contract validation
             if validator:

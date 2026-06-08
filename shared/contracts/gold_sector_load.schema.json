@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gold_sector_load.schema.json",
+  "title": "gold_sector_load",
+  "description": "Sector load density metrics. Aggregates distinct aircraft counts within H3 resolution 4 hexes across time windows.",
+  "type": "object",
+  "properties": {
+    "h3_r4": {
+      "type": "string",
+      "description": "H3 resolution 4 cell index"
+    },
+    "window_start": {
+      "type": "string",
+      "description": "Start of aggregation window (ISO 8601)",
+      "format": "date-time"
+    },
+    "window_end": {
+      "type": "string",
+      "description": "End of aggregation window (ISO 8601)",
+      "format": "date-time"
+    },
+    "aircraft_count": {
+      "type": "integer",
+      "description": "Number of distinct aircraft present in this sector during the window",
+      "minimum": 0
+    }
+  },
+  "required": [
+    "h3_r4",
+    "window_start",
+    "window_end",
+    "aircraft_count"
+  ],
+  "additionalProperties": false,
+  "_contract_version": "1.0.0"
+}

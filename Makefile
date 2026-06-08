@@ -57,12 +57,12 @@ data-sample-verify: ## Verify sample data against manifest checksums
 	$(PYTHON) data/scripts/bootstrap.py --verify
 
 .PHONY: data-local-silver
-data-local-silver: systems-replay-sample ## Run local bronze → silver transform on sample data
+data-local-silver: systems-replay-sample ## Transform local bronze landing to silver
 	$(PYTHON) -m data.transforms.cli --input data/interim/landing.jsonl
 
 .PHONY: data-local-gold
-data-local-gold: ## Run local silver → gold transform on sample data
-	@echo "→ data-local-gold: not yet implemented (target for W2.3)"
+data-local-gold: data-local-silver ## Transform local silver to gold aggregates
+	$(PYTHON) -m data.transforms.cli_gold --input data/processed/silver_flight_state.jsonl
 
 .PHONY: data-refresh-experiment-small
 data-refresh-experiment-small: ## Run incremental-vs-recompute experiment (small)

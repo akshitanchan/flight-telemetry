@@ -1,0 +1,26 @@
+[
+  {
+    "icao": "EHAM",
+    "name": "Amsterdam Airport Schiphol",
+    "lat": 52.3086,
+    "lon": 4.7639
+  },
+  {
+    "icao": "EDDF",
+    "name": "Frankfurt Airport",
+    "lat": 50.0333,
+    "lon": 8.5706
+  },
+  {
+    "icao": "EGLL",
+    "name": "London Heathrow Airport",
+    "lat": 51.4700,
+    "lon": -0.4543
+  },
+  {
+    "icao": "LFPG",
+    "name": "Charles de Gaulle Airport",
+    "lat": 49.0097,
+    "lon": 2.5479
+  }
+]

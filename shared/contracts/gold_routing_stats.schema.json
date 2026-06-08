@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gold_routing_stats.schema.json",
+  "title": "gold_routing_stats",
+  "description": "Route-level aggregates per aircraft over the observed window.",
+  "type": "object",
+  "properties": {
+    "icao24": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{6}$"
+    },
+    "callsign": {
+      "type": ["string", "null"]
+    },
+    "window_start": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "window_end": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "origin_lat": {
+      "type": "number",
+      "minimum": -90.0,
+      "maximum": 90.0
+    },
+    "origin_lon": {
+      "type": "number",
+      "minimum": -180.0,
+      "maximum": 180.0
+    },
+    "destination_lat": {
+      "type": "number",
+      "minimum": -90.0,
+      "maximum": 90.0
+    },
+    "destination_lon": {
+      "type": "number",
+      "minimum": -180.0,
+      "maximum": 180.0
+    },
+    "max_altitude_m": {
+      "type": ["number", "null"]
+    },
+    "avg_velocity_mps": {
+      "type": ["number", "null"]
+    },
+    "ping_count": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "required": [
+    "icao24",
+    "window_start",
+    "window_end",
+    "origin_lat",
+    "origin_lon",
+    "destination_lat",
+    "destination_lon",
+    "ping_count"
+  ],
+  "additionalProperties": false,
+  "_contract_version": "1.0.0"
+}
