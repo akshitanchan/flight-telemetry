@@ -1,0 +1,12 @@
+[
+  {
+    "_description": "Valid congestion record for Schiphol",
+    "airport_icao": "EHAM",
+    "window_start": "2024-06-03T14:00:00Z",
+    "window_end": "2024-06-03T15:00:00Z",
+    "aircraft_count": 42,
+    "avg_altitude_m": 3200.5,
+    "ground_count": 12,
+    "airborne_count": 30
+  }
+]

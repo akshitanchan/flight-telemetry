@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gold_airport_congestion.schema.json",
+  "title": "gold_airport_congestion",
+  "description": "Airport congestion aggregated per time window. Counts aircraft near each airport within configurable windows.",
+  "type": "object",
+  "properties": {
+    "airport_icao": {
+      "type": "string",
+      "description": "ICAO code of the airport"
+    },
+    "window_start": {
+      "type": "string",
+      "description": "Start of aggregation window (ISO 8601)",
+      "format": "date-time"
+    },
+    "window_end": {
+      "type": "string",
+      "description": "End of aggregation window (ISO 8601)",
+      "format": "date-time"
+    },
+    "aircraft_count": {
+      "type": "integer",
+      "description": "Number of distinct aircraft in the window",
+      "minimum": 0
+    },
+    "avg_altitude_m": {
+      "type": ["number", "null"],
+      "description": "Mean barometric altitude in metres within the window"
+    },
+    "ground_count": {
+      "type": "integer",
+      "description": "Number of aircraft on ground",
+      "minimum": 0
+    },
+    "airborne_count": {
+      "type": "integer",
+      "description": "Number of aircraft airborne",
+      "minimum": 0
+    }
+  },
+  "required": [
+    "airport_icao",
+    "window_start",
+    "window_end",
+    "aircraft_count",
+    "ground_count",
+    "airborne_count"
+  ],
+  "additionalProperties": false,
+  "_contract_version": "1.0.0"
+}

@@ -1,0 +1,88 @@
+[
+  {
+    "_description": "INVALID — icao24 too short (5 chars instead of 6)",
+    "icao24": "4b180",
+    "event_ts": "2024-06-03T14:30:05Z",
+    "lon": 4.7638,
+    "lat": 52.3080,
+    "on_ground": false,
+    "origin_country": "Switzerland",
+    "geohash7": "u173zq6",
+    "h3_r7": "872830b2fffffff",
+    "_expected_error": "icao24 pattern"
+  },
+  {
+    "_description": "INVALID — lat out of range (>90)",
+    "icao24": "4b1806",
+    "event_ts": "2024-06-03T14:30:05Z",
+    "lon": 4.7638,
+    "lat": 95.0,
+    "on_ground": false,
+    "origin_country": "Switzerland",
+    "geohash7": "u173zq6",
+    "h3_r7": "872830b2fffffff",
+    "_expected_error": "lat maximum"
+  },
+  {
+    "_description": "INVALID — lon out of range (<-180)",
+    "icao24": "4b1806",
+    "event_ts": "2024-06-03T14:30:05Z",
+    "lon": -200.0,
+    "lat": 52.3080,
+    "on_ground": false,
+    "origin_country": "Switzerland",
+    "geohash7": "u173zq6",
+    "h3_r7": "872830b2fffffff",
+    "_expected_error": "lon minimum"
+  },
+  {
+    "_description": "INVALID — missing required field (icao24)",
+    "event_ts": "2024-06-03T14:30:05Z",
+    "lon": 4.7638,
+    "lat": 52.3080,
+    "on_ground": false,
+    "origin_country": "Switzerland",
+    "geohash7": "u173zq6",
+    "h3_r7": "872830b2fffffff",
+    "_expected_error": "required icao24"
+  },
+  {
+    "_description": "INVALID — velocity_ms is negative",
+    "icao24": "4b1806",
+    "event_ts": "2024-06-03T14:30:05Z",
+    "lon": 4.7638,
+    "lat": 52.3080,
+    "velocity_ms": -10.0,
+    "on_ground": false,
+    "origin_country": "Switzerland",
+    "geohash7": "u173zq6",
+    "h3_r7": "872830b2fffffff",
+    "_expected_error": "velocity_ms minimum"
+  },
+  {
+    "_description": "INVALID — squawk has invalid digit (8 is not octal)",
+    "icao24": "4b1806",
+    "event_ts": "2024-06-03T14:30:05Z",
+    "lon": 4.7638,
+    "lat": 52.3080,
+    "on_ground": false,
+    "squawk": "8000",
+    "origin_country": "Switzerland",
+    "geohash7": "u173zq6",
+    "h3_r7": "872830b2fffffff",
+    "_expected_error": "squawk pattern"
+  },
+  {
+    "_description": "INVALID — extra unknown field not in contract",
+    "icao24": "4b1806",
+    "event_ts": "2024-06-03T14:30:05Z",
+    "lon": 4.7638,
+    "lat": 52.3080,
+    "on_ground": false,
+    "origin_country": "Switzerland",
+    "geohash7": "u173zq6",
+    "h3_r7": "872830b2fffffff",
+    "not_in_schema": 42,
+    "_expected_error": "additionalProperties"
+  }
+]

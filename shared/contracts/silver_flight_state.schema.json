@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "silver_flight_state.schema.json",
+  "title": "silver_flight_state",
+  "description": "Canonical record for every downstream layer. Cleaned, deduped, type-cast state vector joined with nearest-airport METAR and OurAirports reference data.",
+  "type": "object",
+  "properties": {
+    "icao24": {
+      "type": "string",
+      "description": "24-bit transponder hex id",
+      "pattern": "^[0-9a-f]{6}$"
+    },
+    "callsign": {
+      "type": ["string", "null"],
+      "description": "Flight callsign (nullable)"
+    },
+    "event_ts": {
+      "type": "string",
+      "description": "5-second-resolution observation time (ISO 8601)",
+      "format": "date-time"
+    },
+    "lon": {
+      "type": "number",
+      "description": "Longitude in degrees",
+      "minimum": -180,
+      "maximum": 180
+    },
+    "lat": {
+      "type": "number",
+      "description": "Latitude in degrees",
+      "minimum": -90,
+      "maximum": 90
+    },
+    "baro_altitude_m": {
+      "type": ["number", "null"],
+      "description": "Barometric altitude in metres"
+    },
+    "velocity_ms": {
+      "type": ["number", "null"],
+      "description": "Ground speed in m/s",
+      "minimum": 0
+    },
+    "true_track_deg": {
+      "type": ["number", "null"],
+      "description": "True track angle in degrees clockwise from north",
+      "minimum": 0,
+      "maximum": 360
+    },
+    "vertical_rate_ms": {
+      "type": ["number", "null"],
+      "description": "Vertical rate in m/s (positive = climbing)"
+    },
+    "on_ground": {
+      "type": "boolean",
+      "description": "Whether the aircraft is on the ground"
+    },
+    "squawk": {
+      "type": ["string", "null"],
+      "description": "Transponder squawk code (includes emergency codes 7500/7600/7700)",
+      "pattern": "^[0-7]{4}$"
+    },
+    "origin_country": {
+      "type": "string",
+      "description": "Country of aircraft registration"
+    },
+    "nearest_airport": {
+      "type": ["string", "null"],
+      "description": "ICAO code of nearest airport (joined from OurAirports)"
+    },
+    "geohash7": {
+      "type": "string",
+      "description": "Precomputed 7-character geohash for spatial indexing",
+      "pattern": "^[0-9b-hjkmnp-z]{7}$"
+    },
+    "h3_r7": {
+      "type": "string",
+      "description": "Precomputed H3 cell at resolution 7",
+      "pattern": "^[0-9a-f]{15}$"
+    },
+    "metar_wind_kt": {
+      "type": ["number", "null"],
+      "description": "Nearest-airport METAR wind speed in knots",
+      "minimum": 0
+    },
+    "metar_vis_m": {
+      "type": ["number", "null"],
+      "description": "Nearest-airport METAR visibility in metres",
+      "minimum": 0
+    },
+    "metar_ceiling_ft": {
+      "type": ["number", "null"],
+      "description": "Nearest-airport METAR ceiling in feet",
+      "minimum": 0
+    }
+  },
+  "required": [
+    "icao24",
+    "event_ts",
+    "lon",
+    "lat",
+    "on_ground",
+    "origin_country",
+    "geohash7",
+    "h3_r7"
+  ],
+  "additionalProperties": false,
+  "_contract_version": "1.0.0",
+  "_contract_notes": "Fields marked nullable in the plan use [type, null] unions. Required fields are the minimum set needed for spatial queries and dedup."
+}

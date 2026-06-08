@@ -7,6 +7,9 @@
 .DEFAULT_GOAL := help
 SHELL := /bin/bash
 
+# Use project venv if available, else system python3
+PYTHON := $(shell if [ -x .venv/bin/python3 ]; then echo .venv/bin/python3; else echo python3; fi)
+
 # ---- Directories (generated outputs — gitignored) ---------
 DATA_RAW     := data/raw
 DATA_INTERIM := data/interim
@@ -42,7 +45,7 @@ check-env: ## Verify .env exists (does not validate contents)
 # ---- Contracts / Schemas ----------------------------------
 .PHONY: test-contracts
 test-contracts: ## Validate shared schemas and fixtures
-	@echo "→ test-contracts: not yet implemented (target for W1.2)"
+	$(PYTHON) shared/contracts/validate_schemas.py --verbose
 
 # ---- Data -------------------------------------------------
 .PHONY: data-sample

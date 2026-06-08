@@ -1,0 +1,15 @@
+[
+  {
+    "_description": "Valid emergency event — 7700 over Frankfurt",
+    "icao24": "3c6751",
+    "callsign": "DLH42N",
+    "squawk": "7700",
+    "first_seen_ts": "2024-06-03T15:00:00Z",
+    "last_seen_ts": "2024-06-03T15:12:30Z",
+    "lat": 50.0379,
+    "lon": 8.5706,
+    "origin_country": "Germany",
+    "nearest_airport": "EDDF",
+    "duration_s": 750
+  }
+]
