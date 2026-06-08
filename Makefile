@@ -74,8 +74,8 @@ test-data: ## Run data-layer tests
 
 # ---- Systems ----------------------------------------------
 .PHONY: systems-replay-sample
-systems-replay-sample: ## Replay historical sample through ingestion
-	@echo "→ systems-replay-sample: not yet implemented (target for W1.4)"
+systems-replay-sample: data-sample ## Replay historical sample through ingestion
+	$(PYTHON) -m systems.replay.cli --input data/raw/sample_state_vectors.jsonl
 
 .PHONY: systems-benchmark-small
 systems-benchmark-small: ## Run spatiotemporal index benchmark (small)
@@ -83,7 +83,7 @@ systems-benchmark-small: ## Run spatiotemporal index benchmark (small)
 
 .PHONY: test-systems
 test-systems: ## Run systems-layer tests
-	@echo "→ test-systems: not yet implemented (target for W1.4)"
+	$(PYTHON) -m pytest systems/tests/ -v 2>/dev/null || $(PYTHON) -m unittest discover -s systems/tests -v
 
 # ---- ML ---------------------------------------------------
 .PHONY: ml-baseline-small
