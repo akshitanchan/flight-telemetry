@@ -3,3 +3,7 @@
 
 # Schema validation
 jsonschema>=4.20
+
+# Spatial indexing (bronze-to-silver transform)
+h3>=4.0
+pygeohash>=3.0

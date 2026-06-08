@@ -57,8 +57,8 @@ data-sample-verify: ## Verify sample data against manifest checksums
 	$(PYTHON) data/scripts/bootstrap.py --verify
 
 .PHONY: data-local-silver
-data-local-silver: ## Run local bronze → silver transform on sample data
-	@echo "→ data-local-silver: not yet implemented (target for W1.5)"
+data-local-silver: systems-replay-sample ## Run local bronze → silver transform on sample data
+	$(PYTHON) -m data.transforms.cli --input data/interim/landing.jsonl
 
 .PHONY: data-local-gold
 data-local-gold: ## Run local silver → gold transform on sample data
@@ -70,7 +70,7 @@ data-refresh-experiment-small: ## Run incremental-vs-recompute experiment (small
 
 .PHONY: test-data
 test-data: ## Run data-layer tests
-	@echo "→ test-data: not yet implemented (target for W1.5)"
+	$(PYTHON) -m pytest data/tests/ -v 2>/dev/null || $(PYTHON) -m unittest discover -s data/tests -v
 
 # ---- Systems ----------------------------------------------
 .PHONY: systems-replay-sample
