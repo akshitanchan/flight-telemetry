@@ -78,8 +78,8 @@ systems-replay-sample: data-sample ## Replay historical sample through ingestion
 	$(PYTHON) -m systems.replay.cli --input data/raw/sample_state_vectors.jsonl
 
 .PHONY: systems-benchmark-small
-systems-benchmark-small: ## Run spatiotemporal index benchmark (small)
-	@echo "→ systems-benchmark-small: not yet implemented (target for W2.1)"
+systems-benchmark-small: data-local-silver ## Run spatiotemporal index benchmark (small)
+	$(PYTHON) -m systems.index.cli --input data/processed/silver_flight_state.jsonl --queries 200 --profile regional
 
 .PHONY: test-systems
 test-systems: ## Run systems-layer tests
