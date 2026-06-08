@@ -49,8 +49,12 @@ test-contracts: ## Validate shared schemas and fixtures
 
 # ---- Data -------------------------------------------------
 .PHONY: data-sample
-data-sample: ## Download / generate a tiny development data subset
-	@echo "→ data-sample: not yet implemented (target for W1.3)"
+data-sample: setup ## Download / generate a tiny development data subset
+	$(PYTHON) data/scripts/bootstrap.py --mode sample
+
+.PHONY: data-sample-verify
+data-sample-verify: ## Verify sample data against manifest checksums
+	$(PYTHON) data/scripts/bootstrap.py --verify
 
 .PHONY: data-local-silver
 data-local-silver: ## Run local bronze → silver transform on sample data
