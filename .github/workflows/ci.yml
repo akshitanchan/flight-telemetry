@@ -1,8 +1,9 @@
 # ===========================================================
 # Flight Telemetry Platform — CI
 # ===========================================================
-# Basic GitHub Actions workflow for lint and smoke checks.
-# Expand per-layer as implementation lands.
+# Runs the per-layer test suites, the documentation link check, and the
+# offline cross-layer smoke test. The Ollama LLM strategy is not available in
+# CI, so the AI smoke uses only the deterministic/offline path.
 
 name: CI
 
@@ -13,28 +14,38 @@ on:
     branches: [main]
 
 jobs:
-  lint-and-smoke:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Verify scaffold
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
         run: |
-          echo "--- Checking required files ---"
-          test -f .env.example   && echo "✓ .env.example"
-          test -f Makefile       && echo "✓ Makefile"
-          test -f README.md      && echo "✓ README.md"
-          test -d docs           && echo "✓ docs/"
-          test -d shared/contracts && echo "✓ shared/contracts/"
-          test -d systems        && echo "✓ systems/"
-          test -d data           && echo "✓ data/"
-          test -d ml             && echo "✓ ml/"
-          test -d ai             && echo "✓ ai/"
-          test -d infra          && echo "✓ infra/"
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Make help
-        run: make help
+      - name: Create output directories
+        run: make setup
 
-      # Future: add per-layer test jobs as implementation lands
-      # - name: Test contracts
-      #   run: make test-contracts
+      - name: Contracts
+        run: make test-contracts
+
+      - name: Systems tests
+        run: make test-systems
+
+      - name: Data tests
+        run: make test-data
+
+      - name: AI tests
+        run: make test-ai
+
+      - name: Docs check
+        run: make docs-check
+
+      - name: Cross-layer smoke (offline)
+        run: make smoke

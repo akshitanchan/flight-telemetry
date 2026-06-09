@@ -121,8 +121,8 @@ smoke: ## Run cross-layer smoke test (all layers, bounded data, offline)
 	$(PYTHON) scripts/smoke.py
 
 .PHONY: docs-check
-docs-check: ## Lint / check documentation
-	@echo "→ docs-check: not yet implemented (target for W3.5)"
+docs-check: ## Check docs for broken intra-repo links
+	$(PYTHON) scripts/docs_check.py
 
 .PHONY: clean
 clean: ## Remove generated local outputs (not source)

@@ -44,6 +44,17 @@ def haversine_dist_km(lat1: float, lon1: float, lat2: float, lon2: float) -> flo
     a = math.sin(dphi / 2)**2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2)**2
     return 2 * R * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
+def nearest_airport(lat: float, lon: float, airports: list[dict], max_km: float = 50.0) -> str | None:
+    """Return the ICAO of the nearest reference airport within max_km, else None."""
+    closest_dist = float("inf")
+    closest_icao = None
+    for ap in airports:
+        dist = haversine_dist_km(lat, lon, ap["lat"], ap["lon"])
+        if dist < closest_dist:
+            closest_dist = dist
+            closest_icao = ap["icao"]
+    return closest_icao if closest_dist <= max_km else None
+
 def load_airports_reference(ref_path: Path) -> list[dict]:
     if not ref_path.exists():
         return []
@@ -222,18 +233,10 @@ def run_transform(
                 total_dropped += 1
                 continue
 
-            # Spatial Enrichment: Nearest Airport
+            # Spatial Enrichment: Nearest Airport (within 50 km)
             if airports:
-                closest_dist = float("inf")
-                closest_icao = None
-                for ap in airports:
-                    dist = haversine_dist_km(silver["lat"], silver["lon"], ap["lat"], ap["lon"])
-                    if dist < closest_dist:
-                        closest_dist = dist
-                        closest_icao = ap["icao"]
-                # Only associate if within 50km
-                if closest_dist <= 50.0:
-                    silver["nearest_airport"] = closest_icao
+                silver["nearest_airport"] = nearest_airport(
+                    silver["lat"], silver["lon"], airports)
 
             # Contract validation
             if validator:

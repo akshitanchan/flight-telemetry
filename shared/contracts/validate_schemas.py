@@ -49,6 +49,16 @@ SCHEMA_FIXTURE_MAP = [
         "gold_emergency_events_valid.json",
         None,
     ),
+    (
+        "gold_sector_load.schema.json",
+        "gold_sector_load_valid.json",
+        None,
+    ),
+    (
+        "gold_routing_stats.schema.json",
+        "gold_routing_stats_valid.json",
+        None,
+    ),
 ]
 
 

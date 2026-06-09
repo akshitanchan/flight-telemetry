@@ -9,7 +9,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-from data.transforms.bronze_to_silver import transform_record, run_transform
+from data.transforms.bronze_to_silver import (
+    transform_record, run_transform, nearest_airport, HAS_JSONSCHEMA,
+)
 
 
 class TestTransformRecord(unittest.TestCase):
@@ -265,6 +267,38 @@ class TestRunTransform(unittest.TestCase):
             self.assertEqual(summary["records_read"], 2)
             self.assertEqual(summary["records_written"], 1)
             self.assertEqual(summary["records_dropped"], 1)
+        finally:
+            input_path.unlink(missing_ok=True)
+            output_path.unlink(missing_ok=True)
+
+
+class TestEnrichmentAndValidation(unittest.TestCase):
+    """Nearest-airport enrichment, jsonschema availability, and empty input (M19/M20)."""
+
+    def test_nearest_airport_within_radius(self):
+        airports = [
+            {"icao": "EHAM", "lat": 52.3086, "lon": 4.7639},
+            {"icao": "EDDF", "lat": 50.0333, "lon": 8.5706},
+        ]
+        self.assertEqual(nearest_airport(52.31, 4.76, airports), "EHAM")
+
+    def test_nearest_airport_outside_radius(self):
+        airports = [{"icao": "EHAM", "lat": 52.3086, "lon": 4.7639}]
+        self.assertIsNone(nearest_airport(0.0, 0.0, airports))  # thousands of km away
+
+    def test_jsonschema_available(self):
+        # Guards against contract validation being silently skipped (M20).
+        self.assertTrue(HAS_JSONSCHEMA,
+                        "jsonschema must be installed so transform validation runs")
+
+    def test_run_transform_empty_input(self):
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".jsonl", delete=False) as fin:
+            input_path = Path(fin.name)
+        output_path = Path(tempfile.mktemp(suffix=".jsonl"))
+        try:
+            summary = run_transform(input_path, output_path, validate=True)
+            self.assertEqual(summary["records_read"], 0)
+            self.assertEqual(summary["records_written"], 0)
         finally:
             input_path.unlink(missing_ok=True)
             output_path.unlink(missing_ok=True)

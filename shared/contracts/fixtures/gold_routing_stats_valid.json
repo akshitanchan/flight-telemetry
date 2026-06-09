@@ -1,0 +1,30 @@
+[
+  {
+    "_description": "tracked flight with callsign",
+    "icao24": "3c6751",
+    "callsign": "DLH42N",
+    "window_start": "2024-06-03T12:00:00+00:00",
+    "window_end": "2024-06-03T12:00:40+00:00",
+    "origin_lat": 49.535431,
+    "origin_lon": 6.033023,
+    "destination_lat": 49.6,
+    "destination_lon": 6.1,
+    "max_altitude_m": 11574.0,
+    "avg_velocity_mps": 236.32,
+    "ping_count": 5
+  },
+  {
+    "_description": "tracked flight with null callsign and null altitude",
+    "icao24": "30014c",
+    "callsign": null,
+    "window_start": "2024-06-03T12:00:00+00:00",
+    "window_end": "2024-06-03T12:00:40+00:00",
+    "origin_lat": 46.886562,
+    "origin_lon": 17.485017,
+    "destination_lat": 46.9,
+    "destination_lon": 17.5,
+    "max_altitude_m": null,
+    "avg_velocity_mps": null,
+    "ping_count": 3
+  }
+]

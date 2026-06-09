@@ -190,5 +190,22 @@ class TestSilverToGold(unittest.TestCase):
         self.assertEqual(routes[0]["callsign"], "ABC123")
         self.assertEqual(routes[0]["ping_count"], 2)
 
+    def test_empty_input(self):
+        """All gold aggregates return empty lists on empty input (M19)."""
+        self.assertEqual(aggregate_emergency_events([]), [])
+        self.assertEqual(aggregate_sector_load([]), [])
+        self.assertEqual(aggregate_airport_congestion([]), [])
+        self.assertEqual(aggregate_routing_stats([]), [])
+
+    def test_sector_load_cross_window_boundary(self):
+        """Same cell across a 5-minute boundary yields two sector rows (M19)."""
+        recs = [
+            {"icao24": "111111", "h3_r7": "8719694b5ffffff", "event_ts": "2024-06-03T12:04:59+00:00"},
+            {"icao24": "111111", "h3_r7": "8719694b5ffffff", "event_ts": "2024-06-03T12:05:00+00:00"},
+        ]
+        sectors = aggregate_sector_load(recs)
+        self.assertEqual(len(sectors), 2)
+        self.assertEqual({s["aircraft_count"] for s in sectors}, {1})
+
 if __name__ == "__main__":
     unittest.main()

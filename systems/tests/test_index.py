@@ -185,5 +185,27 @@ class TestBenchmark(unittest.TestCase):
         self.assertEqual(result.num_queries, 7)
 
 
+class TestIndexEdgeCases(unittest.TestCase):
+    def _query(self):
+        return SpatiotemporalQuery(
+            bbox=BBox(0.0, 1.0, 0.0, 1.0),
+            time_window=TimeWindow("2024-06-03T11:00:00+00:00", "2024-06-03T13:00:00+00:00"))
+
+    def test_empty_records(self):
+        for index in (GeohashPrefixIndex(prefix_precision=3), H3Index(resolution=4)):
+            index.build([])
+            self.assertEqual(index.stats()["record_count"], 0)
+            self.assertEqual(index.query(self._query()), [])
+
+    def test_missing_spatial_fields_skipped(self):
+        recs = [{"icao24": "111111", "event_ts": "2024-06-03T12:00:00+00:00"}]  # no geohash7/h3_r7
+        g = GeohashPrefixIndex(prefix_precision=3)
+        g.build(recs)
+        self.assertEqual(g.stats()["record_count"], 0)
+        h = H3Index(resolution=4)
+        h.build(recs)
+        self.assertEqual(h.stats()["record_count"], 0)
+
+
 if __name__ == "__main__":
     unittest.main()
