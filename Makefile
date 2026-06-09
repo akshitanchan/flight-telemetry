@@ -108,8 +108,8 @@ test-ai: ## Run AI-layer tests
 	$(PYTHON) -m pytest ai/tests/ -v 2>/dev/null || $(PYTHON) -m unittest discover -s ai/tests -v
 
 .PHONY: ai-eval-small
-ai-eval-small: ## Run AI eval harness on small golden set
-	@echo "→ ai-eval-small: not yet implemented (target for W3.2)"
+ai-eval-small: ## Run AI answer-path eval on the golden set (deterministic, offline)
+	$(PYTHON) -m ai.eval.run_answers
 
 .PHONY: ai-compare-small
 ai-compare-small: ## Compare AI answer strategies on golden set
