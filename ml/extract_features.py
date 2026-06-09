@@ -10,7 +10,7 @@ from tqdm import tqdm
 logging.basicConfig(level=logging.INFO, format="%(asctime)s INFO  [%(name)s] %(message)s")
 logger = logging.getLogger("ml.extract")
 
-def extract_features(data_dir: str, split: str = "train"):
+def extract_features(data_dir: str, split: str = "train", limit: int | None = None):
     """
     Extracts features for all fuel intervals by iterating through the zip file exactly once.
     Saves a flat features_{split}.parquet file to speed up PyTorch training.
@@ -32,15 +32,19 @@ def extract_features(data_dir: str, split: str = "train"):
     
     logger.info(f"Extracting features from {zip_path}")
     with zipfile.ZipFile(zip_path, 'r') as zf:
-        # Get list of all parquets in the zip
-        zip_files = set(zf.namelist())
-        
-        # We iterate over the distinct flights that have fuel labels
-        for flight_id, group in tqdm(flight_intervals, desc="Processing flights"):
-            parquet_filename = f"{flight_id}.parquet"
-            
-            if parquet_filename not in zip_files:
-                # Flight missing from zip, skip or yield zeros
+        # Map flight_id -> zip entry by filename stem, so this works whether the
+        # archive stores entries flat ("<id>.parquet", the mock) or nested under a
+        # prefix ("flights_train/<id>.parquet", the real PRC dataset).
+        zip_map = {Path(n).stem: n for n in zf.namelist() if n.endswith(".parquet")}
+
+        # We iterate over the distinct flights that have fuel labels.
+        for i, (flight_id, group) in enumerate(tqdm(flight_intervals, desc="Processing flights")):
+            if limit is not None and i >= limit:
+                break
+
+            entry = zip_map.get(str(flight_id))
+            if entry is None:
+                # Flight missing from zip — emit zero-features so the label is kept.
                 for _, row in group.iterrows():
                     extracted_features.append({
                         "idx": row["idx"],
@@ -52,9 +56,9 @@ def extract_features(data_dir: str, split: str = "train"):
                         "fuel_kg": row["fuel_kg"]
                     })
                 continue
-                
+
             # Read trajectory once
-            with zf.open(parquet_filename) as f:
+            with zf.open(entry) as f:
                 df_traj = pd.read_parquet(io.BytesIO(f.read()))
                 
             df_traj['timestamp'] = pd.to_datetime(df_traj['timestamp'])
@@ -78,6 +82,7 @@ def extract_features(data_dir: str, split: str = "train"):
                     avg_speed = float(df_interval['groundspeed'].mean())
                     max_vrate = float(df_interval['vertical_rate'].abs().max())
                     
+                    if np.isnan(alt_change): alt_change = 0.0
                     if np.isnan(avg_speed): avg_speed = 0.0
                     if np.isnan(max_vrate): max_vrate = 0.0
                     
@@ -101,6 +106,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-dir", type=str, required=True)
     parser.add_argument("--split", type=str, default="train")
+    parser.add_argument("--limit", type=int, default=None,
+                        help="Process at most N flights (bounded run on the full dataset)")
     args = parser.parse_args()
 
     if args.data_dir == "data/ml/prc_2025_mock" and not Path(args.data_dir).exists():
@@ -110,4 +117,4 @@ if __name__ == "__main__":
         logger.info(f"Generating mock dataset in {args.data_dir}...")
         generate_mock_eurocontrol_data(args.data_dir, num_flights=20)
 
-    extract_features(args.data_dir, args.split)
+    extract_features(args.data_dir, args.split, limit=args.limit)

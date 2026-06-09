@@ -10,6 +10,10 @@ SHELL := /bin/bash
 # Use project venv if available, else system python3
 PYTHON := $(shell if [ -x .venv/bin/python3 ]; then echo .venv/bin/python3; else echo python3; fi)
 
+# ---- Tunables (override on CLI, e.g. `make ml-baseline-real LIMIT=1000 EPOCHS=15`) ----
+LIMIT ?= 500
+EPOCHS ?= 10
+
 # ---- Directories (generated outputs — gitignored) ---------
 DATA_RAW     := data/raw
 DATA_INTERIM := data/interim
@@ -93,6 +97,11 @@ ml-extract-features: ## Precompute trajectory features from zipped parquets
 .PHONY: ml-baseline-small
 ml-baseline-small: ml-extract-features ## Reproduce ML baseline on mock data
 	$(PYTHON) -m ml.train --data-dir data/ml/prc_2025_mock --epochs 5
+
+.PHONY: ml-baseline-real
+ml-baseline-real: ## Train the baseline on the REAL PRC 2025 data (bounded: LIMIT flights, EPOCHS epochs)
+	$(PYTHON) -m ml.extract_features --data-dir data/raw/prc_2025 --split train --limit $(LIMIT)
+	$(PYTHON) -m ml.train --data-dir data/raw/prc_2025 --epochs $(EPOCHS)
 
 .PHONY: ml-serve-smoke
 ml-serve-smoke: ## Start serving endpoint and run smoke test

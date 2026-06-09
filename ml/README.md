@@ -8,18 +8,20 @@ logging, and a serving endpoint with latency logging.
 
 | Item | Result |
 |---|---|
-| Baseline val RMSE | **369 kg** *(on mock PRC-shaped data — sanity only, not the published benchmark)* |
-| Training | reproducible: 152 mock intervals, 5 epochs, MLflow-tracked (best, not final, model logged) |
+| Baseline val RMSE (real data) | **~395 kg** *(real PRC-2025 fuel labels; bounded 500-flight subset, 5,508 intervals)* |
+| Training | reproducible + seeded; MLflow-tracked (best, not final, model logged) |
 | Serving smoke | **2/2** (health + fake-mode prediction bounds) |
 
 > The model targets the **Eurocontrol PRC-2025 fuel-burn challenge** (published RMSE leaderboard).
-> The real ~3.1 GB dataset is present in `data/raw/prc_2025/` (gitignored); the pipeline is not yet
-> pointed at it, so the published-baseline comparison is **pending** (ADR-0005).
+> It now trains on the **real dataset** in `data/raw/prc_2025/` (gitignored) via `make ml-baseline-real`
+> (bounded by `LIMIT`/`EPOCHS`). Full-scale training over all 11,037 flights and the official leaderboard
+> scoring remain **pending** (ADR-0005); `make ml-baseline-small` still runs the offline mock path.
 
 ## Run
 
 ```bash
-make ml-baseline-small   # extract features (mock) + train; logs to MLflow
+make ml-baseline-real    # extract features from real PRC data (bounded) + train; LIMIT=500 EPOCHS=10
+make ml-baseline-small   # offline mock path (no real data needed)
 make ml-serve-smoke      # FastAPI serving smoke test
 ```
 

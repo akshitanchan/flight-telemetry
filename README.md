@@ -13,7 +13,7 @@ data from a single `make` target.
 |---|---|---|---|
 | **Systems** | geohash-p3 p50 **35 µs** vs H3-r4 p50 **162 µs**; ingest up to **3.3M rec/s** | Which spatiotemporal index minimizes tail latency? → geohash-p3 for coarse/continental, **H3-r4 best balanced** tail latency | `make systems-benchmark-small` |
 | **Data** | incremental `MERGE` **2.5×** faster than full recompute at 1M rows | Where is the incremental-vs-recompute frontier? → **`MERGE` wins past ~100k rows** | `make data-refresh-experiment-small` |
-| **ML** | training + serving reproducible (serve smoke **2/2**); val RMSE **369 kg (mock data)** | Can the model match the published PRC-2025 baseline? → **pipeline validated; real-data run pending** | `make ml-baseline-small` |
+| **ML** | **real PRC-2025 baseline: val RMSE ~395 kg** (real fuel labels, 500-flight subset); serve smoke **2/2** | Can the model match the published PRC-2025 baseline? → **real-data baseline trained; full-scale + leaderboard scoring pending** | `make ml-baseline-real` |
 | **AI** | deterministic routers **100%** vs local 7B LLM **92.3%**; citation coverage **100%** | Which agent architecture wins on faithfulness/cost? → **deterministic tool-routing dominates** here | `make ai-compare-small` |
 | **Cross-layer** | `make smoke` **7/7** steps in **~7.5 s**, fully offline | Does the bounded platform run end-to-end from one command? → **yes** | `make smoke` |
 
@@ -61,7 +61,7 @@ This is a three-week bounded build; the honest edges:
 
 - **Systems** is implemented in Python (the plan prefers Go/Rust for a stronger backend signal); a rewrite is a stretch item.
 - **Data** runs a local medallion + DuckDB experiment rather than cloud Databricks/Delta + BigQuery; numbers are local proxies, not cloud cost figures.
-- **ML** metrics are on **mock PRC-shaped data**; the real ~3.1 GB PRC-2025 dataset is present (`data/raw/prc_2025/`, gitignored) but the training pipeline is not yet pointed at it, so the published-baseline comparison is pending.
+- **ML** now trains on the **real PRC-2025 data** (`make ml-baseline-real`, bounded to a 500-flight subset; val RMSE ~395 kg). Full-scale training over all 11,037 flights and the official leaderboard scoring are still pending — the model is a baseline MLP, not yet competitive with the published leaderboard — and there is no drift/retrain loop yet.
 - **AI** numbers are on a small golden set; the LLM strategy needs a local Ollama server (availability-gated, skipped in CI). The LLM comparison figures are a single local `temperature=0` run.
 - ML serving still uses a deprecated FastAPI startup hook and a hardcoded fake-model mode (tracked for cleanup).
 

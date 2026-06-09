@@ -53,7 +53,9 @@ def main():
     parser.add_argument("--batch-size", type=int, default=16, help="Batch size")
     parser.add_argument("--lr", type=float, default=0.001, help="Learning rate")
     args = parser.parse_args()
-    
+
+    torch.manual_seed(42)  # reproducible weight init + train/val split
+
     if args.data_dir == "data/ml/prc_2025_mock" and not Path(args.data_dir).exists():
         raise FileNotFoundError("Mock data missing. Run generate_mock in extract script.")
     device = torch.device("cpu") # Keep simple for local scaffold
