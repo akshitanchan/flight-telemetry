@@ -112,8 +112,8 @@ ai-eval-small: ## Run AI answer-path eval on the golden set (deterministic, offl
 	$(PYTHON) -m ai.eval.run_answers
 
 .PHONY: ai-compare-small
-ai-compare-small: ## Compare AI answer strategies on golden set
-	@echo "→ ai-compare-small: not yet implemented (target for W3.3)"
+ai-compare-small: ## Compare AI answer strategies on golden set (deterministic + Ollama if available)
+	$(PYTHON) -m ai.eval.compare
 
 # ---- Cross-cutting ----------------------------------------
 .PHONY: smoke

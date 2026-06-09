@@ -19,7 +19,9 @@ def _extract(result: dict, field):
         return answer
     if isinstance(answer, dict):
         return answer.get(field)
-    raise CheckError(f"answer is not a dict; cannot extract field {field!r}")
+    # Wrong-shaped answer (e.g. a mis-routed strategy returned a scalar/string):
+    # the check fails rather than raising, so eval stays robust to bad routing.
+    return None
 
 
 def numeric_equals(result, expected, field=None, tolerance=0):
