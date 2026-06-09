@@ -117,8 +117,8 @@ ai-compare-small: ## Compare AI answer strategies on golden set (deterministic +
 
 # ---- Cross-cutting ----------------------------------------
 .PHONY: smoke
-smoke: ## Run cross-layer smoke test (all layers, bounded data)
-	@echo "→ smoke: not yet implemented (target for W3.4)"
+smoke: ## Run cross-layer smoke test (all layers, bounded data, offline)
+	$(PYTHON) scripts/smoke.py
 
 .PHONY: docs-check
 docs-check: ## Lint / check documentation
