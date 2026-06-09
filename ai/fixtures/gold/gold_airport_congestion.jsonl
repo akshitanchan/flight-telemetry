@@ -1,0 +1,11 @@
+{"airport_icao": "LIPX", "window_start": "2024-06-03T12:00:00+00:00", "window_end": "2024-06-03T12:05:00+00:00", "aircraft_count": 1, "ground_count": 0, "airborne_count": 1, "avg_altitude_m": 5498.8}
+{"airport_icao": "LSZS", "window_start": "2024-06-03T12:00:00+00:00", "window_end": "2024-06-03T12:05:00+00:00", "aircraft_count": 1, "ground_count": 0, "airborne_count": 1, "avg_altitude_m": 9570.5}
+{"airport_icao": "EBAR", "window_start": "2024-06-03T12:00:00+00:00", "window_end": "2024-06-03T12:05:00+00:00", "aircraft_count": 1, "ground_count": 0, "airborne_count": 1, "avg_altitude_m": 11565.1}
+{"airport_icao": "LOIR", "window_start": "2024-06-03T12:00:00+00:00", "window_end": "2024-06-03T12:05:00+00:00", "aircraft_count": 1, "ground_count": 0, "airborne_count": 1, "avg_altitude_m": 11158.9}
+{"airport_icao": "LHBP", "window_start": "2024-06-03T12:00:00+00:00", "window_end": "2024-06-03T12:05:00+00:00", "aircraft_count": 1, "ground_count": 0, "airborne_count": 1, "avg_altitude_m": 10086.4}
+{"airport_icao": "UMKK", "window_start": "2024-06-03T12:00:00+00:00", "window_end": "2024-06-03T12:05:00+00:00", "aircraft_count": 1, "ground_count": 0, "airborne_count": 1, "avg_altitude_m": 3682.2}
+{"airport_icao": "EPBD", "window_start": "2024-06-03T12:00:00+00:00", "window_end": "2024-06-03T12:05:00+00:00", "aircraft_count": 1, "ground_count": 0, "airborne_count": 1, "avg_altitude_m": 10722.5}
+{"airport_icao": "LHSM", "window_start": "2024-06-03T12:00:00+00:00", "window_end": "2024-06-03T12:05:00+00:00", "aircraft_count": 1, "ground_count": 0, "airborne_count": 1, "avg_altitude_m": 3410.7}
+{"airport_icao": "EDMS", "window_start": "2024-06-03T12:00:00+00:00", "window_end": "2024-06-03T12:05:00+00:00", "aircraft_count": 1, "ground_count": 0, "airborne_count": 1, "avg_altitude_m": 6618.5}
+{"airport_icao": "LHPL", "window_start": "2024-06-03T12:00:00+00:00", "window_end": "2024-06-03T12:05:00+00:00", "aircraft_count": 1, "ground_count": 0, "airborne_count": 1, "avg_altitude_m": 10085.6}
+{"airport_icao": "ELLX", "window_start": "2024-06-03T12:00:00+00:00", "window_end": "2024-06-03T12:05:00+00:00", "aircraft_count": 1, "ground_count": 0, "airborne_count": 1, "avg_altitude_m": 11558.9}

@@ -1,0 +1,115 @@
+{
+  "version": "1.0",
+  "description": "Golden question set for the AI layer. Expected answers are ground-truthed against the frozen fixtures in ai/fixtures/ (gold snapshot + corpus). Deterministic only — no LLM judging at W3.1.",
+  "questions": [
+    {
+      "id": "a1",
+      "question": "How many emergency squawk events were recorded?",
+      "tool": "analytics",
+      "operation": "count_emergencies",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 3}]
+    },
+    {
+      "id": "a2",
+      "question": "How many flights declared a general emergency (squawk 7700)?",
+      "tool": "analytics",
+      "operation": "count_emergencies",
+      "params": {"squawk": "7700"},
+      "checks": [{"type": "numeric_equals", "expected": 2}]
+    },
+    {
+      "id": "a3",
+      "question": "Which aircraft squawked 7700?",
+      "tool": "analytics",
+      "operation": "list_emergency_aircraft",
+      "params": {"squawk": "7700"},
+      "checks": [{"type": "set_equals", "expected": ["3c6751", "a0b1c2"]}]
+    },
+    {
+      "id": "a4",
+      "question": "Which aircraft squawked 7500 (unlawful interference)?",
+      "tool": "analytics",
+      "operation": "list_emergency_aircraft",
+      "params": {"squawk": "7500"},
+      "checks": [{"type": "set_equals", "expected": ["400a30"]}]
+    },
+    {
+      "id": "a5",
+      "question": "How many aircraft were associated with airport LOIR?",
+      "tool": "analytics",
+      "operation": "airport_congestion",
+      "params": {"airport_icao": "LOIR"},
+      "checks": [{"type": "numeric_equals", "field": "aircraft_count", "expected": 1}]
+    },
+    {
+      "id": "a6",
+      "question": "How many distinct airports had associated traffic?",
+      "tool": "analytics",
+      "operation": "count_active_airports",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 11}]
+    },
+    {
+      "id": "a7",
+      "question": "How many distinct H3 sectors were active?",
+      "tool": "analytics",
+      "operation": "count_active_sectors",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 13}]
+    },
+    {
+      "id": "a8",
+      "question": "How many distinct flights were tracked overall?",
+      "tool": "analytics",
+      "operation": "total_flights_tracked",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 10}]
+    },
+    {
+      "id": "a9",
+      "question": "What was the maximum altitude reached by flight 3c6751?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "3c6751"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 11574.0, "tolerance": 0.5},
+        {"type": "numeric_equals", "field": "ping_count", "expected": 5}
+      ]
+    },
+    {
+      "id": "a10",
+      "question": "Which flight reached the highest altitude in the dataset?",
+      "tool": "analytics",
+      "operation": "highest_altitude_flight",
+      "params": {},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 11574.0, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "r1",
+      "question": "Decode the latest METAR for Amsterdam Schiphol (EHAM).",
+      "tool": "retrieval",
+      "params": {"query": "METAR EHAM Amsterdam Schiphol decode"},
+      "checks": [{"type": "contains_source", "expected": "metar-eham"}]
+    },
+    {
+      "id": "r2",
+      "question": "What does a 7700 transponder squawk code indicate?",
+      "tool": "retrieval",
+      "params": {"query": "what does squawk 7700 transponder code indicate"},
+      "checks": [
+        {"type": "contains_source", "expected": "ref-squawk-codes"},
+        {"type": "contains_text", "expected": "emergency"}
+      ]
+    },
+    {
+      "id": "r3",
+      "question": "Find the incident report about an engine failure during climb.",
+      "tool": "retrieval",
+      "params": {"query": "engine failure during climb incident report"},
+      "checks": [{"type": "contains_source", "expected": "ntsb-eng-failure"}]
+    }
+  ]
+}

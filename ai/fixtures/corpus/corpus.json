@@ -1,0 +1,41 @@
+[
+  {
+    "id": "metar-eham",
+    "type": "metar",
+    "title": "METAR EHAM Amsterdam Schiphol",
+    "airport": "EHAM",
+    "text": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: wind 270 degrees at 10 knots, visibility 10 km or more, few clouds at 2500 ft and scattered at 4000 ft, temperature 18 C, dewpoint 11 C, QNH 1019 hPa, no significant change expected."
+  },
+  {
+    "id": "metar-eddf",
+    "type": "metar",
+    "title": "METAR EDDF Frankfurt am Main",
+    "airport": "EDDF",
+    "text": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: wind 240 degrees at 12 gusting 22 knots, visibility 8000 m in light rain, broken cloud at 1200 ft, temperature 15 C, dewpoint 13 C, QNH 1014 hPa."
+  },
+  {
+    "id": "metar-loww",
+    "type": "metar",
+    "title": "METAR LOWW Vienna",
+    "airport": "LOWW",
+    "text": "LOWW 031150Z 14006KT CAVOK 21/09 Q1020 NOSIG. Decoded: wind 140 degrees at 6 knots, ceiling and visibility OK, temperature 21 C, dewpoint 9 C, QNH 1020 hPa."
+  },
+  {
+    "id": "ref-squawk-codes",
+    "type": "reference",
+    "title": "Emergency transponder squawk codes",
+    "text": "Transponder emergency codes: squawk 7500 indicates unlawful interference (hijacking); squawk 7600 indicates a radio communication failure (lost communications); squawk 7700 indicates a general emergency. Air traffic controllers treat any of these codes as an immediate priority emergency."
+  },
+  {
+    "id": "ntsb-eng-failure",
+    "type": "report",
+    "title": "Illustrative incident report: engine failure during climb",
+    "text": "SYNTHETIC FIXTURE - not a real NTSB report. During the initial climb the flight crew reported a loss of thrust from the right engine, declared an emergency and squawked 7700, dumped fuel, and returned to the departure airport for an overweight landing with no injuries."
+  },
+  {
+    "id": "ntsb-loss-sep",
+    "type": "report",
+    "title": "Illustrative incident report: loss of separation",
+    "text": "SYNTHETIC FIXTURE - not a real NTSB report. Two aircraft on crossing tracks experienced a loss of separation after a level-off clearance was read back incorrectly; TCAS resolution advisories were followed and separation was restored without further event."
+  }
+]

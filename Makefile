@@ -100,8 +100,12 @@ ml-serve-smoke: ## Start serving endpoint and run smoke test
 
 # ---- AI ---------------------------------------------------
 .PHONY: ai-eval-fixtures
-ai-eval-fixtures: ## Validate AI golden question set and fixtures
-	@echo "→ ai-eval-fixtures: not yet implemented (target for W3.1)"
+ai-eval-fixtures: ## Validate AI golden question set and fixtures (offline, no LLM)
+	$(PYTHON) -m ai.eval.run_fixtures
+
+.PHONY: test-ai
+test-ai: ## Run AI-layer tests
+	$(PYTHON) -m pytest ai/tests/ -v 2>/dev/null || $(PYTHON) -m unittest discover -s ai/tests -v
 
 .PHONY: ai-eval-small
 ai-eval-small: ## Run AI eval harness on small golden set
