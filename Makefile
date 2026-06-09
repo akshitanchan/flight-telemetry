@@ -86,13 +86,17 @@ test-systems: ## Run systems-layer tests
 	$(PYTHON) -m pytest systems/tests/ -v 2>/dev/null || $(PYTHON) -m unittest discover -s systems/tests -v
 
 # ---- ML ---------------------------------------------------
+.PHONY: ml-extract-features
+ml-extract-features: ## Precompute trajectory features from zipped parquets
+	$(PYTHON) -m ml.extract_features --data-dir data/ml/prc_2025_mock --split train
+
 .PHONY: ml-baseline-small
-ml-baseline-small: ## Reproduce ML baseline on sample data
-	@echo "→ ml-baseline-small: not yet implemented (target for W2.5)"
+ml-baseline-small: ml-extract-features ## Reproduce ML baseline on mock data
+	$(PYTHON) -m ml.train --data-dir data/ml/prc_2025_mock --epochs 5
 
 .PHONY: ml-serve-smoke
 ml-serve-smoke: ## Start serving endpoint and run smoke test
-	@echo "→ ml-serve-smoke: not yet implemented (target for W2.6)"
+	$(PYTHON) -m pytest ml/test_serve.py -v -s
 
 # ---- AI ---------------------------------------------------
 .PHONY: ai-eval-fixtures
