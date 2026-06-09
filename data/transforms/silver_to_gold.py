@@ -29,15 +29,31 @@ logger = logging.getLogger(__name__)
 
 WINDOW_MINUTES = 5
 
+# Emergency observations of the same (icao24, squawk) farther apart than this
+# start a new event, so two incidents hours apart are not merged (audit M17).
+EMERGENCY_GAP_S = 1800  # 30 minutes
+
 def _floor_to_window(dt: datetime, minutes: int) -> datetime:
     """Floor a datetime to the nearest window bucket."""
     delta_mins = dt.minute - (dt.minute % minutes)
     return dt.replace(minute=delta_mins, second=0, microsecond=0)
 
 def aggregate_emergency_events(records: list[dict]) -> list[dict]:
-    """Identify and aggregate continuous emergency squawk events."""
-    # Group by (icao24, squawk)
-    events: dict[tuple[str, str], dict] = {}
+    """Identify and aggregate emergency squawk events.
+
+    Consecutive observations of the same (icao24, squawk) are merged into one
+    event. A gap larger than EMERGENCY_GAP_S between observations splits them
+    into separate events, so two incidents hours apart are not merged into one
+    huge-duration record (audit M17).
+    """
+    open_event: dict[tuple[str, str], dict] = {}
+    gold_records: list[dict] = []
+
+    def _close(evt: dict) -> None:
+        first = datetime.fromisoformat(evt["first_seen_ts"])
+        last = datetime.fromisoformat(evt["last_seen_ts"])
+        evt["duration_s"] = max(0, int((last - first).total_seconds()))
+        gold_records.append(evt)
 
     for rec in sorted(records, key=lambda r: r.get("event_ts", "")):
         squawk = rec.get("squawk")
@@ -48,32 +64,32 @@ def aggregate_emergency_events(records: list[dict]) -> list[dict]:
         event_ts = rec["event_ts"]
         key = (icao24, squawk)
 
-        if key not in events:
-            events[key] = {
-                "icao24": icao24,
-                "callsign": rec.get("callsign"),
-                "squawk": squawk,
-                "first_seen_ts": event_ts,
-                "last_seen_ts": event_ts,
-                "lat": rec.get("lat"),
-                "lon": rec.get("lon"),
-                "origin_country": rec.get("origin_country"),
-                "nearest_airport": rec.get("nearest_airport"),
-            }
-        else:
-            events[key]["last_seen_ts"] = event_ts
-            # Optionally update callsign if it appeared later
-            if not events[key]["callsign"] and rec.get("callsign"):
-                events[key]["callsign"] = rec["callsign"]
+        evt = open_event.get(key)
+        if evt is not None:
+            gap = (datetime.fromisoformat(event_ts)
+                   - datetime.fromisoformat(evt["last_seen_ts"])).total_seconds()
+            if gap <= EMERGENCY_GAP_S:
+                evt["last_seen_ts"] = event_ts
+                if not evt["callsign"] and rec.get("callsign"):
+                    evt["callsign"] = rec["callsign"]
+                continue
+            # Gap too large: close the current event and start a fresh one.
+            _close(evt)
 
-    # Compute duration and format
-    gold_records = []
-    for evt in events.values():
-        first = datetime.fromisoformat(evt["first_seen_ts"])
-        last = datetime.fromisoformat(evt["last_seen_ts"])
-        duration = int((last - first).total_seconds())
-        evt["duration_s"] = max(0, duration)
-        gold_records.append(evt)
+        open_event[key] = {
+            "icao24": icao24,
+            "callsign": rec.get("callsign"),
+            "squawk": squawk,
+            "first_seen_ts": event_ts,
+            "last_seen_ts": event_ts,
+            "lat": rec.get("lat"),
+            "lon": rec.get("lon"),
+            "origin_country": rec.get("origin_country"),
+            "nearest_airport": rec.get("nearest_airport"),
+        }
+
+    for evt in open_event.values():
+        _close(evt)
 
     return gold_records
 
@@ -127,10 +143,10 @@ def aggregate_airport_congestion(records: list[dict]) -> list[dict]:
     for rec in records:
         airport = rec.get("nearest_airport")
         if not airport:
-            # Fallback for W1 data that hasn't joined reference yet:
-            # We skip them unless we want to map dummy values, but the schema requires it.
-            # We will use "UNKNOWN" so the logic runs on the sample.
-            airport = "UNKNOWN"
+            # No airport within the association radius — this aircraft is not near
+            # any airport and does not contribute to airport congestion. We do NOT
+            # invent a synthetic "UNKNOWN" bucket (audit C7 / ADR-0006).
+            continue
 
         ts_str = rec.get("event_ts")
         if not ts_str:
@@ -189,8 +205,12 @@ def aggregate_routing_stats(records: list[dict]) -> list[dict]:
         if not icao24:
             continue
         callsign = rec.get("callsign")
+        # Normalise callsign before keying so trailing-whitespace / empty variants
+        # of the same flight don't fan out into duplicate routes (audit M18).
+        if isinstance(callsign, str):
+            callsign = callsign.strip() or None
         event_ts = rec.get("event_ts")
-        
+
         key = (icao24, callsign)
         if key not in routes:
             routes[key] = {

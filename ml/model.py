@@ -19,4 +19,8 @@ class FuelBurnMLP(nn.Module):
         )
         
     def forward(self, x):
+        # Accept an unbatched [input_dim] tensor by adding a batch dim, so
+        # squeeze(-1) is well-defined for both batched and single inputs (audit M9).
+        if x.dim() == 1:
+            x = x.unsqueeze(0)
         return self.network(x).squeeze(-1)

@@ -5,12 +5,12 @@ from torch.utils.data import DataLoader
 import mlflow
 import mlflow.pytorch
 import math
+import copy
 import logging
 from pathlib import Path
 
 from ml.dataset import FuelBurnDataset
 from ml.model import FuelBurnMLP
-from ml.mock_data import generate_mock_eurocontrol_data
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s INFO  [%(name)s] %(message)s")
 logger = logging.getLogger("ml.train")
@@ -86,26 +86,34 @@ def main():
         
         logger.info(f"Starting training for {args.epochs} epochs...")
         best_val_rmse = float('inf')
-        
+        best_state = None
+
         for epoch in range(1, args.epochs + 1):
             train_mse = train_epoch(model, train_loader, criterion, optimizer, device)
             val_mse = evaluate(model, val_loader, criterion, device)
-            
+
             train_rmse = math.sqrt(train_mse)
             val_rmse = math.sqrt(val_mse)
-            
+
             mlflow.log_metrics({
                 "train_rmse": train_rmse,
                 "val_rmse": val_rmse
             }, step=epoch)
-            
+
             logger.info(f"Epoch {epoch:03d} | Train RMSE: {train_rmse:.2f} | Val RMSE: {val_rmse:.2f}")
-            
+
             if val_rmse < best_val_rmse:
                 best_val_rmse = val_rmse
-                
+                best_state = copy.deepcopy(model.state_dict())
+
         logger.info(f"Training complete. Best Val RMSE: {best_val_rmse:.2f}")
-        
+        mlflow.log_metric("best_val_rmse", best_val_rmse)
+
+        # Restore the best-performing weights so we register the best model, not
+        # the (possibly overfit) final-epoch model (audit M4).
+        if best_state is not None:
+            model.load_state_dict(best_state)
+
         # Log the PyTorch model
         mlflow.pytorch.log_model(model, "model")
         

@@ -229,9 +229,10 @@ outputs/
 artifacts/
 .tmp/
 
-# OS files
+# OS and IDE files
 .DS_Store
 Thumbs.db
+.claude
 
 # Model weights and checkpoints
 *.pt
@@ -248,3 +249,6 @@ mlruns/
 # Local database files
 *.duckdb
 *.duckdb.wal
+
+# MLflow local tracking store (SQLite) — must not be committed
+mlflow.db

@@ -97,16 +97,17 @@ def extract_features(data_dir: str, split: str = "train"):
     logger.info(f"Successfully extracted features for {len(df_features)} intervals.")
     logger.info(f"Saved to {out_path}")
 
-from ml.mock_data import generate_mock_eurocontrol_data
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-dir", type=str, required=True)
     parser.add_argument("--split", type=str, default="train")
     args = parser.parse_args()
-    
+
     if args.data_dir == "data/ml/prc_2025_mock" and not Path(args.data_dir).exists():
+        # Import the mock generator lazily so importing this module elsewhere does
+        # not pull it in for every caller (audit M6).
+        from ml.mock_data import generate_mock_eurocontrol_data
         logger.info(f"Generating mock dataset in {args.data_dir}...")
         generate_mock_eurocontrol_data(args.data_dir, num_flights=20)
-        
+
     extract_features(args.data_dir, args.split)

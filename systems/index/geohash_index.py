@@ -21,7 +21,7 @@ from typing import Any
 
 import pygeohash
 
-from systems.index.base import SpatiotemporalIndex, SpatiotemporalQuery, BBox
+from systems.index.base import SpatiotemporalIndex, SpatiotemporalQuery, BBox, parse_iso_ts
 
 
 # Base32 alphabet used by geohash
@@ -114,6 +114,11 @@ class GeohashPrefixIndex(SpatiotemporalIndex):
         # Find overlapping geohash prefixes
         prefixes = _geohash_prefixes_for_bbox(q.bbox, self._precision)
 
+        # Parse window bounds once — datetime comparison, not fragile string
+        # comparison that breaks on mixed 'Z' vs '+00:00' suffixes (audit M12).
+        t_start = parse_iso_ts(q.time_window.start)
+        t_end = parse_iso_ts(q.time_window.end)
+
         results = []
         for prefix in prefixes:
             bucket = self._buckets.get(prefix, [])
@@ -127,8 +132,10 @@ class GeohashPrefixIndex(SpatiotemporalIndex):
                     continue
 
                 # Time check
-                event_ts = rec.get("event_ts", "")
-                if q.time_window.start <= event_ts <= q.time_window.end:
+                event_ts = rec.get("event_ts")
+                if not event_ts:
+                    continue
+                if t_start <= parse_iso_ts(event_ts) <= t_end:
                     results.append(rec)
 
         return results

@@ -108,6 +108,10 @@ def transform_record(record: dict) -> dict | None:
         return None
     if not _validate_range(record.get("true_track_deg"), "true_track_deg", 0, 360):
         return None
+    # Barometric altitude sanity bound — drop physically impossible values
+    # (nullable, so None passes) (audit M16).
+    if not _validate_range(record.get("baro_altitude_m"), "baro_altitude_m", -1000, 30000):
+        return None
 
     # --- Squawk validation (octal digits only) ---
     squawk = record.get("squawk")
@@ -117,6 +121,11 @@ def transform_record(record: dict) -> dict | None:
         elif not all(c in "01234567" for c in squawk):
             squawk = None
 
+    # --- Callsign normalization (strip whitespace; empty -> None) (audit M15) ---
+    callsign = record.get("callsign")
+    if isinstance(callsign, str):
+        callsign = callsign.strip() or None
+
     # --- Compute derived spatial indices ---
     geohash7 = pygeohash.encode(lat, lon, precision=7)
     h3_r7 = h3.latlng_to_cell(lat, lon, 7)
@@ -124,7 +133,7 @@ def transform_record(record: dict) -> dict | None:
     # --- Build silver record ---
     silver = {
         "icao24": icao24,
-        "callsign": record.get("callsign"),
+        "callsign": callsign,
         "event_ts": event_ts,
         "lon": round(lon, 6),
         "lat": round(lat, 6),

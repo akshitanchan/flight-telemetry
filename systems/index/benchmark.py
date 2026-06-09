@@ -75,15 +75,19 @@ def run_benchmark(
     idx_stats = index.stats()
     ingest_throughput = len(records) / build_elapsed if build_elapsed > 0 else 0
 
-    # --- Warmup phase ---
+    # --- Warmup phase (not measured) ---
     for q in queries[:warmup_queries]:
         index.query(q)
 
     # --- Measurement phase ---
+    # Exclude the warmup queries from the measured set so warmup actually isolates
+    # cold-start cost instead of being re-measured (audit M14).
+    measured_queries = queries[warmup_queries:] if len(queries) > warmup_queries else queries
+
     latencies = []
     result_counts = []
 
-    for q in queries:
+    for q in measured_queries:
         q_start = time.perf_counter()
         results = index.query(q)
         q_elapsed = time.perf_counter() - q_start
@@ -105,7 +109,7 @@ def run_benchmark(
     return BenchmarkResult(
         strategy=index.name,
         record_count=len(records),
-        num_queries=len(queries),
+        num_queries=len(measured_queries),
         query_profile=query_profile,
         build_time_s=round(build_elapsed, 6),
         ingest_throughput_rps=round(ingest_throughput, 1),

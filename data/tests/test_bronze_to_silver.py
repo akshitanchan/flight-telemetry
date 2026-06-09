@@ -141,6 +141,29 @@ class TestTransformRecord(unittest.TestCase):
         self.assertIsNotNone(silver)
         self.assertEqual(silver["squawk"], "7700")
 
+    def test_callsign_stripped(self):
+        """Trailing-whitespace callsign is stripped (M15)."""
+        silver = transform_record(self._make_landing(callsign="SWR162 "))
+        self.assertIsNotNone(silver)
+        self.assertEqual(silver["callsign"], "SWR162")
+
+    def test_empty_callsign_becomes_none(self):
+        """Whitespace-only callsign becomes None (M15)."""
+        silver = transform_record(self._make_landing(callsign="   "))
+        self.assertIsNotNone(silver)
+        self.assertIsNone(silver["callsign"])
+
+    def test_drops_impossible_altitude(self):
+        """Physically impossible barometric altitude is dropped (M16)."""
+        silver = transform_record(self._make_landing(baro_altitude_m=99999.0))
+        self.assertIsNone(silver)
+
+    def test_nullable_altitude_ok(self):
+        """Null altitude passes the range check (M16)."""
+        silver = transform_record(self._make_landing(baro_altitude_m=None))
+        self.assertIsNotNone(silver)
+        self.assertIsNone(silver["baro_altitude_m"])
+
 
 class TestRunTransform(unittest.TestCase):
     """Integration test for the full transform pipeline."""

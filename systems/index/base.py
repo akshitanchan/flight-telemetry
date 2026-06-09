@@ -14,6 +14,18 @@ from datetime import datetime
 from typing import Any
 
 
+def parse_iso_ts(value: str) -> datetime:
+    """Parse an ISO-8601 timestamp into a timezone-aware datetime.
+
+    Handles a trailing 'Z' (UTC). Used for correct chronological comparison
+    instead of fragile lexicographic string comparison, which breaks across
+    mixed 'Z' vs '+00:00' suffixes (audit M12/M13).
+    """
+    if value.endswith("Z"):
+        value = value[:-1] + "+00:00"
+    return datetime.fromisoformat(value)
+
+
 @dataclass(frozen=True)
 class BBox:
     """Axis-aligned bounding box for spatial range queries."""

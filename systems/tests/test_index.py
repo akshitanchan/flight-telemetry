@@ -12,6 +12,7 @@ from systems.index.base import BBox, TimeWindow, SpatiotemporalQuery
 from systems.index.geohash_index import GeohashPrefixIndex, _geohash_prefixes_for_bbox
 from systems.index.h3_index import H3Index, _h3_cells_for_bbox
 from systems.index.workload import generate_workload
+from systems.index.benchmark import run_benchmark
 
 
 class TestGeohashIndex(unittest.TestCase):
@@ -95,6 +96,20 @@ class TestGeohashIndex(unittest.TestCase):
         self.assertEqual(icao_set, {"111111", "222222"})
 
 
+    def test_mixed_tz_suffix_time_filter(self):
+        """A record stored with a 'Z' suffix matches a '+00:00' window (M12)."""
+        index = GeohashPrefixIndex(prefix_precision=3)
+        index.build([{
+            "icao24": "555555", "lon": 4.7638, "lat": 52.3080,
+            "event_ts": "2024-06-03T12:00:00Z", "geohash7": "u173s6m",
+        }])
+        q = SpatiotemporalQuery(
+            bbox=BBox(4.7, 4.8, 52.3, 52.4),
+            time_window=TimeWindow("2024-06-03T11:00:00+00:00", "2024-06-03T13:00:00+00:00"),
+        )
+        self.assertEqual(len(index.query(q)), 1)
+
+
 class TestH3Index(unittest.TestCase):
     def setUp(self):
         self.records = [
@@ -153,6 +168,22 @@ class TestWorkloadGenerator(unittest.TestCase):
         start_ts = datetime.fromisoformat(q.time_window.start)
         end_ts = datetime.fromisoformat(q.time_window.end)
         self.assertEqual((end_ts - start_ts).total_seconds(), 300)
+
+class TestBenchmark(unittest.TestCase):
+    def test_warmup_excluded_from_measurement(self):
+        """Warmup queries are not part of the measured set (M14)."""
+        records = [{
+            "icao24": "111111", "lon": 4.7638, "lat": 52.3080,
+            "event_ts": "2024-06-03T12:00:00+00:00",
+            "geohash7": "u173s6m", "h3_r7": "8719694b5ffffff",
+        }]
+        index = GeohashPrefixIndex(prefix_precision=3)
+        queries = generate_workload(num_queries=10, profile="regional", seed=7)
+        result = run_benchmark(index, records, queries,
+                               query_profile="regional", warmup_queries=3)
+        # 10 generated - 3 warmup = 7 measured
+        self.assertEqual(result.num_queries, 7)
+
 
 if __name__ == "__main__":
     unittest.main()

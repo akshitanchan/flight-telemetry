@@ -61,18 +61,19 @@ def predict(req: PredictRequest):
         pred_fuel = (req.duration_s / 60.0) * 50.0
         version = "fake-heuristic-v1"
     else:
-        # Real model inference
-        features = torch.tensor([
-            req.duration_s, 
-            req.alt_change, 
-            req.avg_speed, 
-            req.max_vrate
-        ], dtype=torch.float32)
-        
+        # Real model inference. Shape [1, 4] (batch of one) so the output is
+        # well-defined rather than relying on PyTorch auto-broadcast (audit M7).
+        features = torch.tensor([[
+            req.duration_s,
+            req.alt_change,
+            req.avg_speed,
+            req.max_vrate,
+        ]], dtype=torch.float32)
+
         with torch.no_grad():
             pred = MODEL(features)
-        
-        pred_fuel = float(pred.item())
+
+        pred_fuel = float(pred.reshape(-1)[0].item())
         version = "mlflow-baseline"
         
     process_time_ms = (time.perf_counter() - start_time) * 1000

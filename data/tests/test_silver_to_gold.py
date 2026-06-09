@@ -141,5 +141,54 @@ class TestSilverToGold(unittest.TestCase):
         self.assertEqual(emg_route["max_altitude_m"], 5000.0)
         self.assertEqual(emg_route["ping_count"], 2)
 
+    def test_congestion_excludes_unassociated(self):
+        """Records with no nearest_airport are excluded, not bucketed as UNKNOWN (C7)."""
+        unassociated = {
+            "icao24": "999999", "callsign": "NONE1",
+            "event_ts": "2024-06-03T12:00:00+00:00", "lon": 10.0, "lat": 48.0,
+            "squawk": "1200", "on_ground": False, "baro_altitude_m": 9000.0,
+            "h3_r7": "871fa1b13ffffff", "nearest_airport": None,
+        }
+        self.assertEqual(aggregate_airport_congestion([unassociated]), [])
+
+        # Mixed with an associated record: only the real airport appears, no UNKNOWN.
+        mixed = [unassociated, self.silver_records[0]]  # second is EHAM
+        codes = {c["airport_icao"] for c in aggregate_airport_congestion(mixed)}
+        self.assertNotIn("UNKNOWN", codes)
+        self.assertIn("EHAM", codes)
+
+    def test_emergency_gap_splits_events(self):
+        """Two 7700 observations far apart become two events, not one (M17)."""
+        recs = [
+            {"icao24": "777777", "callsign": "EMG1", "squawk": "7700",
+             "event_ts": "2024-06-03T12:00:00+00:00", "lat": 50.0, "lon": 8.0,
+             "on_ground": False, "baro_altitude_m": 5000.0,
+             "h3_r7": "871fa1b13ffffff", "nearest_airport": "EDDF"},
+            # 2 hours later — beyond EMERGENCY_GAP_S — should start a new event
+            {"icao24": "777777", "callsign": "EMG1", "squawk": "7700",
+             "event_ts": "2024-06-03T14:00:00+00:00", "lat": 50.1, "lon": 8.1,
+             "on_ground": False, "baro_altitude_m": 5200.0,
+             "h3_r7": "871fa1b13ffffff", "nearest_airport": "EDDF"},
+        ]
+        events = aggregate_emergency_events(recs)
+        self.assertEqual(len(events), 2)
+        for e in events:
+            self.assertEqual(e["duration_s"], 0)
+
+    def test_routing_callsign_normalized(self):
+        """Whitespace callsign variants don't fan out into duplicate routes (M18)."""
+        recs = [
+            {"icao24": "555555", "callsign": "ABC123 ",
+             "event_ts": "2024-06-03T12:00:00+00:00", "lat": 50.0, "lon": 8.0,
+             "on_ground": False, "baro_altitude_m": 9000.0, "velocity_ms": 200.0},
+            {"icao24": "555555", "callsign": "ABC123",
+             "event_ts": "2024-06-03T12:01:00+00:00", "lat": 50.1, "lon": 8.1,
+             "on_ground": False, "baro_altitude_m": 9100.0, "velocity_ms": 210.0},
+        ]
+        routes = aggregate_routing_stats(recs)
+        self.assertEqual(len(routes), 1)
+        self.assertEqual(routes[0]["callsign"], "ABC123")
+        self.assertEqual(routes[0]["ping_count"], 2)
+
 if __name__ == "__main__":
     unittest.main()
