@@ -277,7 +277,10 @@ def load_schema(schema_path: Path) -> dict:
 def write_gold_table(output_path: Path, records: list[dict], schema: dict | None, validate: bool = True) -> int:
     """Write records to JSONL, optionally validating against schema."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    
+
+    # Deterministic output order so gold diffs are stable across runs (audit m15).
+    records = sorted(records, key=lambda r: json.dumps(r, sort_keys=True))
+
     validator = None
     if validate and HAS_JSONSCHEMA and schema:
         validator = jsonschema.Draft202012Validator(schema)

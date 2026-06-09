@@ -36,7 +36,4 @@ class FuelBurnDataset(Dataset):
         ], dtype=torch.float32)
         
         return features, target_fuel
-        
-    def close(self):
-        pass
 

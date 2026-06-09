@@ -10,7 +10,6 @@ Production would use a database-backed store (e.g., Redis SET, or a
 UNIQUE constraint on (icao24, event_ts) in the landing table).
 """
 
-import json
 import logging
 from pathlib import Path
 

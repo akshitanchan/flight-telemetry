@@ -45,20 +45,3 @@ def read_snapshots(path: Path) -> Generator[dict, None, None]:
             yield snapshot
 
     logger.info("Read %d snapshots from %s", line_count, path.name)
-
-
-def iter_state_vectors(path: Path) -> Generator[tuple[int, list], None, None]:
-    """Yield (snapshot_time, state_vector_array) pairs from a JSONL file.
-
-    Flattens snapshots into individual state vectors, each paired with
-    the snapshot timestamp for normalization.
-    """
-    total_vectors = 0
-    for snapshot in read_snapshots(path):
-        ts = snapshot["time"]
-        states = snapshot.get("states") or []
-        for sv in states:
-            total_vectors += 1
-            yield ts, sv
-
-    logger.info("Yielded %d total state vectors", total_vectors)

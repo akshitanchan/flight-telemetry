@@ -1,6 +1,8 @@
+import os
 import time
 import logging
-from typing import Optional
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from pydantic import BaseModel, Field
 import torch
@@ -9,7 +11,51 @@ import torch
 logging.basicConfig(level=logging.INFO, format="%(asctime)s INFO  [%(name)s] %(message)s")
 logger = logging.getLogger("ml.serve")
 
-app = FastAPI(title="Fuel Burn Estimation API", version="0.1.0")
+
+def _env_bool(name: str, default: bool) -> bool:
+    return os.environ.get(name, str(default)).strip().lower() in ("1", "true", "yes")
+
+
+# --- Config (env-overridable) ---
+# FAKE_MODE serves a fast heuristic when no trained model is mounted. Set
+# ML_FAKE_MODE=false and ML_MODEL_URI=<mlflow uri> to serve the real model.
+FAKE_MODE = _env_bool("ML_FAKE_MODE", True)
+MODEL_URI = os.environ.get("ML_MODEL_URI")  # e.g. "models:/FuelBurn/Production" or "runs:/<id>/model"
+MODEL = None
+
+
+def _load_model():
+    """Load the PyTorch model from MLflow; return it, or None (and flip to fake) on failure."""
+    global FAKE_MODE
+    if FAKE_MODE:
+        return None
+    if not MODEL_URI:
+        logger.warning("ML_MODEL_URI not set; falling back to fake mode")
+        FAKE_MODE = True
+        return None
+    try:
+        import mlflow.pytorch
+        model = mlflow.pytorch.load_model(MODEL_URI)
+        model.eval()
+        logger.info("Loaded model from %s", MODEL_URI)
+        return model
+    except Exception as e:  # noqa: BLE001 — any load failure should degrade gracefully
+        logger.warning("Model load failed (%s); falling back to fake mode", e)
+        FAKE_MODE = True
+        return None
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Load the model once at startup (replaces the deprecated on_event hook)."""
+    global MODEL
+    MODEL = _load_model()
+    logger.info("ML serving ready. Fake mode: %s", FAKE_MODE)
+    yield
+
+
+app = FastAPI(title="Fuel Burn Estimation API", version="0.1.0", lifespan=lifespan)
+
 
 class PredictRequest(BaseModel):
     flight_id: str = Field(..., description="Unique flight identifier")
@@ -18,45 +64,34 @@ class PredictRequest(BaseModel):
     avg_speed: float = Field(..., description="Average ground speed")
     max_vrate: float = Field(..., description="Maximum vertical rate")
 
+
 class PredictResponse(BaseModel):
     flight_id: str
     predicted_fuel_kg: float
     model_version: str
     latency_ms: float
 
-# Global model state
-MODEL = None
-FAKE_MODE = True
-
-@app.on_event("startup")
-async def startup_event():
-    global MODEL, FAKE_MODE
-    # In a real environment, we'd load the MLflow model from a path provided via env var.
-    # For the scaffold, we default to fake mode unless wired otherwise.
-    logger.info(f"Starting ML Serving. Fake Mode: {FAKE_MODE}")
-    if not FAKE_MODE:
-        # Placeholder for real model load
-        pass
 
 @app.middleware("http")
 async def log_latency_middleware(request: Request, call_next):
     start_time = time.perf_counter()
     response = await call_next(request)
     process_time_ms = (time.perf_counter() - start_time) * 1000
-    
-    # Simple latency logging
     logger.info(f"{request.method} {request.url.path} - Latency: {process_time_ms:.2f} ms")
     return response
+
 
 @app.get("/health")
 def health_check():
     return {"status": "ok", "fake_mode": FAKE_MODE}
 
+
 @app.post("/predict", response_model=PredictResponse)
 def predict(req: PredictRequest):
     start_time = time.perf_counter()
-    
-    if FAKE_MODE:
+
+    # Guard: serve the heuristic whenever we're in fake mode OR no model is loaded.
+    if FAKE_MODE or MODEL is None:
         # Simple heuristic for fake mode: ~50kg per minute of duration
         pred_fuel = (req.duration_s / 60.0) * 50.0
         version = "fake-heuristic-v1"
@@ -75,12 +110,12 @@ def predict(req: PredictRequest):
 
         pred_fuel = float(pred.reshape(-1)[0].item())
         version = "mlflow-baseline"
-        
+
     process_time_ms = (time.perf_counter() - start_time) * 1000
-    
+
     return PredictResponse(
         flight_id=req.flight_id,
         predicted_fuel_kg=pred_fuel,
         model_version=version,
-        latency_ms=process_time_ms
+        latency_ms=process_time_ms,
     )

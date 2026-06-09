@@ -5,11 +5,12 @@ import numpy as np
 from datetime import datetime, timedelta
 from pathlib import Path
 
-def generate_mock_eurocontrol_data(out_dir: str, num_flights: int = 5):
+def generate_mock_eurocontrol_data(out_dir: str, num_flights: int = 5, seed: int = 42):
     """
     Generates a mock version of the Eurocontrol PRC Data Challenge 2025 dataset
     to unblock the ML pipeline build while awaiting real data access.
     """
+    np.random.seed(seed)  # reproducible mock data (audit m7)
     out_path = Path(out_dir)
     out_path.mkdir(parents=True, exist_ok=True)
     

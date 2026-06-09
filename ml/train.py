@@ -12,7 +12,7 @@ from pathlib import Path
 from ml.dataset import FuelBurnDataset
 from ml.model import FuelBurnMLP
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s INFO  [%(name)s] %(message)s")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s INFO  [%(name)s] %(message)s", force=True)  # force: override MLflow's root-logger config so epoch RMSE logs show
 logger = logging.getLogger("ml.train")
 
 def train_epoch(model, dataloader, criterion, optimizer, device):
@@ -116,8 +116,6 @@ def main():
 
         # Log the PyTorch model
         mlflow.pytorch.log_model(model, "model")
-        
-    dataset.close()
 
 if __name__ == "__main__":
     main()
