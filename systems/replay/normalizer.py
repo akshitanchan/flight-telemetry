@@ -3,7 +3,7 @@
 Normalizer — converts raw OpenSky state-vector arrays into structured
 landing-format dicts.
 
-OpenSky /states/all returns each state vector as a 17-element array:
+OpenSky /states/all returns each state vector as a 17- or 18-element array:
     [0]  icao24            str
     [1]  callsign          str|null
     [2]  origin_country    str
@@ -21,9 +21,12 @@ OpenSky /states/all returns each state vector as a 17-element array:
     [14] squawk             str|null
     [15] spi                bool
     [16] position_source    int
+    [17] category           int|null     (aircraft category; present in 18-field responses)
 
 This module converts each array into a flat dict in the "landing" format,
 which is the raw-but-structured representation before silver transforms.
+Vectors of length >= 17 are accepted; index 17 (category) is read only
+when present, otherwise None is used (contract C4).
 """
 
 import logging
@@ -38,9 +41,13 @@ MIN_FIELDS = 17
 def normalize_state_vector(snapshot_time: int, sv: list) -> dict | None:
     """Convert a raw OpenSky state-vector array into a landing-format dict.
 
+    Accepts vectors of length >= 17 (contract C4).  When the vector contains
+    18 or more fields, index 17 is read as ``category``; otherwise ``category``
+    is ``None``.
+
     Args:
         snapshot_time: Unix timestamp of the API snapshot.
-        sv: 17-element list from the OpenSky states array.
+        sv: List of >= 17 elements from the OpenSky states array.
 
     Returns:
         A normalized dict, or None if the record is malformed.
@@ -65,6 +72,9 @@ def normalize_state_vector(snapshot_time: int, sv: list) -> dict | None:
 
     # Use time_position if available, else snapshot_time
     event_time = sv[3] if sv[3] is not None else snapshot_time
+
+    # Index 17 (category) is only present in 18-field responses (contract C4)
+    category = sv[17] if len(sv) > 17 else None
 
     record = {
         # --- Identity ---
@@ -91,6 +101,7 @@ def normalize_state_vector(snapshot_time: int, sv: list) -> dict | None:
         "spi": bool(sv[15]),
         # --- Meta ---
         "position_source": sv[16],
+        "category": category,
         "last_contact": sv[4],
         # --- Idempotency key (precomputed for downstream) ---
         "idem_key": f"{icao24.lower().strip()}:{event_time}",

@@ -14,8 +14,19 @@ from systems.replay.normalizer import normalize_state_vector, normalize_batch
 class TestNormalizeStateVector(unittest.TestCase):
     """Test individual state vector normalization."""
 
-    def _make_sv(self, **overrides):
-        """Build a valid 17-element OpenSky state vector with optional overrides."""
+    # Sentinel so callers can distinguish "omit category" from "category=None"
+    _MISSING = object()
+
+    def _make_sv(self, category=_MISSING, **overrides):
+        """Build a valid OpenSky state vector with optional overrides.
+
+        Args:
+            category: When provided (including ``None``), an 18th element is
+                appended, producing an 18-field vector.  When omitted entirely,
+                the returned list has exactly 17 elements.
+            **overrides: Numeric-string keys (e.g. ``"0"``) override the
+                corresponding index in the base vector.
+        """
         base = [
             "4b1806",       # 0: icao24
             "SWR162 ",      # 1: callsign (note trailing space)
@@ -39,6 +50,8 @@ class TestNormalizeStateVector(unittest.TestCase):
             idx = int(k) if k.isdigit() else None
             if idx is not None:
                 base[idx] = v
+        if category is not self._MISSING:
+            base.append(category)  # index 17 — produces 18-field vector
         return base
 
     def test_basic_normalization(self):
@@ -135,6 +148,39 @@ class TestNormalizeStateVector(unittest.TestCase):
         sv[8] = True
         result = normalize_state_vector(1717416000, sv)
         self.assertTrue(result["on_ground"])
+
+    # --- contract C4: length-robust category field ---
+
+    def test_18_field_vector_category_present(self):
+        """18-field vector normalizes with category set to sv[17]."""
+        sv = self._make_sv(category=3)
+        self.assertEqual(len(sv), 18)
+        result = normalize_state_vector(1717416000, sv)
+        self.assertIsNotNone(result)
+        self.assertEqual(result["category"], 3)
+
+    def test_17_field_vector_category_none(self):
+        """17-field vector normalizes with category == None (field absent)."""
+        sv = self._make_sv()  # no category argument → 17 elements
+        self.assertEqual(len(sv), 17)
+        result = normalize_state_vector(1717416000, sv)
+        self.assertIsNotNone(result)
+        self.assertIsNone(result["category"])
+
+    def test_18_field_vector_category_null(self):
+        """18-field vector with null category normalizes with category == None."""
+        sv = self._make_sv(category=None)
+        self.assertEqual(len(sv), 18)
+        result = normalize_state_vector(1717416000, sv)
+        self.assertIsNotNone(result)
+        self.assertIsNone(result["category"])
+
+    def test_lt17_field_vector_returns_none(self):
+        """Vector with fewer than 17 fields is rejected and returns None."""
+        sv = self._make_sv()[:16]  # 16 elements — below MIN_FIELDS
+        self.assertEqual(len(sv), 16)
+        result = normalize_state_vector(1717416000, sv)
+        self.assertIsNone(result)
 
 
 class TestNormalizeBatch(unittest.TestCase):
