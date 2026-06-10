@@ -1,0 +1,169 @@
+version: 2
+
+models:
+
+  # ---------------------------------------------------------------------------
+  # gold_airport_congestion
+  # Partition: DATE(window_start) | Cluster: airport_icao
+  # ---------------------------------------------------------------------------
+  - name: gold_airport_congestion
+    description: >
+      Airport congestion aggregates per 5-minute time window.
+      Partitioned by day (window_start), clustered by airport_icao.
+      Contract v1.0.0 — schema/contracts/gold_airport_congestion.schema.json.
+    config:
+      contract:
+        enforced: false    # BigQuery adapter enforces via DDL; keep false for offline compile
+    columns:
+      - name: airport_icao
+        description: ICAO airport code.
+        tests:
+          - not_null
+      - name: window_start
+        description: Start of 5-minute aggregation window (TIMESTAMP, partition column).
+        tests:
+          - not_null
+      - name: window_end
+        description: End of 5-minute aggregation window (TIMESTAMP).
+        tests:
+          - not_null
+      - name: aircraft_count
+        description: Distinct aircraft observed in the window.
+        tests:
+          - not_null
+      - name: avg_altitude_m
+        description: Mean barometric altitude in metres (nullable — no data when no alt available).
+      - name: ground_count
+        description: Aircraft on ground.
+        tests:
+          - not_null
+      - name: airborne_count
+        description: Aircraft airborne.
+        tests:
+          - not_null
+
+  # ---------------------------------------------------------------------------
+  # gold_sector_load
+  # Partition: DATE(window_start) | Cluster: h3_r4
+  # ---------------------------------------------------------------------------
+  - name: gold_sector_load
+    description: >
+      Sector load density per H3 resolution-4 hex per 5-minute window.
+      Partitioned by day (window_start), clustered by h3_r4.
+      Contract v1.0.0 — schema/contracts/gold_sector_load.schema.json.
+    columns:
+      - name: h3_r4
+        description: H3 resolution-4 cell index.
+        tests:
+          - not_null
+      - name: window_start
+        description: Start of 5-minute aggregation window (TIMESTAMP, partition column).
+        tests:
+          - not_null
+      - name: window_end
+        description: End of 5-minute aggregation window (TIMESTAMP).
+        tests:
+          - not_null
+      - name: aircraft_count
+        description: Distinct aircraft in this sector during the window.
+        tests:
+          - not_null
+
+  # ---------------------------------------------------------------------------
+  # gold_emergency_events
+  # No partition / no cluster (event grain — C3 locked)
+  # ---------------------------------------------------------------------------
+  - name: gold_emergency_events
+    description: >
+      Emergency squawk event log. Squawk codes 7500 (hijack), 7600 (radio
+      failure), 7700 (general emergency).  No partition or cluster per C3.
+      Contract v1.0.0 — schema/contracts/gold_emergency_events.schema.json.
+    columns:
+      - name: icao24
+        description: 24-bit transponder hex ID (6 hex chars, lower-case).
+        tests:
+          - not_null
+      - name: callsign
+        description: Flight callsign (nullable).
+      - name: squawk
+        description: Emergency squawk code.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["7500", "7600", "7700"]
+      - name: first_seen_ts
+        description: First observation of the emergency squawk.
+        tests:
+          - not_null
+      - name: last_seen_ts
+        description: Last observation of the emergency squawk.
+        tests:
+          - not_null
+      - name: lat
+        description: Latitude at first observation.
+        tests:
+          - not_null
+      - name: lon
+        description: Longitude at first observation.
+        tests:
+          - not_null
+      - name: origin_country
+        description: Country of aircraft registration.
+        tests:
+          - not_null
+      - name: nearest_airport
+        description: ICAO code of nearest airport at first observation (nullable).
+      - name: duration_s
+        description: Duration of the emergency squawk event in seconds.
+        tests:
+          - not_null
+
+  # ---------------------------------------------------------------------------
+  # gold_routing_stats
+  # No partition / no cluster (route/aircraft grain — C3 locked)
+  # ---------------------------------------------------------------------------
+  - name: gold_routing_stats
+    description: >
+      Route-level aggregates per aircraft per observed window.
+      No partition or cluster per C3.
+      Contract v1.0.0 — schema/contracts/gold_routing_stats.schema.json.
+    columns:
+      - name: icao24
+        description: 24-bit transponder hex ID.
+        tests:
+          - not_null
+      - name: callsign
+        description: Flight callsign (nullable).
+      - name: window_start
+        description: Start of the observed flight window.
+        tests:
+          - not_null
+      - name: window_end
+        description: End of the observed flight window.
+        tests:
+          - not_null
+      - name: origin_lat
+        description: Latitude at first ping.
+        tests:
+          - not_null
+      - name: origin_lon
+        description: Longitude at first ping.
+        tests:
+          - not_null
+      - name: destination_lat
+        description: Latitude at last ping.
+        tests:
+          - not_null
+      - name: destination_lon
+        description: Longitude at last ping.
+        tests:
+          - not_null
+      - name: max_altitude_m
+        description: Maximum barometric altitude in metres (nullable).
+      - name: avg_velocity_mps
+        description: Mean ground speed in m/s (nullable).
+      - name: ping_count
+        description: Total ADS-B state-vector pings.
+        tests:
+          - not_null

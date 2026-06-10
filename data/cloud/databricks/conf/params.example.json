@@ -1,0 +1,6 @@
+{
+  "_comment": "Copy this file to params.json (gitignored) and substitute real UC Volume paths before running the notebook.",
+  "bronze_volume_path": "/Volumes/<catalog>/<schema>/<volume>/bronze/flight_state/",
+  "silver_table": "<catalog>.silver_flight_state",
+  "airports_ref_path": "/Volumes/<catalog>/<schema>/<volume>/reference/airports.json"
+}

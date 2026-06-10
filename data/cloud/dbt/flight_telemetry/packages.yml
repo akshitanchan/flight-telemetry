@@ -1,0 +1,3 @@
+packages: []
+# No external dbt packages required for this project.
+# Add dbt-utils or other packages here if needed in future iterations.

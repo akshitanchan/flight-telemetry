@@ -1,0 +1,55 @@
+# profiles.example.yml — copy this to ~/.dbt/profiles.yml (or set DBT_PROFILES_DIR
+# to the directory containing your profiles.yml), then fill in real values.
+#
+# SECURITY: Never commit a real keyfile path or project ID here.
+# Use environment variables as shown — they are resolved at runtime by dbt.
+#
+# Required env vars:
+#   GCP_PROJECT                    — your GCP project ID
+#   GOOGLE_APPLICATION_CREDENTIALS — absolute path to the dbt-runner service-account JSON key
+#
+# Terraform (infra/terraform/bigquery) already provisions:
+#   - dataset: flight_telemetry (US, multi-region)
+#   - service account: dbt-runner  (roles/bigquery.dataEditor + bigquery.jobUser)
+
+flight_telemetry:
+  target: prod
+
+  outputs:
+    prod:
+      type: bigquery
+      method: service-account
+      project: "{{ env_var('GCP_PROJECT') }}"
+      dataset: flight_telemetry
+      location: US
+      keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS') }}"
+      threads: 4
+      timeout_seconds: 300
+      priority: interactive
+      # Retries on transient BigQuery errors (rate limits, backend errors)
+      retries: 3
+
+    # Offline / CI profile — for dbt parse and dbt ls without real credentials.
+    # Note: dbt compile and dbt test (data tests) still require a live BigQuery
+    # connection because the BigQuery adapter populates a relation cache on startup.
+    # Set --target offline to activate.
+    offline:
+      type: bigquery
+      method: service-account
+      project: "{{ env_var('GCP_PROJECT', 'dummy-project') }}"
+      dataset: flight_telemetry
+      location: US
+      keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS', '/dev/null') }}"
+      threads: 1
+      timeout_seconds: 60
+
+    # Fully offline DuckDB target — for native unit tests only.
+    # dbt unit tests (test_type:unit) execute in a local DuckDB engine regardless
+    # of the configured adapter.  Using this target avoids the BigQuery adapter's
+    # relation-cache call that requires valid credentials.
+    # Requires: pip install "dbt-duckdb>=1.8,<2.0"
+    # Usage: dbt test --select "test_type:unit" --target duckdb_unit
+    duckdb_unit:
+      type: duckdb
+      path: ":memory:"
+      threads: 1

@@ -1,0 +1,177 @@
+{
+  "_comment": [
+    "Databricks Jobs API 2.1 job definition — W4.3 / ds-07",
+    "Bronze -> Silver -> Gold Delta medallion pipeline.",
+    "",
+    "OWNER MUST fill every placeholder marked <OWNER-FILL> before deploying:",
+    "  workspace_url  : your Databricks workspace URL",
+    "  repo_path      : Databricks Repo path where this git repo is imported",
+    "  catalog        : Unity Catalog catalog name (e.g. main)",
+    "  schema         : Unity Catalog schema name (e.g. default)",
+    "  volume         : UC Volume name that contains the bronze JSONL files",
+    "",
+    "Deployment options (choose one):",
+    "  A) Databricks Asset Bundle: `databricks bundle deploy` (see databricks.yml in this dir)",
+    "  B) REST API: POST /api/2.1/jobs/create with this JSON body",
+    "  C) Databricks UI: Jobs > Create Job > Import from JSON"
+  ],
+
+  "name": "flight_telemetry_medallion_pipeline",
+
+  "parameters": [
+    {
+      "name": "catalog",
+      "default": "<OWNER-FILL:catalog>"
+    },
+    {
+      "name": "schema",
+      "default": "<OWNER-FILL:schema>"
+    },
+    {
+      "name": "volume",
+      "default": "<OWNER-FILL:volume>"
+    },
+    {
+      "name": "bronze_volume_path",
+      "default": "{{job.parameters.catalog}}/{{job.parameters.schema}}/{{job.parameters.volume}}/bronze/flight_state/"
+    },
+    {
+      "name": "silver_table",
+      "default": "{{job.parameters.catalog}}.{{job.parameters.schema}}.silver_flight_state"
+    },
+    {
+      "name": "gold_emergency_table",
+      "default": "{{job.parameters.catalog}}.{{job.parameters.schema}}.gold_emergency_events"
+    },
+    {
+      "name": "gold_sector_table",
+      "default": "{{job.parameters.catalog}}.{{job.parameters.schema}}.gold_sector_load"
+    },
+    {
+      "name": "gold_congestion_table",
+      "default": "{{job.parameters.catalog}}.{{job.parameters.schema}}.gold_airport_congestion"
+    },
+    {
+      "name": "gold_routing_table",
+      "default": "{{job.parameters.catalog}}.{{job.parameters.schema}}.gold_routing_stats"
+    },
+    {
+      "name": "airports_ref_path",
+      "default": ""
+    },
+    {
+      "name": "incremental_window_start",
+      "default": ""
+    },
+    {
+      "name": "incremental_window_end",
+      "default": ""
+    }
+  ],
+
+  "tasks": [
+    {
+      "task_key": "bronze_to_silver",
+      "description": "Read bronze JSONL from UC Volume, apply C1 transform, write silver Delta table (ds-02)",
+      "notebook_task": {
+        "notebook_path": "data/cloud/databricks/notebooks/01_bronze_to_silver",
+        "base_parameters": {
+          "bronze_volume_path": "{{job.parameters.bronze_volume_path}}",
+          "silver_table":       "{{job.parameters.silver_table}}",
+          "airports_ref_path":  "{{job.parameters.airports_ref_path}}"
+        },
+        "source": "GIT"
+      },
+      "job_cluster_key": "medallion_single_node",
+      "timeout_seconds": 3600,
+      "max_retries": 1,
+      "min_retry_interval_millis": 60000,
+      "retry_on_timeout": false
+    },
+    {
+      "task_key": "silver_to_gold",
+      "description": "Build all four gold Delta tables from silver (full recompute + optional incremental MERGE) (ds-04)",
+      "depends_on": [
+        {
+          "task_key": "bronze_to_silver"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "data/cloud/databricks/notebooks/02_silver_to_gold",
+        "base_parameters": {
+          "silver_table":             "{{job.parameters.silver_table}}",
+          "gold_emergency_table":     "{{job.parameters.gold_emergency_table}}",
+          "gold_sector_table":        "{{job.parameters.gold_sector_table}}",
+          "gold_congestion_table":    "{{job.parameters.gold_congestion_table}}",
+          "gold_routing_table":       "{{job.parameters.gold_routing_table}}",
+          "incremental_window_start": "{{job.parameters.incremental_window_start}}",
+          "incremental_window_end":   "{{job.parameters.incremental_window_end}}"
+        },
+        "source": "GIT"
+      },
+      "job_cluster_key": "medallion_single_node",
+      "timeout_seconds": 7200,
+      "max_retries": 1,
+      "min_retry_interval_millis": 60000,
+      "retry_on_timeout": false
+    }
+  ],
+
+  "job_clusters": [
+    {
+      "job_cluster_key": "medallion_single_node",
+      "_comment": "Single-node cluster sized for Databricks Free Edition (14 GB / 4 vCPUs). Adjust node_type_id for your cloud region.",
+      "new_cluster": {
+        "spark_version": "15.4.x-scala2.12",
+        "node_type_id": "Standard_DS3_v2",
+        "num_workers": 0,
+        "spark_conf": {
+          "spark.master": "local[*]",
+          "spark.databricks.cluster.profile": "singleNode"
+        },
+        "custom_tags": {
+          "ResourceClass": "SingleNode"
+        },
+        "spark_env_vars": {
+          "PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+        },
+        "init_scripts": [],
+        "libraries": [
+          {"pypi": {"package": "h3==3.7.7"}},
+          {"pypi": {"package": "geohash2==1.1"}}
+        ],
+        "autotermination_minutes": 30
+      }
+    }
+  ],
+
+  "git_source": {
+    "_comment": "OWNER: set url to your fork/remote and branch to main (or the release tag).",
+    "git_url": "<OWNER-FILL:https://github.com/<org>/flight-telemetry.git>",
+    "git_provider": "gitHub",
+    "git_branch": "main"
+  },
+
+  "schedule": {
+    "quartz_cron_expression": "0 0 2 * * ?",
+    "timezone_id": "UTC",
+    "pause_status": "PAUSED",
+    "_comment": "Runs daily at 02:00 UTC. OWNER: set pause_status to UNPAUSED when ready to activate."
+  },
+
+  "max_concurrent_runs": 1,
+
+  "email_notifications": {
+    "on_failure": [],
+    "no_alert_for_skipped_runs": true
+  },
+
+  "tags": {
+    "project": "flight-telemetry",
+    "wave": "W4.3",
+    "task": "ds-07",
+    "layer": "medallion"
+  },
+
+  "format": "MULTI_TASK"
+}

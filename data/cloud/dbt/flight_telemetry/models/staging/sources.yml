@@ -1,0 +1,165 @@
+version: 2
+
+# ---------------------------------------------------------------------------
+# Source declarations for the bq-load landed gold Parquet tables.
+#
+# These tables are populated by the owner via:
+#   bq load --source_format=PARQUET flight_telemetry.<table> gs://<bucket>/<file>
+#
+# dbt does NOT own the source tables — it only reads from them.
+# dbt DOES own the mart tables (models/marts/) which it creates/increments.
+# ---------------------------------------------------------------------------
+
+sources:
+  - name: gold_landing
+    description: >
+      Landing-zone tables populated by bq load from gold Parquet files.
+      These are the raw-loaded counterparts of the aggregates produced by
+      data/transforms/silver_to_gold.py.  dbt marts read from here and
+      write into the final flight_telemetry.gold_* destination tables.
+    database: "{{ env_var('GCP_PROJECT', 'dummy-project') }}"
+    schema: flight_telemetry
+
+    tables:
+      - name: gold_airport_congestion_landing
+        description: >
+          bq-load landing table for airport congestion aggregates.
+          Schema mirrors gold_airport_congestion (DDL: data/cloud/ddl/bigquery/gold_airport_congestion.sql).
+        columns:
+          - name: airport_icao
+            description: ICAO code of the airport.
+            tests:
+              - not_null
+          - name: window_start
+            description: Start of 5-minute aggregation window (TIMESTAMP).
+            tests:
+              - not_null
+          - name: window_end
+            description: End of 5-minute aggregation window (TIMESTAMP).
+            tests:
+              - not_null
+          - name: aircraft_count
+            description: Distinct aircraft observed within the window.
+            tests:
+              - not_null
+          - name: avg_altitude_m
+            description: Mean barometric altitude in metres (nullable).
+          - name: ground_count
+            description: Aircraft on ground count.
+            tests:
+              - not_null
+          - name: airborne_count
+            description: Aircraft airborne count.
+            tests:
+              - not_null
+
+      - name: gold_sector_load_landing
+        description: >
+          bq-load landing table for H3 sector load aggregates.
+          Schema mirrors gold_sector_load (DDL: data/cloud/ddl/bigquery/gold_sector_load.sql).
+        columns:
+          - name: h3_r4
+            description: H3 resolution-4 cell index.
+            tests:
+              - not_null
+          - name: window_start
+            description: Start of 5-minute aggregation window (TIMESTAMP).
+            tests:
+              - not_null
+          - name: window_end
+            description: End of 5-minute aggregation window (TIMESTAMP).
+            tests:
+              - not_null
+          - name: aircraft_count
+            description: Distinct aircraft in this sector during the window.
+            tests:
+              - not_null
+
+      - name: gold_emergency_events_landing
+        description: >
+          bq-load landing table for emergency squawk events.
+          Schema mirrors gold_emergency_events (DDL: data/cloud/ddl/bigquery/gold_emergency_events.sql).
+        columns:
+          - name: icao24
+            description: 24-bit transponder hex ID.
+            tests:
+              - not_null
+          - name: callsign
+            description: Flight callsign (nullable).
+          - name: squawk
+            description: Emergency squawk code — one of 7500, 7600, 7700.
+            tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values: ["7500", "7600", "7700"]
+          - name: first_seen_ts
+            description: First observation of the emergency squawk.
+            tests:
+              - not_null
+          - name: last_seen_ts
+            description: Last observation of the emergency squawk.
+            tests:
+              - not_null
+          - name: lat
+            description: Latitude at first observation.
+            tests:
+              - not_null
+          - name: lon
+            description: Longitude at first observation.
+            tests:
+              - not_null
+          - name: origin_country
+            description: Country of aircraft registration.
+            tests:
+              - not_null
+          - name: nearest_airport
+            description: ICAO code of nearest airport at first observation (nullable).
+          - name: duration_s
+            description: Duration of emergency squawk in seconds.
+            tests:
+              - not_null
+
+      - name: gold_routing_stats_landing
+        description: >
+          bq-load landing table for route-level aggregates.
+          Schema mirrors gold_routing_stats (DDL: data/cloud/ddl/bigquery/gold_routing_stats.sql).
+        columns:
+          - name: icao24
+            description: 24-bit transponder hex ID.
+            tests:
+              - not_null
+          - name: callsign
+            description: Flight callsign (nullable).
+          - name: window_start
+            description: Start of the observed flight window.
+            tests:
+              - not_null
+          - name: window_end
+            description: End of the observed flight window.
+            tests:
+              - not_null
+          - name: origin_lat
+            description: Latitude at first ping.
+            tests:
+              - not_null
+          - name: origin_lon
+            description: Longitude at first ping.
+            tests:
+              - not_null
+          - name: destination_lat
+            description: Latitude at last ping.
+            tests:
+              - not_null
+          - name: destination_lon
+            description: Longitude at last ping.
+            tests:
+              - not_null
+          - name: max_altitude_m
+            description: Maximum barometric altitude in metres (nullable).
+          - name: avg_velocity_mps
+            description: Mean ground speed in m/s (nullable).
+          - name: ping_count
+            description: Total number of ADS-B state-vector pings.
+            tests:
+              - not_null

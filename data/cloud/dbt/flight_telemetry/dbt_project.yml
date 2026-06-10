@@ -1,0 +1,39 @@
+name: "flight_telemetry"
+version: "1.0.0"
+config-version: 2
+
+# Profile matches profiles.example.yml (owner copies to ~/.dbt/profiles.yml or
+# points DBT_PROFILES_DIR at the directory containing a real profiles.yml).
+profile: "flight_telemetry"
+
+# Project layout
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# ---------------------------------------------------------------------------
+# Model defaults
+# ---------------------------------------------------------------------------
+models:
+  flight_telemetry:
+    # Mart layer: incremental tables created/managed by dbt inside the
+    # flight_telemetry dataset (dataset provisioned by Terraform — ds-01).
+    # The staging/ directory contains only sources.yml (no SQL models).
+    marts:
+      +materialized: incremental
+      +schema: ""       # empty → writes directly into the profile dataset
+      +on_schema_change: append_new_columns
+
+# ---------------------------------------------------------------------------
+# Unit tests (dbt >= 1.8 native unit tests)
+# ---------------------------------------------------------------------------
+# unit-tests live in models/marts/_unit_tests.yml — dbt discovers them
+# automatically from the model yaml files in that path.
