@@ -1,0 +1,24 @@
+# Terraform state — NEVER commit; contains plaintext resource IDs and secrets
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Terraform working directory — provider binaries and cached modules
+.terraform/
+.terraform.lock.hcl
+
+# Variable files the owner keeps locally — may contain project IDs, SA emails
+*.tfvars
+*.tfvars.json
+
+# Terraform plan output files (may embed sensitive values)
+*.tfplan
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Service-account JSON keys — should NEVER be in the repo
+*.json.key
+*-sa-key.json
+*-credentials.json

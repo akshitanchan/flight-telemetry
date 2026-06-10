@@ -103,6 +103,11 @@ ml-baseline-real: ## Train the baseline on the REAL PRC 2025 data (bounded: LIMI
 	$(PYTHON) -m ml.extract_features --data-dir data/raw/prc_2025 --split train --limit $(LIMIT)
 	$(PYTHON) -m ml.train --data-dir data/raw/prc_2025 --epochs $(EPOCHS)
 
+.PHONY: ml-cv
+ml-cv: ## Chronological CV on the bounded real dataset (LIMIT flights, EPOCHS epochs)
+	$(PYTHON) -m ml.extract_features --data-dir data/raw/prc_2025 --split train --limit $(LIMIT)
+	$(PYTHON) -m ml.cv --data-dir data/raw/prc_2025 --epochs $(EPOCHS)
+
 .PHONY: ml-serve-smoke
 ml-serve-smoke: ## Start serving endpoint and run smoke test
 	$(PYTHON) -m pytest ml/test_serve.py -v -s

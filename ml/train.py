@@ -1,12 +1,13 @@
 import argparse
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 import mlflow
 import mlflow.pytorch
 import math
 import copy
 import logging
+import numpy as np
 from pathlib import Path
 
 from ml.dataset import FuelBurnDataset
@@ -62,14 +63,38 @@ def main():
     
     logger.info(f"Loading dataset from {args.data_dir}")
     dataset = FuelBurnDataset(data_dir=args.data_dir, split="train")
-    
-    # Simple split for scaffold
-    train_size = int(0.8 * len(dataset))
-    val_size = len(dataset) - train_size
-    train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
-    
+
+    # --- Flight-level group split (no flight leaks across train/val) ---
+    # Use GroupShuffleSplit so the 80/20 boundary is drawn at the flight level,
+    # not the interval level.  random_state=0 is a fixed seed independent of
+    # torch.manual_seed so the split is identical across runs.
+    from sklearn.model_selection import GroupShuffleSplit
+
+    flight_ids = dataset.flight_ids            # shape (N,) — one entry per interval
+    all_indices = np.arange(len(dataset))
+
+    gss = GroupShuffleSplit(n_splits=1, test_size=0.2, random_state=0)
+    train_idx, val_idx = next(gss.split(all_indices, groups=flight_ids))
+
+    train_dataset = Subset(dataset, train_idx)
+    val_dataset   = Subset(dataset, val_idx)
+
+    # Verify that no flight appears on both sides (correctness guarantee).
+    train_flights = set(flight_ids[train_idx])
+    val_flights   = set(flight_ids[val_idx])
+    assert train_flights.isdisjoint(val_flights), (
+        f"Data leakage: {len(train_flights & val_flights)} flights appear in both "
+        "train and val splits."
+    )
+    logger.info(
+        f"Flight-level split — train flights: {len(train_flights)}, "
+        f"val flights: {len(val_flights)}, "
+        f"train intervals: {len(train_idx)}, val intervals: {len(val_idx)} — "
+        "train/val flight sets are DISJOINT (no leakage)."
+    )
+
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=args.batch_size)
+    val_loader   = DataLoader(val_dataset,   batch_size=args.batch_size)
     
     model = FuelBurnMLP().to(device)
     criterion = nn.MSELoss()

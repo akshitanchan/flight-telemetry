@@ -1,0 +1,56 @@
+# =============================================================================
+# .dockerignore — Flight Telemetry Platform
+# Keeps Docker build contexts lean by excluding generated, large, and
+# sensitive files that must never be baked into images.
+# =============================================================================
+
+# Python virtual environments
+.venv/
+venv/
+env/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Raw / large data files (can be hundreds of MB)
+data/raw/
+data/interim/
+data/processed/
+data/ml/
+
+# Generated outputs and ML artefacts
+outputs/
+artifacts/
+mlruns/
+mlflow.db
+
+# Git metadata
+.git/
+.gitignore
+
+# Environment / secrets — NEVER bake into images
+.env
+*.env
+.env.*
+!.env.example
+
+# Editor and OS noise
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test and coverage artefacts
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Docs (not needed at runtime)
+docs/
+*.md

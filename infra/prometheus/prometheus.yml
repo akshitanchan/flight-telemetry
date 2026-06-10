@@ -1,0 +1,64 @@
+# =============================================================================
+# infra/prometheus/prometheus.yml
+# Prometheus scrape configuration for the Flight Telemetry platform
+#
+# Scrape jobs:
+#   otel-collector  — self-metrics + forwarded app metrics from the collector
+#   ml-serve        — PLACEHOLDER: ML inference service /metrics (ws0-03)
+#   ingestion       — PLACEHOLDER: Data ingestion service /metrics (ws0-03)
+#   dashboard       — PLACEHOLDER: Dashboard / API service /metrics (ws0-03)
+#
+# PLACEHOLDER jobs use file_sd_configs with an empty targets list so they
+# appear in the Prometheus target discovery without causing scrape errors
+# until the application containers are added in task ws0-03.
+# =============================================================================
+
+global:
+  scrape_interval: 15s       # How often Prometheus scrapes each target
+  evaluation_interval: 15s   # How often rules are evaluated
+  scrape_timeout: 10s
+
+scrape_configs:
+  # ---------------------------------------------------------------------------
+  # OpenTelemetry Collector self-metrics and forwarded application metrics.
+  # The collector's prometheus exporter listens on port 8889.
+  # ---------------------------------------------------------------------------
+  - job_name: "otel-collector"
+    static_configs:
+      - targets: ["otel-collector:8889"]
+        labels:
+          service: "otel-collector"
+
+  # ---------------------------------------------------------------------------
+  # ml-serve — ML inference service /metrics endpoint (ws0-03)
+  # FastAPI app mounts prometheus-client ASGI app at /metrics on port 8000.
+  # ---------------------------------------------------------------------------
+  - job_name: "ml-serve"
+    static_configs:
+      - targets: ["ml-serve:8000"]
+        labels:
+          service: "ml-serve"
+
+  # ---------------------------------------------------------------------------
+  # ingestion — Data ingestion service /metrics endpoint (ws0-03)
+  # shared/obs/telemetry.py::start_metrics_server() exposes metrics on 8001.
+  # NOTE: this target will produce scrape errors until task ws1-02 lands and
+  # the ingestion container is running.
+  # ---------------------------------------------------------------------------
+  - job_name: "ingestion"
+    static_configs:
+      - targets: ["ingestion:8001"]
+        labels:
+          service: "ingestion"
+
+  # ---------------------------------------------------------------------------
+  # dashboard — Streamlit dashboard /metrics endpoint (ws0-03)
+  # NOTE: Streamlit does not natively expose /metrics. This target is a
+  # placeholder for a sidecar or future metrics endpoint added in ws5-01.
+  # Scrape errors are expected until that task lands.
+  # ---------------------------------------------------------------------------
+  - job_name: "dashboard"
+    static_configs:
+      - targets: ["dashboard:8501"]
+        labels:
+          service: "dashboard"

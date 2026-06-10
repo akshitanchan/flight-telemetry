@@ -1,0 +1,62 @@
+# =============================================================================
+# infra/otel/collector.yaml
+# OpenTelemetry Collector Contrib configuration
+#
+# Receivers  : OTLP gRPC (4317) + HTTP (4318)  — application services push here
+# Processors : batch (reduces downstream pressure)
+# Exporters  :
+#   - jaeger    : forwards traces to Jaeger via OTLP gRPC
+#   - prometheus : exposes collector self-metrics + forwarded metrics at :8889
+#   - logging   : debug exporter (prints to container stdout, verbosity=detailed)
+# Pipelines  :
+#   - traces  : otlp → batch → jaeger + logging
+#   - metrics : otlp → batch → prometheus
+# =============================================================================
+
+extensions:
+  health_check:
+    endpoint: "0.0.0.0:13133"
+  pprof:
+    endpoint: "0.0.0.0:1777"
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317"
+      http:
+        endpoint: "0.0.0.0:4318"
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 1024
+
+exporters:
+  # Forward traces to Jaeger over OTLP gRPC
+  otlp/jaeger:
+    endpoint: "jaeger:4317"
+    tls:
+      insecure: true
+
+  # Expose scraped metrics on :8889/metrics — Prometheus scrapes this
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+    namespace: "otelcol"
+
+  # Human-readable debug output in container logs
+  debug:
+    verbosity: detailed
+
+service:
+  extensions: [health_check, pprof]
+  pipelines:
+    traces:
+      receivers:  [otlp]
+      processors: [batch]
+      exporters:  [otlp/jaeger, debug]
+
+    metrics:
+      receivers:  [otlp]
+      processors: [batch]
+      exporters:  [prometheus, debug]

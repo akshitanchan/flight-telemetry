@@ -252,3 +252,32 @@ mlruns/
 
 # MLflow local tracking store (SQLite) — must not be committed
 mlflow.db
+
+# ===========================================================
+# Terraform — infra/terraform/
+# ===========================================================
+
+# State files contain resource IDs and can embed sensitive values
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Local working directory created by `terraform init`
+.terraform/
+.terraform.lock.hcl
+
+# Variable files the owner keeps out of version control
+# (pass values via -var flags or a local *.tfvars file that is gitignored)
+*.tfvars
+*.tfvars.json
+
+# Saved plan files (can embed sensitive config)
+*.tfplan
+
+# Terraform crash logs
+crash.log
+crash.*.log
+
+# GCP service-account JSON keys — must never be committed
+*-sa-key.json
+*-credentials.json

@@ -1,0 +1,234 @@
+# =============================================================================
+# docker-compose.yml — Flight Telemetry Platform: Local Infrastructure Backbone
+#
+# Services defined here (task ws0-02):
+#   postgres       — Custom PostGIS 16-3.4 + pgvector image; schema auto-applied
+#   otel-collector — OpenTelemetry Collector Contrib; OTLP in, Jaeger+Prom out
+#   prometheus     — Scrapes otel-collector metrics; placeholder jobs for apps
+#   jaeger         — Trace storage + UI (all-in-one); OTLP receive on 4317
+#
+# Services added in task ws0-03 (see placeholder block at the bottom):
+#   ingestion, ml-serve, dashboard
+#
+# Usage:
+#   docker compose up -d postgres otel-collector prometheus jaeger
+#   docker compose down -v          # tear down and remove volumes
+# =============================================================================
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # postgres
+  # Custom image layers pgvector on top of the official postgis/postgis:16-3.4
+  # base. On first start the Postgres entrypoint executes every *.sql file in
+  # /docker-entrypoint-initdb.d/ — our init script creates both extensions and
+  # all three tables.
+  # ---------------------------------------------------------------------------
+  postgres:
+    build:
+      context: ./infra/postgres
+      dockerfile: Dockerfile
+    image: flight-telemetry/postgres:16-3.4-pgvector
+    container_name: flight-postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: flight
+      POSTGRES_PASSWORD: flight
+      POSTGRES_DB: flight
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/db/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flight -d flight"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ---------------------------------------------------------------------------
+  # otel-collector
+  # Receives OTLP spans/metrics from application services and fans out to
+  # Jaeger (traces) and the built-in Prometheus exporter (metrics).
+  # Config: infra/otel/collector.yaml
+  # ---------------------------------------------------------------------------
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.103.0
+    container_name: flight-otel-collector
+    restart: unless-stopped
+    command: ["--config=/etc/otelcol/collector.yaml"]
+    volumes:
+      - ./infra/otel/collector.yaml:/etc/otelcol/collector.yaml:ro
+    ports:
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+      - "8889:8889"   # Prometheus exporter scrape endpoint
+      - "13133:13133" # Collector health_check extension
+      - "1777:1777"   # pprof endpoint (profiling)
+    depends_on:
+      jaeger:
+        condition: service_started
+    # The otel-collector-contrib image is distroless (no shell/wget/curl).
+    # Docker HEALTHCHECK is disabled here; liveness is verified externally via
+    # the health_check extension on http://localhost:13133/ from the host or
+    # from a sidecar. The collector is ready when port 4317 accepts connections.
+    healthcheck:
+      disable: true
+
+  # ---------------------------------------------------------------------------
+  # prometheus
+  # Scrapes the otel-collector metrics exporter plus placeholder jobs for the
+  # application services (ingestion, ml-serve, dashboard — added in ws0-03).
+  # Config: infra/prometheus/prometheus.yml
+  # ---------------------------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    container_name: flight-prometheus
+    restart: unless-stopped
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+      - "--web.enable-lifecycle"   # allows POST /-/reload to hot-reload config
+    volumes:
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      otel-collector:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9090/-/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # ---------------------------------------------------------------------------
+  # jaeger
+  # All-in-one image: collector + query + UI in a single container.
+  # Receives traces from otel-collector via OTLP gRPC on the internal port 4317.
+  # The host port mapping for OTLP uses 14317 to avoid collision with the
+  # otel-collector's host-exposed 4317.
+  # ---------------------------------------------------------------------------
+  jaeger:
+    image: jaegertracing/all-in-one:1.58
+    container_name: flight-jaeger
+    restart: unless-stopped
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"  # Jaeger UI
+      - "14317:4317"   # OTLP gRPC (host 14317 → container 4317; avoids conflict)
+      - "14318:4318"   # OTLP HTTP (host 14318 → container 4318)
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:16686/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # ---------------------------------------------------------------------------
+  # ml-serve  (added in task ws0-03)
+  # FastAPI inference service (ml/serve.py) — exposes /health and /metrics.
+  # ML_FAKE_MODE=true keeps the service functional before a real model is
+  # trained and registered in MLflow; set ML_FAKE_MODE=false and
+  # ML_MODEL_URI=<uri> once the model artefact exists.
+  # ---------------------------------------------------------------------------
+  ml-serve:
+    build:
+      context: .
+      dockerfile: infra/docker/ml-serve.Dockerfile
+    image: flight-telemetry/ml-serve:latest
+    container_name: flight-ml-serve
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://flight:flight@postgres:5432/flight
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_SERVICE_NAME: ml-serve
+      # MLflow tracking — override ML_MODEL_URI to load a real model
+      MLFLOW_TRACKING_URI: http://localhost:5000
+      ML_FAKE_MODE: "true"
+      ML_MODEL_URI: ""
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # ingestion  (added in task ws0-03)
+  # Real-time ADS-B / OpenSky ingestion pipeline.
+  # DEPENDENCY: systems.ingest.cli is created in task ws1-02.
+  # The image builds now; the container will start successfully once ws1-02
+  # lands and systems/ingest/cli.py exists in the repo.
+  # ---------------------------------------------------------------------------
+  ingestion:
+    build:
+      context: .
+      dockerfile: infra/docker/ingestion.Dockerfile
+    image: flight-telemetry/ingestion:latest
+    container_name: flight-ingestion
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://flight:flight@postgres:5432/flight
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_SERVICE_NAME: ingestion
+      # OpenSky credentials — set in .env (OPENSKY_CLIENT_ID / OPENSKY_CLIENT_SECRET)
+    depends_on:
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+
+  # ---------------------------------------------------------------------------
+  # dashboard  (added in task ws0-03)
+  # Streamlit analytics dashboard.
+  # DEPENDENCY: dashboard/app.py and the `streamlit` package are added in
+  # task ws5-01. The image builds now; the container starts once ws5-01 lands.
+  # ---------------------------------------------------------------------------
+  dashboard:
+    build:
+      context: .
+      dockerfile: infra/docker/dashboard.Dockerfile
+    image: flight-telemetry/dashboard:latest
+    container_name: flight-dashboard
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://flight:flight@postgres:5432/flight
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_SERVICE_NAME: dashboard
+    ports:
+      - "8501:8501"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+    driver: local
+  prometheus_data:
+    driver: local
+
+networks:
+  default:
+    name: flight-telemetry-net

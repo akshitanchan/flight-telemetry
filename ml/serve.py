@@ -7,9 +7,22 @@ from fastapi import FastAPI, Request
 from pydantic import BaseModel, Field
 import torch
 
+from shared.obs.telemetry import (
+    ml_predict_latency_seconds,
+    http_requests_total,
+    setup_metrics,
+    setup_tracing,
+    get_tracer,
+)
+
 # Configure Logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s INFO  [%(name)s] %(message)s")
 logger = logging.getLogger("ml.serve")
+
+# Configure tracing early — before the app is used.  No-ops gracefully when no
+# collector is reachable (offline runs and CI stay green).
+setup_tracing("ml-serve")
+_tracer = get_tracer("ml.serve")
 
 
 def _env_bool(name: str, default: bool) -> bool:
@@ -56,6 +69,10 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Fuel Burn Estimation API", version="0.1.0", lifespan=lifespan)
 
+# Mount /metrics and register the HTTP metrics + latency logging middleware.
+# setup_metrics is idempotent so test re-imports are safe.
+setup_metrics(app)
+
 
 class PredictRequest(BaseModel):
     flight_id: str = Field(..., description="Unique flight identifier")
@@ -74,6 +91,12 @@ class PredictResponse(BaseModel):
 
 @app.middleware("http")
 async def log_latency_middleware(request: Request, call_next):
+    """Log per-request latency to structured logger.
+
+    Prometheus HTTP counters are handled separately by the metrics middleware
+    registered in setup_metrics; this middleware focuses only on structured
+    logging so the two concerns remain independent.
+    """
     start_time = time.perf_counter()
     response = await call_next(request)
     process_time_ms = (time.perf_counter() - start_time) * 1000
@@ -88,34 +111,42 @@ def health_check():
 
 @app.post("/predict", response_model=PredictResponse)
 def predict(req: PredictRequest):
-    start_time = time.perf_counter()
+    with _tracer.start_as_current_span("ml.predict") as span:
+        span.set_attribute("flight_id", req.flight_id)
 
-    # Guard: serve the heuristic whenever we're in fake mode OR no model is loaded.
-    if FAKE_MODE or MODEL is None:
-        # Simple heuristic for fake mode: ~50kg per minute of duration
-        pred_fuel = (req.duration_s / 60.0) * 50.0
-        version = "fake-heuristic-v1"
-    else:
-        # Real model inference. Shape [1, 4] (batch of one) so the output is
-        # well-defined rather than relying on PyTorch auto-broadcast (audit M7).
-        features = torch.tensor([[
-            req.duration_s,
-            req.alt_change,
-            req.avg_speed,
-            req.max_vrate,
-        ]], dtype=torch.float32)
+        start_time = time.perf_counter()
 
-        with torch.no_grad():
-            pred = MODEL(features)
+        # Guard: serve the heuristic whenever we're in fake mode OR no model is loaded.
+        if FAKE_MODE or MODEL is None:
+            # Simple heuristic for fake mode: ~50kg per minute of duration
+            pred_fuel = (req.duration_s / 60.0) * 50.0
+            version = "fake-heuristic-v1"
+        else:
+            # Real model inference. Shape [1, 4] (batch of one) so the output is
+            # well-defined rather than relying on PyTorch auto-broadcast (audit M7).
+            features = torch.tensor([[
+                req.duration_s,
+                req.alt_change,
+                req.avg_speed,
+                req.max_vrate,
+            ]], dtype=torch.float32)
 
-        pred_fuel = float(pred.reshape(-1)[0].item())
-        version = "mlflow-baseline"
+            with torch.no_grad():
+                pred = MODEL(features)
 
-    process_time_ms = (time.perf_counter() - start_time) * 1000
+            pred_fuel = float(pred.reshape(-1)[0].item())
+            version = "mlflow-baseline"
 
-    return PredictResponse(
-        flight_id=req.flight_id,
-        predicted_fuel_kg=pred_fuel,
-        model_version=version,
-        latency_ms=process_time_ms,
-    )
+        elapsed_s = time.perf_counter() - start_time
+        ml_predict_latency_seconds.observe(elapsed_s)
+        process_time_ms = elapsed_s * 1000
+
+        span.set_attribute("model_version", version)
+        span.set_attribute("predicted_fuel_kg", pred_fuel)
+
+        return PredictResponse(
+            flight_id=req.flight_id,
+            predicted_fuel_kg=pred_fuel,
+            model_version=version,
+            latency_ms=process_time_ms,
+        )

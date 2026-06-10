@@ -26,6 +26,15 @@ fastapi>=0.110.0
 uvicorn>=0.27.0
 pydantic>=2.0.0
 
+# Postgres / PostGIS access (C2 contract — shared/store/pg.py)
+psycopg[binary]>=3.1
+
+# Observability (C6 contract — shared/obs/telemetry.py)
+prometheus-client>=0.20.0
+opentelemetry-sdk>=1.20.0
+opentelemetry-exporter-otlp>=1.20.0
+opentelemetry-instrumentation-fastapi>=0.45b0
+
 # NOTE: evidently (drift monitoring, plan §5.3) is intentionally NOT added yet —
 # it is not imported by any module. Add it when the drift monitor is built so a
 # fresh `pip install -r requirements.txt` stays lean and conflict-free.
