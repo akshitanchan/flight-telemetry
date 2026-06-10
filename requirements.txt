@@ -35,6 +35,5 @@ opentelemetry-sdk>=1.20.0
 opentelemetry-exporter-otlp>=1.20.0
 opentelemetry-instrumentation-fastapi>=0.45b0
 
-# NOTE: evidently (drift monitoring, plan §5.3) is intentionally NOT added yet —
-# it is not imported by any module. Add it when the drift monitor is built so a
-# fresh `pip install -r requirements.txt` stays lean and conflict-free.
+# Drift monitoring (ml/drift.py — ml-08, W4.2)
+evidently>=0.7.21

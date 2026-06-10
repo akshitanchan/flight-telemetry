@@ -1,0 +1,162 @@
+# =============================================================================
+# ml/configs/fullscale.yaml
+# Full-scale training configuration for PRC-2025 (11,037 flights)
+# Databricks Free Edition — OWNER-CLOUD preparation
+# =============================================================================
+#
+# Schema contract
+# ---------------
+# Every key here is read by ml/train_fullscale.py.  Overrides are accepted via
+# CLI flags (--override key=value) or environment variables prefixed FULLSCALE_
+# (e.g. FULLSCALE_DATA_DIR=/Volumes/...).
+#
+# Owner: fill in the three OWNER-FILL blocks before submitting the Databricks
+#        job.  All other keys have production-ready defaults.
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# Data paths
+# ---------------------------------------------------------------------------
+data:
+  # Path to the PRC-2025 raw dataset directory.
+  # Local  : data/raw/prc_2025
+  # Databricks UC volume: /Volumes/<catalog>/<schema>/<volume>/prc_2025
+  # OWNER-FILL: set to your Unity Catalog volume path on Databricks, e.g.
+  #   /Volumes/flight_telemetry/bronze/prc2025_raw/prc_2025
+  data_dir: "data/raw/prc_2025"
+
+  # Dataset split to extract and train on.  Do not change unless you have
+  # a separate val split parquet pre-extracted.
+  split: "train"
+
+  # Per-flight checkpoint shards directory for resumable extract_features.
+  # null => defaults to <data_dir>/features_checkpoint_<split>/
+  # On Databricks: set to a path under /dbfs/tmp/ or a UC volume for
+  # durability across cluster restarts.
+  # OWNER-FILL (optional): override with a durable UC volume path, e.g.
+  #   /Volumes/flight_telemetry/bronze/prc2025_raw/features_checkpoint_train
+  checkpoint_dir: null
+
+  # Limit the number of flights to extract.  null = all 11,037 flights.
+  # Set to a small integer (e.g. 50) for offline smoke tests.
+  extract_limit: null
+
+# ---------------------------------------------------------------------------
+# Training hyperparameters
+# ---------------------------------------------------------------------------
+training:
+  # Number of training epochs.
+  # Full-scale recommendation: 50 epochs delivers convergence in ~30 min on
+  # a Standard_DS3_v2 single-node Databricks cluster (CPU-only).
+  # The existing train.py default is 5; the CV re-baseline used 10.
+  # Increase to 100 for a longer run; best_val_rmse is tracked so early stopping
+  # via the logged metric is trivial to add later.
+  epochs: 50
+
+  # Mini-batch size.  16 is the validated default from the CV re-baseline.
+  # On a GPU-enabled Databricks cluster, increase to 256 for higher throughput.
+  batch_size: 16
+
+  # Adam learning rate.  0.001 is the validated default.
+  # With batch_size >64 apply the sqrt-scaling rule: lr = 0.001 * sqrt(bs/16).
+  lr: 0.001
+
+  # Random seed — fixes weight init and train/val split.
+  seed: 42
+
+# ---------------------------------------------------------------------------
+# Model selection
+# ---------------------------------------------------------------------------
+model:
+  # Supported: "mlp" (FuelBurnMLP — validated, production default)
+  # Future:    "histgbr" (HistGradientBoostingRegressor from ml-04 ablation)
+  #            — not yet wired into train.py; train_fullscale.py will raise
+  #              NotImplementedError if selected, prompting a future ml-trainer.
+  type: "mlp"
+
+  # Hidden layer width for the MLP.  Default matches the current architecture.
+  # Changing this changes model.py's hidden_dim; requires model.py edit (ml-09+).
+  hidden_dim: 64
+
+# ---------------------------------------------------------------------------
+# MLflow tracking
+# ---------------------------------------------------------------------------
+mlflow:
+  # Experiment name — must match the name ml-09 uses for registry promotion.
+  experiment_name: "FuelBurn_Baseline"
+
+  # MLflow tracking URI.
+  # Local  : sqlite:///mlflow.db  (relative to CWD, which is the project root)
+  # Databricks: databricks  (uses the workspace-embedded MLflow; no extra config)
+  # OWNER-FILL: change to "databricks" when running on Databricks.
+  tracking_uri: "sqlite:///mlflow.db"
+
+  # Run name shown in the MLflow UI.  The entrypoint appends a timestamp.
+  run_name: "fullscale_prc2025"
+
+  # Log every N epochs (to reduce MLflow overhead on long runs).
+  log_every_n_epochs: 5
+
+# ---------------------------------------------------------------------------
+# Databricks compute envelope (OWNER-FILL before job submission)
+# ---------------------------------------------------------------------------
+# These keys are documentation-only — train_fullscale.py does NOT read them
+# at runtime.  They exist so the owner has a single canonical place to record
+# the cluster configuration used for a given run.  The Databricks job JSON
+# (ml/configs/databricks_job.json) is the authoritative compute spec sent to
+# the API.
+databricks:
+  # OWNER-FILL: node type for the driver and worker nodes.
+  # Databricks Free Edition recommended: Standard_DS3_v2 (14 GB RAM, 4 cores)
+  # For GPU acceleration: Standard_NC6 (K80) or Standard_NC6s_v3 (V100)
+  node_type_id: "Standard_DS3_v2"
+
+  # OWNER-FILL: number of worker nodes.  0 = single-node (driver-only) cluster.
+  # Single-node is sufficient for 11,037 flights on CPU.
+  num_workers: 0
+
+  # OWNER-FILL: Databricks Runtime version.
+  # Recommend: "15.4.x-cpu-ml-scala2.12" (includes MLflow, torch, scikit-learn)
+  # For GPU: "15.4.x-gpu-ml-scala2.12"
+  runtime_version: "15.4.x-cpu-ml-scala2.12"
+
+  # OWNER-FILL: auto-termination in minutes (prevent runaway billing).
+  autotermination_minutes: 120
+
+  # OWNER-FILL: Unity Catalog volume path where PRC-2025 raw data lives.
+  # Example: /Volumes/flight_telemetry/bronze/prc2025_raw/prc_2025
+  uc_data_volume: "/Volumes/<catalog>/<schema>/<volume>/prc_2025"
+
+  # OWNER-FILL: Unity Catalog volume path for feature checkpoint shards.
+  # Example: /Volumes/flight_telemetry/bronze/prc2025_raw/features_checkpoint_train
+  uc_checkpoint_volume: "/Volumes/<catalog>/<schema>/<volume>/features_checkpoint_train"
+
+# ---------------------------------------------------------------------------
+# Expected-output contract (for owner sanity check after the run)
+# ---------------------------------------------------------------------------
+# These are NOT read by the entrypoint.  They document what a successful
+# full-scale run is expected to produce so the owner can verify in the
+# MLflow UI and flag regressions before promoting to registry (ml-09).
+expected_output:
+  # CV re-baseline on the BOUNDED (500-flight) real PRC-2025 dataset.
+  # The full-scale run uses ALL 11,037 flights; RMSE is expected to IMPROVE
+  # (more training data → better generalisation).
+  cv_rmse_baseline_kg: 442.65
+  cv_rmse_baseline_std_kg: 36.36
+  cv_rmse_note: "Re-baseline from bounded real data (500 flights, 10 epochs, 4 folds)."
+
+  # Full-scale target: RMSE should be at or below the bounded baseline.
+  # Flag as regression if best_val_rmse_kg > 500.0 after 50 epochs.
+  full_scale_regression_threshold_kg: 500.0
+
+  # MLflow artifacts expected in the run:
+  #   - "model/"           (logged via mlflow.pytorch.log_model)
+  # MLflow metrics expected in the run:
+  #   - best_val_rmse      (best validation RMSE across all epochs)
+  #   - train_rmse         (per-epoch, step-indexed)
+  #   - val_rmse           (per-epoch, step-indexed)
+  mlflow_model_artifact: "model"
+  mlflow_metrics:
+    - "best_val_rmse"
+    - "train_rmse"
+    - "val_rmse"

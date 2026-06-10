@@ -46,6 +46,7 @@ from torch.utils.data import DataLoader, Subset
 
 from ml.dataset import FuelBurnDataset
 from ml.model import FuelBurnMLP
+from ml.features import FEATURE_COLUMNS, encode_aircraft_type
 
 logging.basicConfig(
     level=logging.INFO,
@@ -265,6 +266,13 @@ def run_cv(
     # Join chronological metadata onto the interval rows.
     # flight_date is a Python date object (object dtype in parquet); keep as-is
     # for sorting — comparison operators work correctly.
+    #
+    # If the features parquet already carries aircraft_type (new extraction
+    # pipeline), drop it before the merge to avoid a _x/_y collision.  The
+    # canonical string value comes from the flightlist and is what compute_slices
+    # expects.  The one-hot ac_* columns are kept as extracted.
+    if "aircraft_type" in df_feat.columns:
+        df_feat = df_feat.drop(columns=["aircraft_type"])
     df_merged = df_feat.merge(df_fl, on="flight_id", how="left")
 
     missing_date = df_merged["flight_date"].isna().sum()
@@ -304,9 +312,20 @@ def run_cv(
     # path; we need a dataset whose internal DataFrame is df_merged (already
     # merged).  We subclass temporarily to avoid touching dataset.py.
     class _MergedDataset(torch.utils.data.Dataset):
-        """Thin wrapper so fold Subsets can index df_merged directly."""
+        """Thin wrapper so fold Subsets can index df_merged directly.
+
+        Feature assembly is delegated to FEATURE_COLUMNS from ml/features.py
+        so this class stays in sync with the shared schema automatically.
+        Missing columns are filled with 0.0 to support gradual schema rollout.
+        """
         def __init__(self, df):
             self._df = df.reset_index(drop=True)
+            # Pre-fill any missing feature columns with 0.0 so the tensor
+            # always has the correct width even when df_merged lacks new
+            # columns (e.g. during a schema transition).
+            for col in FEATURE_COLUMNS:
+                if col not in self._df.columns:
+                    self._df[col] = 0.0
 
         def __len__(self):
             return len(self._df)
@@ -314,7 +333,7 @@ def run_cv(
         def __getitem__(self, idx):
             row = self._df.iloc[idx]
             features = torch.tensor(
-                [row["duration_s"], row["alt_change"], row["avg_speed"], row["max_vrate"]],
+                [float(row[col]) for col in FEATURE_COLUMNS],
                 dtype=torch.float32,
             )
             target = torch.tensor(row["fuel_kg"], dtype=torch.float32)
