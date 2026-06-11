@@ -13,29 +13,29 @@ It:
   3. Runs ml.extract_features.extract_features() for the resumable feature
      extraction step (skips if features_{split}.parquet already exists and
      --force-extract is not set).
-  4. Invokes ml.train.main() by patching sys.argv so the existing argparse-
-     based entrypoint is driven without any edit to train.py.
-     (See "train.py compatibility note" below.)
+  4. Calls ml.train.train(args) directly, passing an argparse.Namespace built
+     from the resolved config.  The sys.argv-patching hack previously used to
+     drive ml.train.main() has been REMOVED (rem-ml-02).
   5. Supports a --smoke flag: generates 20-flight mock data and runs 2 epochs
      to verify the pipeline end-to-end without any real PRC data or Databricks
      connection.
 
-train.py compatibility note (FLAGGED LIMITATION)
--------------------------------------------------
-train.py exposes only a main() function that calls argparse.parse_args(),
-which reads sys.argv directly.  It cannot be cleanly called as a library
-function without patching sys.argv.  This wrapper uses the standard pattern
-of temporarily replacing sys.argv before calling main() and restoring it
-afterward.
+train.py direct-call contract (rem-ml-02)
+-----------------------------------------
+train.py now exposes train(args: argparse.Namespace) as a proper callable.
+This wrapper builds a Namespace from the resolved config and calls it
+directly.  The sys.argv save/patch/restore block has been removed entirely.
 
-This is a known limitation.  A future ml-trainer task should refactor
-train.py to expose a train(args) function that accepts a Namespace directly
-so wrappers like this one do not need the sys.argv patch.
+The Namespace passed to train() carries:
+  data_dir    str   — path to the directory with features_train.parquet
+  epochs      int   — training epochs
+  batch_size  int   — mini-batch size
+  lr          float — Adam learning rate
+  device      str   — "auto" | "cpu" | "cuda" | "mps"
 
-The patch is safe here because:
-  a) The wrapper is the sole caller; no concurrent argparse calls are in flight.
-  b) sys.argv is restored in a finally block regardless of exceptions.
-  c) The pattern is standard in Python CLI tool testing and wrapping.
+Note for rem-ml-03: a training.checkpoint_dir config key will be added to
+the training section of fullscale.yaml by the next task.  Leave the
+training section open for that addition.
 
 Usage
 -----
@@ -61,7 +61,6 @@ from __future__ import annotations
 import argparse
 import logging
 import os
-import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -205,58 +204,64 @@ def _run_extract(cfg: dict, data_dir: str) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Training step (sys.argv patch wrapper around train.main)
+# Training step (direct call to ml.train.train)
 # ---------------------------------------------------------------------------
 
 def _run_train(cfg: dict, data_dir: str) -> None:
     """
-    Invoke ml.train.main() by temporarily patching sys.argv.
+    Build an argparse.Namespace from cfg and call ml.train.train() directly.
 
-    This is the standard pattern for wrapping argparse-based CLIs.
-    sys.argv is restored in a finally block.
+    The sys.argv save/patch/restore block has been removed (rem-ml-02).
+    ml.train now exposes train(args: argparse.Namespace) as a proper callable;
+    this function constructs that Namespace from the resolved config and calls
+    it without touching sys.argv.
 
-    FLAGGED LIMITATION: train.py calls argparse.parse_args() inside main(),
-    reading sys.argv directly.  A future refactor should expose a
-    train(args: argparse.Namespace) function.  Until then, this patch is the
-    cleanest option that avoids editing train.py.
+    Device routing (production path to CUDA):
+        training.device in cfg (default "auto") is passed straight through to
+        train(), which delegates to ml.train.resolve_device().  On a GPU
+        Databricks cluster, set training.device="cuda" (or leave "auto") via
+        an --override flag or directly in fullscale.yaml.
     """
     import mlflow  # noqa: PLC0415
-    from ml.train import main as _train_main  # noqa: PLC0415
+    from ml.train import train as _train  # noqa: PLC0415
 
     epochs = _get(cfg, "training.epochs", 50)
     batch_size = _get(cfg, "training.batch_size", 16)
     lr = _get(cfg, "training.lr", 0.001)
+    device = _get(cfg, "training.device", "auto")
+    # training.checkpoint_dir — added by rem-ml-03.  None (default) = off;
+    # set to a durable directory path to enable epoch checkpointing + resume.
+    checkpoint_dir = _get(cfg, "training.checkpoint_dir", None)
     tracking_uri = _get(cfg, "mlflow.tracking_uri", "sqlite:///mlflow.db")
     experiment_name = _get(cfg, "mlflow.experiment_name", "FuelBurn_Baseline")
 
-    # Set MLflow tracking URI and experiment before train.main() overwrites
-    # the experiment name — train.py calls mlflow.set_experiment() internally,
-    # so we just need the URI set beforehand.
+    # Set MLflow tracking URI before train() calls mlflow.set_experiment()
+    # internally — the URI must be configured first so the experiment lands
+    # in the right backend (local SQLite vs Databricks workspace MLflow).
     mlflow.set_tracking_uri(tracking_uri)
     logger.info(f"MLflow tracking URI: {tracking_uri}")
     logger.info(f"MLflow experiment: {experiment_name}")
 
-    # Build the argv list that train.main()'s argparse expects.
-    fake_argv = [
-        "ml.train",  # argv[0] (program name, ignored by argparse)
-        "--data-dir", str(data_dir),
-        "--epochs", str(int(epochs)),
-        "--batch-size", str(int(batch_size)),
-        "--lr", str(float(lr)),
-    ]
-
-    logger.info(
-        f"Invoking ml.train.main() with: "
-        f"data_dir={data_dir}, epochs={epochs}, "
-        f"batch_size={batch_size}, lr={lr}"
+    ns = argparse.Namespace(
+        data_dir=str(data_dir),
+        epochs=int(epochs),
+        batch_size=int(batch_size),
+        lr=float(lr),
+        device=str(device),
+        # checkpoint_dir is passed through as-is (None or a path string).
+        # train() reads it via getattr(args, "checkpoint_dir", None) so the
+        # field is optional — existing callers that don't set it are unaffected.
+        checkpoint_dir=checkpoint_dir if checkpoint_dir is None else str(checkpoint_dir),
     )
 
-    original_argv = sys.argv
-    try:
-        sys.argv = fake_argv
-        _train_main()
-    finally:
-        sys.argv = original_argv
+    logger.info(
+        f"Invoking ml.train.train() with: "
+        f"data_dir={ns.data_dir}, epochs={ns.epochs}, "
+        f"batch_size={ns.batch_size}, lr={ns.lr}, device={ns.device!r}, "
+        f"checkpoint_dir={ns.checkpoint_dir!r}"
+    )
+
+    _train(ns)
 
     logger.info("Training complete.")
 

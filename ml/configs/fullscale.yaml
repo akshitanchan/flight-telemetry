@@ -64,6 +64,28 @@ training:
   # Random seed — fixes weight init and train/val split.
   seed: 42
 
+  # Compute device passed to ml.train.train() (rem-ml-02).
+  # "auto" resolves to: cuda (if available) -> mps -> cpu.
+  # On a GPU Databricks cluster override to "cuda" via:
+  #   --override training.device=cuda
+  # Leave as "auto" for CPU-only clusters; resolve_device() handles the probe.
+  device: "auto"
+
+  # Epoch-level checkpoint directory for resumable training (rem-ml-03).
+  # null (default) = checkpointing disabled; behaviour bit-identical to a run
+  # without this key.  Set to a durable path to enable crash-safe resumption:
+  # after each epoch, checkpoint.pt is written atomically (temp + os.replace).
+  # A crashed/interrupted run restarts from the last completed epoch and
+  # reaches the SAME final best_val_rmse as an uninterrupted run.
+  #
+  # Local dry-run example:
+  #   --override training.checkpoint_dir=/tmp/fullscale_checkpoints
+  #
+  # Databricks UC volume (recommended for durability across cluster restarts):
+  # OWNER-FILL (optional): set to a UC volume path before submitting the job,
+  # e.g. /Volumes/<catalog>/<schema>/<volume>/training_checkpoints
+  checkpoint_dir: null
+
 # ---------------------------------------------------------------------------
 # Model selection
 # ---------------------------------------------------------------------------

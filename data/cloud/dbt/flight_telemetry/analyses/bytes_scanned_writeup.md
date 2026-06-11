@@ -30,11 +30,11 @@ their small cardinality keeps absolute cost negligible.
 ### Prerequisites
 
 ```bash
-export GCP_PROJECT=<your-project-id>
+export BIGQUERY_PROJECT=<your-project-id>
 export GOOGLE_APPLICATION_CREDENTIALS=/path/to/dbt-runner-key.json
 
 # Confirm table sizes after dbt build
-bq show --format=prettyjson "${GCP_PROJECT}:flight_telemetry.gold_airport_congestion" \
+bq show --format=prettyjson "${BIGQUERY_PROJECT}:flight_telemetry.gold_airport_congestion" \
   | python3 -c "import sys,json; t=json.load(sys.stdin); print(t['numBytes'], 'bytes')"
 ```
 
@@ -47,16 +47,16 @@ and once with (AFTER).  Use `--dry-run` so no bytes are actually billed.
 # ---------------------------------------------------------------------------
 # gold_airport_congestion — BEFORE (no filter)
 # ---------------------------------------------------------------------------
-bq query --dry-run --use_legacy_sql=false --project_id="${GCP_PROJECT}" \
+bq query --dry-run --use_legacy_sql=false --project_id="${BIGQUERY_PROJECT}" \
   'SELECT * FROM `flight_telemetry.gold_airport_congestion`'
 
 # gold_airport_congestion — AFTER (partition filter on one day)
-bq query --dry-run --use_legacy_sql=false --project_id="${GCP_PROJECT}" \
+bq query --dry-run --use_legacy_sql=false --project_id="${BIGQUERY_PROJECT}" \
   'SELECT * FROM `flight_telemetry.gold_airport_congestion`
    WHERE DATE(window_start) = "2024-01-15"'
 
 # gold_airport_congestion — AFTER (partition + cluster filter)
-bq query --dry-run --use_legacy_sql=false --project_id="${GCP_PROJECT}" \
+bq query --dry-run --use_legacy_sql=false --project_id="${BIGQUERY_PROJECT}" \
   'SELECT * FROM `flight_telemetry.gold_airport_congestion`
    WHERE DATE(window_start) = "2024-01-15"
      AND airport_icao = "EGLL"'
@@ -64,11 +64,11 @@ bq query --dry-run --use_legacy_sql=false --project_id="${GCP_PROJECT}" \
 # ---------------------------------------------------------------------------
 # gold_sector_load — BEFORE (no filter)
 # ---------------------------------------------------------------------------
-bq query --dry-run --use_legacy_sql=false --project_id="${GCP_PROJECT}" \
+bq query --dry-run --use_legacy_sql=false --project_id="${BIGQUERY_PROJECT}" \
   'SELECT * FROM `flight_telemetry.gold_sector_load`'
 
 # gold_sector_load — AFTER (partition + cluster filter)
-bq query --dry-run --use_legacy_sql=false --project_id="${GCP_PROJECT}" \
+bq query --dry-run --use_legacy_sql=false --project_id="${BIGQUERY_PROJECT}" \
   'SELECT * FROM `flight_telemetry.gold_sector_load`
    WHERE DATE(window_start) = "2024-01-15"
      AND h3_r4 = "8426b47ffffffff"'
@@ -134,10 +134,10 @@ job history after a run:
 
 ```bash
 # List recent dbt jobs (look for CREATE OR INSERT statements)
-bq ls --jobs --max_results=20 --project_id="${GCP_PROJECT}"
+bq ls --jobs --max_results=20 --project_id="${BIGQUERY_PROJECT}"
 
 # Inspect bytes billed for a specific job
-bq show --job --format=prettyjson "${GCP_PROJECT}:US.<job-id>" \
+bq show --job --format=prettyjson "${BIGQUERY_PROJECT}:US.<job-id>" \
   | python3 -c "import sys,json; s=json.load(sys.stdin)['statistics']; \
       print('bytes billed:', s.get('query',{}).get('totalBytesBilled','n/a'))"
 ```

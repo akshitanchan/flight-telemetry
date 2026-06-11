@@ -47,6 +47,12 @@ jobs:
       - name: AI tests
         run: make test-ai
 
+      - name: Cloud tests
+        run: make test-cloud
+
+      - name: Dashboard tests
+        run: make test-dashboard
+
       - name: Docs check
         run: make docs-check
 
@@ -54,14 +60,41 @@ jobs:
         run: make smoke
 
   # ---------------------------------------------------------------------------
+  # ML test suite (~157 s).  Runs in parallel with the main test job so it
+  # gates every PR without adding to the fast-feedback wall-clock time.
+  # Setup mirrors the test job exactly; no live-service env vars are set —
+  # the suite skips registry/validate paths that require external services.
+  # ---------------------------------------------------------------------------
+  ml-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Create output directories
+        run: make setup
+
+      - name: ML tests
+        run: make test-ml
+
+  # ---------------------------------------------------------------------------
   # Build the three service images.
   # No image is pushed to any registry — this job only validates that every
   # Dockerfile produces a successful build from the repo-root build context.
-  # Runs only after the test job passes.
+  # Runs only after both test jobs pass.
   # ---------------------------------------------------------------------------
   build-images:
     runs-on: ubuntu-latest
-    needs: test
+    needs: [test, ml-tests]
     steps:
       - uses: actions/checkout@v4
 

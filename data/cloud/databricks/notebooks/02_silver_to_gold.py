@@ -159,6 +159,8 @@ if _REPO_ROOT not in sys.path:
 from data.cloud.databricks.lib.gold_logic import (
     WINDOW_MINUTES,
     EMERGENCY_GAP_S,
+    incremental_merge_emergency,
+    incremental_merge_routing,
 )
 
 print(f"WINDOW_MINUTES  : {WINDOW_MINUTES}")   # 5
@@ -854,32 +856,65 @@ else:
 
 # COMMAND ----------
 # MAGIC %md
-# MAGIC ### B3 — Incremental upsert: gold_emergency_events (append-only batches)
+# MAGIC ### B3 — Incremental keyed partial-recompute: gold_emergency_events
 # MAGIC
-# MAGIC For non-overlapping time-scoped batches, emergency events can be upserted
-# MAGIC by `(icao24, squawk, first_seen_ts)`.  This is safe when:
-# MAGIC   (a) the batch covers a closed time range with no late-arriving data, AND
-# MAGIC   (b) sessions do not span batch boundaries.
+# MAGIC **Overlapping-batch safe.**  The previous approach keyed the MERGE on
+# MAGIC `(icao24, squawk, first_seen_ts)`, which is only correct for non-overlapping
+# MAGIC append-only batches.  When an incoming batch contains an earlier observation
+# MAGIC of an ongoing event, the true `first_seen_ts` shifts earlier — a naive MERGE
+# MAGIC on the old key inserts a duplicate event row instead of extending the existing
+# MAGIC one.
 # MAGIC
-# MAGIC If either condition may be violated, use Section A (full recompute).
+# MAGIC The fix is a **keyed partial-recompute**:
+# MAGIC
+# MAGIC 1. Identify affected `(icao24, squawk)` entities in the new batch.
+# MAGIC 2. For those entities, fetch ALL their silver rows from the full silver table
+# MAGIC    (existing history + new batch observations).
+# MAGIC 3. Recompute emergency event sessions from the combined silver rows — this
+# MAGIC    re-derives `first_seen_ts` as the true global minimum, correctly handles
+# MAGIC    gap splits, and is idempotent.
+# MAGIC 4. DELETE the stale gold rows for affected entities, then INSERT the
+# MAGIC    recomputed rows.  Unaffected entities are untouched.
+# MAGIC
+# MAGIC Idempotency: running the same batch twice produces no net change (DELETE
+# MAGIC targets the same entities; INSERT recomputes to the same rows).
+# MAGIC Order-independence: batch A then B yields the same gold as batch B then A,
+# MAGIC both equal to a full recompute over (A + B).
 
 # COMMAND ----------
 
 if _ON_DATABRICKS and _RUN_INCREMENTAL:
     from pyspark.sql import functions as F  # noqa: F811
 
+    # Step 1: Identify affected (icao24, squawk) entities from the new batch.
     silver_df = spark.table(SILVER_TABLE)  # type: ignore[union-attr]
-    inc_emg_silver = (
+    inc_emg_new = (
         silver_df
         .filter(F.col("squawk").isin("7500", "7600", "7700"))
         .filter(
             (F.col("event_ts") >= F.lit(INCREMENTAL_WINDOW_START).cast("timestamp"))
             & (F.col("event_ts") < F.lit(INCREMENTAL_WINDOW_END).cast("timestamp"))
         )
+        .select("icao24", "squawk")
+        .distinct()
+    )
+    # Persist affected entities as a temp view for the DELETE predicate.
+    inc_emg_new.createOrReplaceTempView("_inc_emg_affected_entities")
+    _n_affected = inc_emg_new.count()
+    print(f"Affected emergency entities: {_n_affected:,}")
+
+    # Step 2: For affected entities, collect ALL their silver rows (full history).
+    # This is the union of existing silver + new batch for those entities only.
+    full_emg_silver_for_affected = (
+        silver_df
+        .filter(F.col("squawk").isin("7500", "7600", "7700"))
+        .join(inc_emg_new, on=["icao24", "squawk"], how="inner")
     )
 
-    inc_emg_df = (
-        inc_emg_silver
+    # Step 3: Recompute emergency sessions from the combined silver for affected
+    # entities.  Uses the same session_window aggregation as Section A2.
+    recomputed_emg_df = (
+        full_emg_silver_for_affected
         .groupBy(
             "icao24",
             "squawk",
@@ -901,29 +936,52 @@ if _ON_DATABRICKS and _RUN_INCREMENTAL:
         )
         .drop("session")
     )
-    inc_emg_df.createOrReplaceTempView("_inc_emg_source")
+    recomputed_emg_df.createOrReplaceTempView("_inc_emg_recomputed")
+    _n_recomputed = recomputed_emg_df.count()
+    print(f"Recomputed emergency gold rows for affected entities: {_n_recomputed:,}")
 
+    # Step 4a: DELETE stale gold rows for affected (icao24, squawk) entities.
+    # This removes all old rows — including those with now-stale first_seen_ts
+    # values that would become duplicates if we only inserted.
     spark.sql(f"""  # type: ignore[union-attr]
-        MERGE INTO {GOLD_EMERGENCY_TABLE} AS target
-        USING _inc_emg_source AS source
-        ON target.icao24         = source.icao24
-           AND target.squawk     = source.squawk
-           AND target.first_seen_ts = source.first_seen_ts
-        WHEN MATCHED THEN UPDATE SET *
-        WHEN NOT MATCHED THEN INSERT *
+        DELETE FROM {GOLD_EMERGENCY_TABLE}
+        WHERE (icao24, squawk) IN (
+            SELECT icao24, squawk FROM _inc_emg_affected_entities
+        )
     """)
-    print("Emergency events MERGE complete.")
+
+    # Step 4b: INSERT the freshly recomputed rows for affected entities.
+    (
+        recomputed_emg_df.write  # type: ignore[union-attr]
+        .format("delta")
+        .mode("append")
+        .saveAsTable(GOLD_EMERGENCY_TABLE)
+    )
+    _emg_total = spark.table(GOLD_EMERGENCY_TABLE).count()  # type: ignore[union-attr]
+    print(f"Emergency events incremental complete. Total rows: {_emg_total:,}")
 elif _ON_DATABRICKS:
-    print("Skipping emergency MERGE — incremental parameters not set.")
+    print("Skipping emergency incremental — incremental parameters not set.")
 else:
-    print("Offline mode — emergency MERGE skipped.")
+    print("Offline mode — emergency incremental skipped.")
 
 # COMMAND ----------
 # MAGIC %md
-# MAGIC ### B4 — Incremental upsert: gold_routing_stats (append-only batches)
+# MAGIC ### B4 — Incremental keyed partial-recompute: gold_routing_stats
 # MAGIC
-# MAGIC Same caveat as B3.  Upsert key: `(icao24, callsign, window_start)`.
-# MAGIC Safe for non-overlapping batches only.
+# MAGIC **Overlapping-batch safe.**  The previous approach keyed the MERGE on
+# MAGIC `(icao24, callsign, window_start)`, but `window_start` is the derived
+# MAGIC `min(event_ts)` of the route — it shifts earlier when a new batch brings
+# MAGIC observations that predate existing ones.  A naive MERGE would insert a
+# MAGIC duplicate row instead of extending the route.
+# MAGIC
+# MAGIC The fix mirrors B3: **keyed partial-recompute**.
+# MAGIC
+# MAGIC 1. Identify affected `(icao24, normalised_callsign)` entities in the batch.
+# MAGIC 2. Fetch ALL silver rows for those entities from the full silver table.
+# MAGIC 3. Recompute routing stats from the combined set — re-derives `window_start`
+# MAGIC    as the true global `min(event_ts)`, `origin_lat/lon` from the earliest
+# MAGIC    observation, etc.
+# MAGIC 4. DELETE stale gold rows for affected entities, INSERT recomputed rows.
 
 # COMMAND ----------
 
@@ -931,8 +989,9 @@ if _ON_DATABRICKS and _RUN_INCREMENTAL:
     from pyspark.sql import functions as F  # noqa: F811
     from pyspark.sql.window import Window  # noqa: F811
 
+    # Step 1: Identify affected (icao24, normalised callsign) entities.
     silver_df = spark.table(SILVER_TABLE)  # type: ignore[union-attr]
-    inc_routing_silver = (
+    inc_routing_new = (
         silver_df
         .filter(F.col("icao24").isNotNull())
         .filter(
@@ -946,20 +1005,41 @@ if _ON_DATABRICKS and _RUN_INCREMENTAL:
                 F.lit(None).cast("string"),
             ).otherwise(F.trim(F.col("callsign"))),
         )
+        .select("icao24", "callsign")
+        .distinct()
+    )
+    inc_routing_new.createOrReplaceTempView("_inc_routing_affected_entities")
+    _n_routing_affected = inc_routing_new.count()
+    print(f"Affected routing entities: {_n_routing_affected:,}")
+
+    # Step 2: Collect ALL silver rows for affected entities (full history).
+    full_routing_silver_for_affected = (
+        silver_df
+        .filter(F.col("icao24").isNotNull())
+        .withColumn(
+            "callsign",
+            F.when(
+                F.trim(F.col("callsign")) == "",
+                F.lit(None).cast("string"),
+            ).otherwise(F.trim(F.col("callsign"))),
+        )
+        .join(inc_routing_new, on=["icao24", "callsign"], how="inner")
     )
 
+    # Step 3: Recompute routing stats from combined silver for affected entities.
+    # Uses the same window-function aggregation as Section A5.
     _w_asc = Window.partitionBy("icao24", "callsign").orderBy("event_ts")
     _w_desc = Window.partitionBy("icao24", "callsign").orderBy(F.col("event_ts").desc())
-    inc_routing_enriched = (
-        inc_routing_silver
+    routing_enriched = (
+        full_routing_silver_for_affected
         .withColumn("_first_lat", F.first("lat").over(_w_asc))
         .withColumn("_first_lon", F.first("lon").over(_w_asc))
         .withColumn("_last_lat", F.first("lat").over(_w_desc))
         .withColumn("_last_lon", F.first("lon").over(_w_desc))
     )
 
-    inc_routing_df = (
-        inc_routing_enriched
+    recomputed_routing_df = (
+        routing_enriched
         .groupBy("icao24", "callsign")
         .agg(
             F.min("event_ts").alias("window_start"),
@@ -982,22 +1062,33 @@ if _ON_DATABRICKS and _RUN_INCREMENTAL:
         )
         .drop("_vel_sum", "_vel_count")
     )
-    inc_routing_df.createOrReplaceTempView("_inc_routing_source")
+    recomputed_routing_df.createOrReplaceTempView("_inc_routing_recomputed")
+    _n_routing_recomputed = recomputed_routing_df.count()
+    print(f"Recomputed routing gold rows for affected entities: {_n_routing_recomputed:,}")
 
+    # Step 4a: DELETE stale gold rows for affected entities.
+    # Uses COALESCE to handle NULL callsign in the IN predicate safely.
     spark.sql(f"""  # type: ignore[union-attr]
-        MERGE INTO {GOLD_ROUTING_TABLE} AS target
-        USING _inc_routing_source AS source
-        ON target.icao24       = source.icao24
-           AND target.callsign = source.callsign
-           AND target.window_start = source.window_start
-        WHEN MATCHED THEN UPDATE SET *
-        WHEN NOT MATCHED THEN INSERT *
+        DELETE FROM {GOLD_ROUTING_TABLE}
+        WHERE (icao24, COALESCE(callsign, '')) IN (
+            SELECT icao24, COALESCE(callsign, '')
+            FROM _inc_routing_affected_entities
+        )
     """)
-    print("Routing stats MERGE complete.")
+
+    # Step 4b: INSERT recomputed rows for affected entities.
+    (
+        recomputed_routing_df.write  # type: ignore[union-attr]
+        .format("delta")
+        .mode("append")
+        .saveAsTable(GOLD_ROUTING_TABLE)
+    )
+    _routing_total = spark.table(GOLD_ROUTING_TABLE).count()  # type: ignore[union-attr]
+    print(f"Routing stats incremental complete. Total rows: {_routing_total:,}")
 elif _ON_DATABRICKS:
-    print("Skipping routing MERGE — incremental parameters not set.")
+    print("Skipping routing incremental — incremental parameters not set.")
 else:
-    print("Offline mode — routing MERGE skipped.")
+    print("Offline mode — routing incremental skipped.")
 
 # COMMAND ----------
 # MAGIC %md

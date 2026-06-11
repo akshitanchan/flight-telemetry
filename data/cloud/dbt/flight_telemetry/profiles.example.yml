@@ -5,7 +5,7 @@
 # Use environment variables as shown — they are resolved at runtime by dbt.
 #
 # Required env vars:
-#   GCP_PROJECT                    — your GCP project ID
+#   BIGQUERY_PROJECT               — your GCP project ID
 #   GOOGLE_APPLICATION_CREDENTIALS — absolute path to the dbt-runner service-account JSON key
 #
 # Terraform (infra/terraform/bigquery) already provisions:
@@ -19,7 +19,7 @@ flight_telemetry:
     prod:
       type: bigquery
       method: service-account
-      project: "{{ env_var('GCP_PROJECT') }}"
+      project: "{{ env_var('BIGQUERY_PROJECT') }}"
       dataset: flight_telemetry
       location: US
       keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS') }}"
@@ -36,7 +36,7 @@ flight_telemetry:
     offline:
       type: bigquery
       method: service-account
-      project: "{{ env_var('GCP_PROJECT', 'dummy-project') }}"
+      project: "{{ env_var('BIGQUERY_PROJECT', 'dummy-project') }}"
       dataset: flight_telemetry
       location: US
       keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS', '/dev/null') }}"

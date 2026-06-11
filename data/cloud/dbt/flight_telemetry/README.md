@@ -64,7 +64,7 @@ All commands run from `data/cloud/dbt/flight_telemetry/`.
 ### 1. Set required environment variables (dummy values are fine offline)
 
 ```bash
-export GCP_PROJECT=dummy-project
+export BIGQUERY_PROJECT=dummy-project
 export GOOGLE_APPLICATION_CREDENTIALS=/dev/null
 export DBT_PROFILES_DIR=$(pwd)   # points dbt at profiles.example.yml in this dir
 ```
@@ -102,7 +102,7 @@ Expected output: `Done.` with no errors.
 ### 4. dbt ls (list all nodes — fully offline)
 
 ```bash
-GCP_PROJECT=dummy-project \
+BIGQUERY_PROJECT=dummy-project \
 GOOGLE_APPLICATION_CREDENTIALS=/dev/null \
 dbt ls \
   --profiles-dir . \
@@ -122,7 +122,7 @@ dbt >= 1.8 unit tests execute in DuckDB locally.  Use the `duckdb_unit` target
 to bypass the BigQuery adapter's mandatory relation-cache API call.
 
 ```bash
-GCP_PROJECT=dummy-project \
+BIGQUERY_PROJECT=dummy-project \
 dbt test \
   --select "test_type:unit" \
   --profiles-dir . \
@@ -155,7 +155,7 @@ dbt test \
 ### Step 0: Configure environment
 
 ```bash
-export GCP_PROJECT=<your-gcp-project-id>
+export BIGQUERY_PROJECT=<your-gcp-project-id>
 export GOOGLE_APPLICATION_CREDENTIALS=/path/to/dbt-runner-sa-key.json
 export DBT_PROFILES_DIR=/path/to/data/cloud/dbt/flight_telemetry
 ```
@@ -170,25 +170,25 @@ Terraform must have already provisioned the dataset and service account
 bq load \
   --source_format=PARQUET \
   --replace \
-  "${GCP_PROJECT}:flight_telemetry.gold_airport_congestion_landing" \
+  "${BIGQUERY_PROJECT}:flight_telemetry.gold_airport_congestion_landing" \
   "gs://<bucket>/gold/airport_congestion/dt=<date>/*.parquet"
 
 bq load \
   --source_format=PARQUET \
   --replace \
-  "${GCP_PROJECT}:flight_telemetry.gold_sector_load_landing" \
+  "${BIGQUERY_PROJECT}:flight_telemetry.gold_sector_load_landing" \
   "gs://<bucket>/gold/sector_load/dt=<date>/*.parquet"
 
 bq load \
   --source_format=PARQUET \
   --replace \
-  "${GCP_PROJECT}:flight_telemetry.gold_emergency_events_landing" \
+  "${BIGQUERY_PROJECT}:flight_telemetry.gold_emergency_events_landing" \
   "gs://<bucket>/gold/emergency_events/dt=<date>/*.parquet"
 
 bq load \
   --source_format=PARQUET \
   --replace \
-  "${GCP_PROJECT}:flight_telemetry.gold_routing_stats_landing" \
+  "${BIGQUERY_PROJECT}:flight_telemetry.gold_routing_stats_landing" \
   "gs://<bucket>/gold/routing_stats/dt=<date>/*.parquet"
 ```
 
@@ -222,16 +222,16 @@ dbt build \
 
 ```bash
 # Full-table scan baseline
-bq query --dry-run --use_legacy_sql=false --project_id="${GCP_PROJECT}" \
+bq query --dry-run --use_legacy_sql=false --project_id="${BIGQUERY_PROJECT}" \
   'SELECT * FROM `flight_telemetry.gold_airport_congestion`'
 
 # Partition-filtered query
-bq query --dry-run --use_legacy_sql=false --project_id="${GCP_PROJECT}" \
+bq query --dry-run --use_legacy_sql=false --project_id="${BIGQUERY_PROJECT}" \
   'SELECT * FROM `flight_telemetry.gold_airport_congestion`
    WHERE DATE(window_start) = "2024-01-15"'
 
 # Partition + cluster filtered query
-bq query --dry-run --use_legacy_sql=false --project_id="${GCP_PROJECT}" \
+bq query --dry-run --use_legacy_sql=false --project_id="${BIGQUERY_PROJECT}" \
   'SELECT * FROM `flight_telemetry.gold_airport_congestion`
    WHERE DATE(window_start) = "2024-01-15" AND airport_icao = "EGLL"'
 ```

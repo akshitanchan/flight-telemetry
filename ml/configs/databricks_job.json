@@ -24,7 +24,9 @@
           "--override", "mlflow.tracking_uri=databricks",
           "--override", "training.epochs=50",
           "--override", "training.batch_size=16",
-          "--override", "training.lr=0.001"
+          "--override", "training.lr=0.001",
+          "--override", "training.device=auto",
+          "--override", "training.checkpoint_dir=<OWNER-FILL: UC volume path for epoch checkpoints, e.g. /Volumes/flight_telemetry/bronze/prc2025_raw/training_checkpoints>"
         ]
       },
 

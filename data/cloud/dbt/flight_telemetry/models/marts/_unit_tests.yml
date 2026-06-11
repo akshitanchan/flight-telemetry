@@ -19,7 +19,7 @@ version: 2
 #
 # Offline run command (from data/cloud/dbt/flight_telemetry/):
 #
-#   GCP_PROJECT=dummy-project \
+#   BIGQUERY_PROJECT=dummy-project \
 #   dbt test \
 #     --select "test_type:unit" \
 #     --profiles-dir . \
