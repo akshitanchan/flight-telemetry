@@ -204,10 +204,6 @@ test-dashboard: ## Run dashboard test suite (80 tests, offline)
 smoke: ## Run cross-layer smoke test (all layers, bounded data, offline)
 	$(PYTHON) scripts/smoke.py
 
-.PHONY: docs-check
-docs-check: ## Check docs for broken intra-repo links
-	$(PYTHON) scripts/docs_check.py
-
 .PHONY: clean
 clean: ## Remove generated local outputs (not source)
 	rm -rf $(DATA_RAW) $(DATA_INTERIM) $(DATA_PROCESSED) $(OUTPUTS) $(ARTIFACTS)
