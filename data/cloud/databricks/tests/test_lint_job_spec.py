@@ -8,9 +8,9 @@ Tests:
   1. The real medallion_job.json passes the linter (zero violations).
   2. A spec pointing at a non-existent notebook is rejected.
   3. A spec with a reversed depends_on order is rejected.
-  4. A spec containing a hard-coded /Volumes/ literal is rejected.
+  4. Classic-compute fields are rejected.
   5. The linter rejects a broken-JSON file gracefully.
-  6. The linter accepts a minimal well-formed spec.
+  6. The linter accepts a minimal serverless spec.
   7. A source task that incorrectly declares depends_on is rejected.
 """
 
@@ -37,6 +37,7 @@ from data.cloud.databricks.jobs.lint_job_spec import lint  # noqa: E402
 
 _JOBS_DIR = _PROJECT_ROOT / "data" / "cloud" / "databricks" / "jobs"
 _REAL_SPEC = _JOBS_DIR / "medallion_job.json"
+_REAL_ML_SPEC = _PROJECT_ROOT / "ml" / "configs" / "databricks_job.json"
 
 # Notebooks that actually exist in the repo (relative to repo root, no .py).
 _NB_BRONZE = "data/cloud/databricks/notebooks/01_bronze_to_silver"
@@ -47,6 +48,7 @@ _MINIMAL_VALID_SPEC = {
     "tasks": [
         {
             "task_key": "bronze_to_silver",
+            "environment_key": "default",
             "notebook_task": {
                 "notebook_path": _NB_BRONZE,
                 "base_parameters": {},
@@ -55,6 +57,7 @@ _MINIMAL_VALID_SPEC = {
         },
         {
             "task_key": "silver_to_gold",
+            "environment_key": "default",
             "depends_on": [{"task_key": "bronze_to_silver"}],
             "notebook_task": {
                 "notebook_path": _NB_GOLD,
@@ -63,12 +66,17 @@ _MINIMAL_VALID_SPEC = {
             },
         },
     ],
-    "job_clusters": [
+    "environments": [
         {
-            "job_cluster_key": "test_cluster",
-            "new_cluster": {"spark_version": "15.4.x-scala2.12", "num_workers": 0},
+            "environment_key": "default",
+            "spec": {"environment_version": "2", "dependencies": []},
         }
     ],
+    "git_source": {
+        "git_url": "https://github.com/example/flight-telemetry",
+        "git_provider": "gitHub",
+        "git_branch": "main",
+    },
 }
 
 
@@ -88,7 +96,7 @@ def _write_tmp(spec: dict) -> Path:
 
 
 class TestRealSpecPassesLint(unittest.TestCase):
-    """The committed medallion_job.json must pass all lint checks."""
+    """Both committed serverless job specs must pass all lint checks."""
 
     def test_real_spec_zero_violations(self):
         violations = lint(_REAL_SPEC)
@@ -96,6 +104,15 @@ class TestRealSpecPassesLint(unittest.TestCase):
             violations,
             [],
             msg=f"Real spec has lint violations:\n"
+            + "\n".join(f"  {v}" for v in violations),
+        )
+
+    def test_real_ml_spec_zero_violations(self):
+        violations = lint(_REAL_ML_SPEC)
+        self.assertEqual(
+            violations,
+            [],
+            msg=f"Real ML spec has lint violations:\n"
             + "\n".join(f"  {v}" for v in violations),
         )
 
@@ -129,6 +146,48 @@ class TestNonExistentNotebook(unittest.TestCase):
             self.assertTrue(
                 any("99_does_not_exist" in v for v in violations),
                 msg=f"Expected a violation for missing notebook. Got: {violations}",
+            )
+        finally:
+            tmp.unlink(missing_ok=True)
+
+
+class TestSparkPythonTask(unittest.TestCase):
+    """Git-backed Spark Python tasks must resolve their entrypoint."""
+
+    def test_missing_python_file_is_rejected(self):
+        spec = {
+            "name": "ml_job",
+            "tasks": [
+                {
+                    "task_key": "train",
+                    "environment_key": "default",
+                    "spark_python_task": {
+                        "python_file": "ml/does_not_exist.py",
+                        "source": "GIT",
+                    },
+                }
+            ],
+            "environments": [
+                {
+                    "environment_key": "default",
+                    "spec": {
+                        "environment_version": "2",
+                        "dependencies": [],
+                    },
+                }
+            ],
+            "git_source": {
+                "git_url": "https://github.com/example/repo",
+                "git_provider": "gitHub",
+                "git_branch": "main",
+            },
+        }
+        tmp = _write_tmp(spec)
+        try:
+            violations = lint(tmp)
+            self.assertTrue(
+                any("does_not_exist.py" in violation for violation in violations),
+                msg=f"Expected a missing Python file violation. Got: {violations}",
             )
         finally:
             tmp.unlink(missing_ok=True)
@@ -174,42 +233,70 @@ class TestMissingSinkDependency(unittest.TestCase):
             tmp.unlink(missing_ok=True)
 
 
-class TestHardCodedVolumesRejected(unittest.TestCase):
-    """Any non-comment field containing '/Volumes/' must be flagged."""
+class TestServerlessComputeRules(unittest.TestCase):
+    """Classic compute and broken environment references must be flagged."""
 
-    def test_hard_coded_volume_in_param_default(self):
+    def test_job_clusters_are_rejected(self):
         import copy
 
         spec = copy.deepcopy(_MINIMAL_VALID_SPEC)
-        spec["parameters"] = [
+        spec["job_clusters"] = [
             {
-                "name": "bronze_volume_path",
-                "default": "/Volumes/main/default/bronze_vol/bronze/",
+                "job_cluster_key": "legacy",
+                "new_cluster": {"spark_version": "15.4.x-scala2.12"},
             }
         ]
         tmp = _write_tmp(spec)
         try:
             violations = lint(tmp)
             self.assertTrue(
-                any("/Volumes/" in v for v in violations),
-                msg=f"Expected a /Volumes/ hard-code violation. Got: {violations}",
+                any("job_clusters" in v for v in violations),
+                msg=f"Expected a classic-compute violation. Got: {violations}",
             )
         finally:
             tmp.unlink(missing_ok=True)
 
-    def test_hard_coded_volume_in_notebook_base_param(self):
+    def test_unknown_environment_is_rejected(self):
         import copy
 
         spec = copy.deepcopy(_MINIMAL_VALID_SPEC)
-        spec["tasks"][0]["notebook_task"]["base_parameters"] = {
-            "bronze_volume_path": "/Volumes/main/default/bronze_vol/bronze/"
-        }
+        spec["tasks"][0]["environment_key"] = "missing"
         tmp = _write_tmp(spec)
         try:
             violations = lint(tmp)
             self.assertTrue(
-                any("/Volumes/" in v for v in violations),
-                msg=f"Expected a /Volumes/ violation in base_parameters. Got: {violations}",
+                any("unknown environment_key" in v for v in violations),
+                msg=f"Expected an environment violation. Got: {violations}",
+            )
+        finally:
+            tmp.unlink(missing_ok=True)
+
+    def test_owner_fill_placeholder_is_rejected(self):
+        import copy
+
+        spec = copy.deepcopy(_MINIMAL_VALID_SPEC)
+        spec["git_source"]["git_url"] = "<OWNER-FILL:url>"
+        tmp = _write_tmp(spec)
+        try:
+            violations = lint(tmp)
+            self.assertTrue(
+                any("OWNER-FILL" in v for v in violations),
+                msg=f"Expected a placeholder violation. Got: {violations}",
+            )
+        finally:
+            tmp.unlink(missing_ok=True)
+
+    def test_unknown_dependency_is_rejected(self):
+        import copy
+
+        spec = copy.deepcopy(_MINIMAL_VALID_SPEC)
+        spec["tasks"][1]["depends_on"] = [{"task_key": "missing_task"}]
+        tmp = _write_tmp(spec)
+        try:
+            violations = lint(tmp)
+            self.assertTrue(
+                any("unknown task 'missing_task'" in v for v in violations),
+                msg=f"Expected an unknown dependency violation. Got: {violations}",
             )
         finally:
             tmp.unlink(missing_ok=True)

@@ -7,15 +7,15 @@ data from a single `make` target.
 
 ## Metrics at a glance
 
-*Measured locally on bounded sample data (2026-06-10). Reproduce with the `make` target in each row.*
+*Measured locally on 2026-06-11. Reproduce with the command in each row.*
 
 | Layer | Headline measured result | Research question → answer | Reproduce |
 |---|---|---|---|
-| **Systems** | geohash-p3 p50 **35 µs** vs H3-r4 p50 **162 µs**; ingest up to **3.3M rec/s** | Which spatiotemporal index minimizes tail latency? → geohash-p3 for coarse/continental, **H3-r4 best balanced** tail latency | `make systems-benchmark-small` |
-| **Data** | incremental `MERGE` **2.5×** faster than full recompute at 1M rows | Where is the incremental-vs-recompute frontier? → **`MERGE` wins past ~100k rows** | `make data-refresh-experiment-small` |
-| **ML** | **real PRC-2025 baseline: val RMSE ~395 kg** (real fuel labels, 500-flight subset); serve smoke **2/2** | Can the model match the published PRC-2025 baseline? → **real-data baseline trained; full-scale + leaderboard scoring pending** | `make ml-baseline-real` |
-| **AI** | deterministic routers **100%** vs local 7B LLM **92.3%**; citation coverage **100%** | Which agent architecture wins on faithfulness/cost? → **deterministic tool-routing dominates** here | `make ai-compare-small` |
-| **Cross-layer** | `make smoke` **7/7** steps in **~7.5 s**, fully offline | Does the bounded platform run end-to-end from one command? → **yes** | `make smoke` |
+| **Systems** | At 1M rows: geohash-p4 p50 **35.5 ms**, H3-r4 **30.4 ms**, PostGIS GIST **257.9 ms** | Which index wins this regional workload? -> **H3-r4 has the lowest measured latency; PostGIS provides persistence, not a latency win here** | `python -m systems.index.cli --mode postgres --synthetic-rows 1000000 --queries 500 --profile regional` |
+| **Data** | DuckDB proxy: incremental `MERGE` **1.5x-2.3x** faster at 10k-200k rows | Where is the incremental-vs-recompute frontier? -> **directional proxy only; real Delta timing pending** | `make data-refresh-experiment-small` |
+| **ML** | full-data four-fold RMSE: HistGBR **142.20 +/- 22.68 kg**, MLP **355.04 +/- 89.12 kg** | Which model wins on the extracted 11,037-flight set? -> **HistGBR by 212.83 kg RMSE; cloud training and rank scoring remain** | `python -m ml.ablation --data-dir data/raw/prc_2025 --epochs 10 --n-folds 4 --model histgbr` |
+| **AI** | Core deterministic **100%/100%**; local `llama3.2` extended-tier accuracy: single-shot **36%**, ReAct **20%**, plan-execute **52%** | Which live architecture wins here? -> **plan-execute on accuracy; single-shot on latency** | `python -m ai.eval.compare` |
+| **Cross-layer** | `make smoke` **7/7** steps in **13.21 s**, fully offline | Does the bounded platform run end-to-end from one command? → **yes** | `make smoke` |
 
 ## Architecture
 
@@ -39,7 +39,7 @@ ingestion (systems) → landing → bronze→silver→gold (data) → ┬→ ML 
 ```bash
 cp .env.example .env     # optional; only needed for live API / MLflow server
 make setup               # create local output directories
-make smoke               # run every layer end-to-end on bounded data (~7.5s, offline)
+make smoke               # run every layer end-to-end on bounded data (~13s, offline)
 make help                # list all targets
 ```
 
@@ -60,10 +60,13 @@ make help                # list all targets
 This is a three-week bounded build; the honest edges:
 
 - **Systems** is implemented in Python (the plan prefers Go/Rust for a stronger backend signal); a rewrite is a stretch item.
-- **Data** runs a local medallion + DuckDB experiment rather than cloud Databricks/Delta + BigQuery; numbers are local proxies, not cloud cost figures.
-- **ML** now trains on the **real PRC-2025 data** (`make ml-baseline-real`, bounded to a 500-flight subset; val RMSE ~395 kg). Full-scale training over all 11,037 flights and the official leaderboard scoring are still pending — the model is a baseline MLP, not yet competitive with the published leaderboard — and there is no drift/retrain loop yet.
-- **AI** numbers are on a small golden set; the LLM strategy needs a local Ollama server (availability-gated, skipped in CI). The LLM comparison figures are a single local `temperature=0` run.
-- ML serving still uses a deprecated FastAPI startup hook and a hardcoded fake-model mode (tracked for cleanup).
+- **Data** has Databricks serverless and BigQuery/dbt deployment artifacts, but the real cloud row counts, Lakeflow metrics, Delta timings, and bytes-scanned captures are still pending.
+- **ML** has an honest bounded CV baseline and a measured 11,037-flight
+  ablation/challenger result. Databricks full-scale training and held-out rank
+  scoring remain pending. The JOAS paper's 201 kg winning score is from the
+  separate final phase, not a same-split rank baseline.
+- **AI** live architecture numbers are local `llama3.2:latest` measurements, not a provider-independent ranking. CI still skips unavailable providers.
+- **Serving** defaults to configurable fake mode for offline smoke tests. Real serving requires `ML_FAKE_MODE=false` plus a model path or registry URI.
 
 ## Documentation
 

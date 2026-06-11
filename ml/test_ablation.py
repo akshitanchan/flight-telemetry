@@ -175,6 +175,10 @@ class TestMLPCV:
         )
         assert math.isfinite(result["mean_rmse_kg"])
 
+    def test_result_records_fold_count(self, df):
+        result = run_mlp_cv(df, epochs=1, batch_size=8, n_folds=1, seed=42)
+        assert result["n_folds"] == 1
+
 
 # ---------------------------------------------------------------------------
 # 5. Ablation runner
@@ -309,6 +313,17 @@ class TestMarkdownRendering:
         assert "MLP" in md
         assert "HistGBR" in md
 
+    def test_real_tables_do_not_claim_mock_data(self, comparison_result):
+        challenger_md = format_challenger_table_md(comparison_result, "real")
+        assert "On mock data" not in challenger_md
+        assert "11,037-flight" in challenger_md
+
+        df = _make_mock_df_merged(seed=3)
+        ablation = run_ablation(df, n_folds=1, seed=42, model_type="histgbr")
+        ablation_md = format_ablation_table_md(ablation, "histgbr", "real")
+        assert "On mock data" not in ablation_md
+        assert "11,037-flight" in ablation_md
+
 
 # ---------------------------------------------------------------------------
 # 9. _AblationDataset zeroing logic
@@ -344,3 +359,14 @@ class TestAblationDataset:
     def test_len_matches_df(self, df):
         ds = _AblationDataset(df)
         assert len(ds) == len(df)
+
+    def test_materializes_float32_tensors(self, df):
+        import torch
+
+        ds = _AblationDataset(df)
+        features, target = ds[0]
+
+        assert features.dtype == torch.float32
+        assert target.dtype == torch.float32
+        assert features.shape == (len(FEATURE_COLUMNS),)
+        assert target.item() == pytest.approx(float(df.iloc[0]["fuel_kg"]))

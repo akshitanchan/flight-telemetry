@@ -23,14 +23,13 @@
   Cluster   : airport_icao
   Unique key: (airport_icao, window_start)
 
-  Incremental predicate
-  ---------------------
-  On each dbt run we select only source rows whose window_start falls strictly
-  AFTER the latest window_start already present in the destination table.
-  Because window_start is also the partition column, BigQuery can prune to
-  the relevant day-partitions in BOTH the source (landing table) and the
-  destination (for dedup merge) — guaranteed partition-pruning on every
-  incremental load.
+  Incremental behavior
+  --------------------
+  The landing table is replaced as a complete snapshot by `bq load --replace`.
+  Each incremental dbt run therefore reads that snapshot and MERGEs it by the
+  declared unique key. This intentionally favors correctness: corrected or
+  late rows at an existing window_start are updated instead of being skipped by
+  a fragile `window_start > max(window_start)` watermark.
 
   Full-refresh safety
   -------------------
@@ -56,12 +55,3 @@ select
     ground_count,
     airborne_count
 from {{ source('gold_landing', 'gold_airport_congestion_landing') }}
-
-{% if is_incremental() %}
--- Partition-pruning predicate: only new windows not yet in the destination.
--- The sub-select hits only the last partition in the destination (cheap).
-where window_start > (
-    select coalesce(max(window_start), cast('1970-01-01' as timestamp))
-    from {{ this }}
-)
-{% endif %}

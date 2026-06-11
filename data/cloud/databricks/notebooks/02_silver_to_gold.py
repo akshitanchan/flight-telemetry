@@ -705,20 +705,12 @@ else:
 # MAGIC   the source value is identical → MATCHED UPDATE writes the same value.
 # MAGIC * No floating-point drift accumulates across re-runs.
 # MAGIC
-# MAGIC ### Why emergency events and routing stats use upsert-by-key instead
+# MAGIC ### Emergency events and routing stats
 # MAGIC
-# MAGIC * **Emergency events**: the grain is `(icao24, squawk, first_seen_ts)` but
-# MAGIC   `first_seen_ts` is itself a derived aggregate (session window min), not a
-# MAGIC   source column.  Re-running on overlapping time ranges could generate
-# MAGIC   sessions with different first_seen_ts values if new early observations
-# MAGIC   arrive.  A MERGE keyed on `(icao24, squawk, first_seen_ts)` is therefore
-# MAGIC   correct only for append-only / non-overlapping batches.  Full recompute
-# MAGIC   is the safer default.
-# MAGIC
-# MAGIC * **Routing stats**: `window_start` (first_seen_ts per route) shifts when new
-# MAGIC   earlier pings arrive.  Same argument applies — upsert by
-# MAGIC   `(icao24, callsign, window_start)` is safe only when batches are
-# MAGIC   non-overlapping and no late-arriving data is expected.
+# MAGIC Their natural timestamps can shift when earlier observations arrive, so a
+# MAGIC naive timestamp-keyed MERGE is unsafe. Sections B3 and B4 use keyed partial
+# MAGIC recompute: identify affected entities, rebuild them from full silver history,
+# MAGIC delete their stale gold rows, and insert the corrected aggregates.
 
 # COMMAND ----------
 # MAGIC %md
@@ -858,7 +850,7 @@ else:
 # MAGIC %md
 # MAGIC ### B3 — Incremental keyed partial-recompute: gold_emergency_events
 # MAGIC
-# MAGIC **Overlapping-batch safe.**  The previous approach keyed the MERGE on
+# MAGIC **Overlapping-batch safe.**  The superseded approach keyed the MERGE on
 # MAGIC `(icao24, squawk, first_seen_ts)`, which is only correct for non-overlapping
 # MAGIC append-only batches.  When an incoming batch contains an earlier observation
 # MAGIC of an ongoing event, the true `first_seen_ts` shifts earlier — a naive MERGE

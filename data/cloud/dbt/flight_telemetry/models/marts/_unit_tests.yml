@@ -31,14 +31,12 @@ version: 2
 unit_tests:
 
   # =========================================================================
-  # gold_airport_congestion — incremental filter passes only new rows
+  # gold_airport_congestion — incremental snapshot includes corrected keys
   # =========================================================================
-  - name: ut_airport_congestion_incremental_filter
+  - name: ut_airport_congestion_incremental_snapshot
     description: >
-      Verifies the is_incremental() predicate: given a destination table whose
-      max(window_start) is 2024-01-15 10:00:00 UTC, only landing rows with
-      window_start STRICTLY AFTER that watermark reach the output.
-      The row exactly at the watermark must be excluded (strict > comparison).
+      Verifies that incremental compilation keeps the full replacement landing
+      snapshot, including rows at existing timestamps that may be corrections.
     model: gold_airport_congestion
     overrides:
       macros:
@@ -84,22 +82,27 @@ unit_tests:
             CAST(1 AS BIGINT),
             CAST(6 AS BIGINT)
 
-      # Mock the destination so max(window_start) watermark resolves to 2024-01-15 10:00:00
-      - input: this
-        format: sql
-        rows: |
-          select
-            CAST('EGLL' AS VARCHAR)                   AS airport_icao,
-            CAST('2024-01-15 10:00:00' AS TIMESTAMP)  AS window_start,
-            CAST('2024-01-15 10:05:00' AS TIMESTAMP)  AS window_end,
-            CAST(14 AS BIGINT)                        AS aircraft_count,
-            CAST(NULL AS DOUBLE)                      AS avg_altitude_m,
-            CAST(5 AS BIGINT)                         AS ground_count,
-            CAST(9 AS BIGINT)                         AS airborne_count
-
     expect:
       format: sql
       rows: |
+        select
+          CAST('EGLL' AS VARCHAR)                   AS airport_icao,
+          CAST('2024-01-15 09:55:00' AS TIMESTAMP)  AS window_start,
+          CAST('2024-01-15 10:00:00' AS TIMESTAMP)  AS window_end,
+          CAST(12 AS BIGINT)                        AS aircraft_count,
+          CAST(850.5 AS DOUBLE)                     AS avg_altitude_m,
+          CAST(3 AS BIGINT)                         AS ground_count,
+          CAST(9 AS BIGINT)                         AS airborne_count
+        UNION ALL
+        select
+          CAST('EGLL' AS VARCHAR),
+          CAST('2024-01-15 10:00:00' AS TIMESTAMP),
+          CAST('2024-01-15 10:05:00' AS TIMESTAMP),
+          CAST(14 AS BIGINT),
+          CAST(NULL AS DOUBLE),
+          CAST(5 AS BIGINT),
+          CAST(9 AS BIGINT)
+        UNION ALL
         select
           CAST('EGLL' AS VARCHAR)                   AS airport_icao,
           CAST('2024-01-15 10:05:00' AS TIMESTAMP)  AS window_start,
@@ -175,12 +178,12 @@ unit_tests:
           CAST(20 AS BIGINT)
 
   # =========================================================================
-  # gold_sector_load — incremental filter
+  # gold_sector_load — incremental snapshot
   # =========================================================================
-  - name: ut_sector_load_incremental_filter
+  - name: ut_sector_load_incremental_snapshot
     description: >
-      Verifies the is_incremental() predicate for sector_load: rows at or
-      before the watermark are excluded; rows strictly after are included.
+      Verifies that incremental compilation keeps every row in the replacement
+      landing snapshot.
     model: gold_sector_load
     overrides:
       macros:
@@ -208,18 +211,15 @@ unit_tests:
             CAST('2024-01-20 12:15:00' AS TIMESTAMP),
             CAST(2 AS BIGINT)
 
-      - input: this
-        format: sql
-        rows: |
-          select
-            CAST('8426b47ffffffff' AS VARCHAR)        AS h3_r4,
-            CAST('2024-01-20 12:00:00' AS TIMESTAMP)  AS window_start,
-            CAST('2024-01-20 12:05:00' AS TIMESTAMP)  AS window_end,
-            CAST(4 AS BIGINT)                         AS aircraft_count
-
     expect:
       format: sql
       rows: |
+        select
+          CAST('8426b47ffffffff' AS VARCHAR)        AS h3_r4,
+          CAST('2024-01-20 12:00:00' AS TIMESTAMP)  AS window_start,
+          CAST('2024-01-20 12:05:00' AS TIMESTAMP)  AS window_end,
+          CAST(4 AS BIGINT)                         AS aircraft_count
+        UNION ALL
         select
           CAST('8426b47ffffffff' AS VARCHAR)        AS h3_r4,
           CAST('2024-01-20 12:05:00' AS TIMESTAMP)  AS window_start,
@@ -233,13 +233,12 @@ unit_tests:
           CAST(2 AS BIGINT)
 
   # =========================================================================
-  # gold_emergency_events — incremental filter + squawk pass-through
+  # gold_emergency_events — incremental snapshot + squawk pass-through
   # =========================================================================
-  - name: ut_emergency_events_incremental_filter
+  - name: ut_emergency_events_incremental_snapshot
     description: >
-      Verifies is_incremental() predicate on first_seen_ts watermark and that
-      all three valid squawk codes (7500/7600/7700) pass through correctly,
-      including nullable callsign and nearest_airport.
+      Verifies all replacement-snapshot rows and all three valid squawk codes
+      pass through, including nullable callsign and nearest_airport.
     model: gold_emergency_events
     overrides:
       macros:
@@ -285,24 +284,21 @@ unit_tests:
             CAST('EDDB' AS VARCHAR),
             CAST(300 AS BIGINT)
 
-      - input: this
-        format: sql
-        rows: |
-          select
-            CAST('a1b2c3' AS VARCHAR)               AS icao24,
-            CAST('BAW123' AS VARCHAR)               AS callsign,
-            CAST('7700' AS VARCHAR)                 AS squawk,
-            CAST('2024-02-10 14:30:00' AS TIMESTAMP) AS first_seen_ts,
-            CAST('2024-02-10 14:45:00' AS TIMESTAMP) AS last_seen_ts,
-            CAST(51.5 AS DOUBLE)                    AS lat,
-            CAST(-0.1 AS DOUBLE)                    AS lon,
-            CAST('United Kingdom' AS VARCHAR)       AS origin_country,
-            CAST('EGLL' AS VARCHAR)                 AS nearest_airport,
-            CAST(900 AS BIGINT)                     AS duration_s
-
     expect:
       format: sql
       rows: |
+        select
+          CAST('a1b2c3' AS VARCHAR)               AS icao24,
+          CAST('BAW123' AS VARCHAR)               AS callsign,
+          CAST('7700' AS VARCHAR)                 AS squawk,
+          CAST('2024-02-10 14:30:00' AS TIMESTAMP) AS first_seen_ts,
+          CAST('2024-02-10 14:45:00' AS TIMESTAMP) AS last_seen_ts,
+          CAST(51.5 AS DOUBLE)                    AS lat,
+          CAST(-0.1 AS DOUBLE)                    AS lon,
+          CAST('United Kingdom' AS VARCHAR)       AS origin_country,
+          CAST('EGLL' AS VARCHAR)                 AS nearest_airport,
+          CAST(900 AS BIGINT)                     AS duration_s
+        UNION ALL
         select
           CAST('d4e5f6' AS VARCHAR)                AS icao24,
           CAST(NULL AS VARCHAR)                    AS callsign,
@@ -328,12 +324,12 @@ unit_tests:
           CAST(300 AS BIGINT)
 
   # =========================================================================
-  # gold_routing_stats — incremental filter + nullable columns
+  # gold_routing_stats — incremental snapshot + nullable columns
   # =========================================================================
-  - name: ut_routing_stats_incremental_filter
+  - name: ut_routing_stats_incremental_snapshot
     description: >
-      Verifies is_incremental() predicate on window_start watermark.
-      Also covers nullable max_altitude_m and avg_velocity_mps pass-through.
+      Verifies the replacement snapshot passes through on incremental runs.
+      Also covers nullable max_altitude_m and avg_velocity_mps.
     model: gold_routing_stats
     overrides:
       macros:
@@ -382,25 +378,22 @@ unit_tests:
             CAST(245.0 AS DOUBLE),
             CAST(324 AS BIGINT)
 
-      - input: this
-        format: sql
-        rows: |
-          select
-            CAST('112233' AS VARCHAR)                AS icao24,
-            CAST('EZY001' AS VARCHAR)                AS callsign,
-            CAST('2024-03-05 06:00:00' AS TIMESTAMP) AS window_start,
-            CAST('2024-03-05 06:30:00' AS TIMESTAMP) AS window_end,
-            CAST(51.1 AS DOUBLE)                     AS origin_lat,
-            CAST(-1.8 AS DOUBLE)                     AS origin_lon,
-            CAST(51.5 AS DOUBLE)                     AS destination_lat,
-            CAST(-0.1 AS DOUBLE)                     AS destination_lon,
-            CAST(10000.0 AS DOUBLE)                  AS max_altitude_m,
-            CAST(220.5 AS DOUBLE)                    AS avg_velocity_mps,
-            CAST(180 AS BIGINT)                      AS ping_count
-
     expect:
       format: sql
       rows: |
+        select
+          CAST('112233' AS VARCHAR)                AS icao24,
+          CAST('EZY001' AS VARCHAR)                AS callsign,
+          CAST('2024-03-05 06:00:00' AS TIMESTAMP) AS window_start,
+          CAST('2024-03-05 06:30:00' AS TIMESTAMP) AS window_end,
+          CAST(51.1 AS DOUBLE)                     AS origin_lat,
+          CAST(-1.8 AS DOUBLE)                     AS origin_lon,
+          CAST(51.5 AS DOUBLE)                     AS destination_lat,
+          CAST(-0.1 AS DOUBLE)                     AS destination_lon,
+          CAST(10000.0 AS DOUBLE)                  AS max_altitude_m,
+          CAST(220.5 AS DOUBLE)                    AS avg_velocity_mps,
+          CAST(180 AS BIGINT)                      AS ping_count
+        UNION ALL
         select
           CAST('445566' AS VARCHAR)                AS icao24,
           CAST(NULL AS VARCHAR)                    AS callsign,

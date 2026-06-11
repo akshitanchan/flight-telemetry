@@ -80,6 +80,10 @@ data-local-silver: systems-replay-sample ## Transform local bronze landing to si
 data-local-gold: data-local-silver ## Transform local silver to gold aggregates
 	$(PYTHON) -m data.transforms.cli_gold --input data/processed/silver_flight_state.jsonl
 
+.PHONY: data-export-gold-parquet
+data-export-gold-parquet: data-local-gold ## Export typed local gold Parquet for BigQuery bq load
+	$(PYTHON) data/scripts/export_gold_parquet.py
+
 .PHONY: data-refresh-experiment-small
 data-refresh-experiment-small: data-local-silver ## Run incremental-vs-recompute experiment (small)
 	$(PYTHON) data/experiments/refresh_strategy.py --sizes 10000,100000,1000000 --inc-pct 0.1
@@ -89,7 +93,7 @@ test-data: ## Run data-layer tests
 	$(PYTHON) -m pytest data/tests/ -v 2>/dev/null || $(PYTHON) -m unittest discover -s data/tests -v
 
 .PHONY: test-cloud
-test-cloud: ## Run cloud data-layer tests (213 tests, offline)
+test-cloud: ## Run cloud data-layer tests (237 tests, offline)
 	$(PYTHON) -m pytest data/cloud/ -v
 
 # ---- Systems ----------------------------------------------
@@ -133,7 +137,7 @@ ml-serve-smoke: ## Start serving endpoint and run smoke test
 	$(PYTHON) -m pytest ml/test_serve.py -v -s
 
 .PHONY: test-ml
-test-ml: ## Run full ML-layer test suite (212 tests, offline)
+test-ml: ## Run full ML-layer test suite (226 tests, offline)
 	$(PYTHON) -m pytest ml/ -v
 
 .PHONY: ml-ablate

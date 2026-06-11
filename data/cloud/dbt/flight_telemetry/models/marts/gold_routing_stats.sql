@@ -16,10 +16,10 @@
 
   No partition or cluster — C3 locked contract for route-grain table.
 
-  Incremental predicate
-  ---------------------
-  Uses window_start as the watermark.  On each run we select only rows
-  whose window_start exceeds the max already loaded.
+  Incremental behavior
+  --------------------
+  The landing table is a complete replacement snapshot. Every source key is
+  included in the MERGE so corrected route rows remain updateable.
 
   Schema contract (C3 locked):
     icao24           STRING    NOT NULL
@@ -48,10 +48,3 @@ select
     avg_velocity_mps,
     ping_count
 from {{ source('gold_landing', 'gold_routing_stats_landing') }}
-
-{% if is_incremental() %}
-where window_start > (
-    select coalesce(max(window_start), cast('1970-01-01' as timestamp))
-    from {{ this }}
-)
-{% endif %}

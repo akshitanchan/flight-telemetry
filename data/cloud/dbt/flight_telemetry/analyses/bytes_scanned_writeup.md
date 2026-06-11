@@ -4,7 +4,7 @@
 **Date captured:** ____-__-__  
 **GCP project:** ______________________  
 **BigQuery dataset:** `flight_telemetry`  
-**dbt version:** `dbt-core 1.11.x` / `dbt-bigquery 1.11.x`
+**dbt version:** ______________________
 
 ---
 
@@ -40,8 +40,8 @@ bq show --format=prettyjson "${BIGQUERY_PROJECT}:flight_telemetry.gold_airport_c
 
 ### Benchmark queries
 
-Run each query **twice** — once without a partition/cluster filter (BEFORE)
-and once with (AFTER).  Use `--dry-run` so no bytes are actually billed.
+Use `--dry-run` so no query bytes are billed. The fixture data is dated
+`2024-06-03`; replace the date and keys only if the loaded data differs.
 
 ```bash
 # ---------------------------------------------------------------------------
@@ -53,13 +53,13 @@ bq query --dry-run --use_legacy_sql=false --project_id="${BIGQUERY_PROJECT}" \
 # gold_airport_congestion — AFTER (partition filter on one day)
 bq query --dry-run --use_legacy_sql=false --project_id="${BIGQUERY_PROJECT}" \
   'SELECT * FROM `flight_telemetry.gold_airport_congestion`
-   WHERE DATE(window_start) = "2024-01-15"'
+   WHERE DATE(window_start) = "2024-06-03"'
 
 # gold_airport_congestion — AFTER (partition + cluster filter)
 bq query --dry-run --use_legacy_sql=false --project_id="${BIGQUERY_PROJECT}" \
   'SELECT * FROM `flight_telemetry.gold_airport_congestion`
-   WHERE DATE(window_start) = "2024-01-15"
-     AND airport_icao = "EGLL"'
+   WHERE DATE(window_start) = "2024-06-03"
+     AND airport_icao = "EBAR"'
 
 # ---------------------------------------------------------------------------
 # gold_sector_load — BEFORE (no filter)
@@ -70,8 +70,17 @@ bq query --dry-run --use_legacy_sql=false --project_id="${BIGQUERY_PROJECT}" \
 # gold_sector_load — AFTER (partition + cluster filter)
 bq query --dry-run --use_legacy_sql=false --project_id="${BIGQUERY_PROJECT}" \
   'SELECT * FROM `flight_telemetry.gold_sector_load`
-   WHERE DATE(window_start) = "2024-01-15"
-     AND h3_r4 = "8426b47ffffffff"'
+   WHERE DATE(window_start) = "2024-06-03"
+     AND h3_r4 = "841e033ffffffff"'
+
+# ---------------------------------------------------------------------------
+# Unpartitioned reference tables
+# ---------------------------------------------------------------------------
+bq query --dry-run --use_legacy_sql=false --project_id="${BIGQUERY_PROJECT}" \
+  'SELECT * FROM `flight_telemetry.gold_emergency_events`'
+
+bq query --dry-run --use_legacy_sql=false --project_id="${BIGQUERY_PROJECT}" \
+  'SELECT * FROM `flight_telemetry.gold_routing_stats`'
 ```
 
 ---
@@ -82,18 +91,18 @@ Fill in from `bq query --dry-run` output line: `Query will process X bytes`.
 
 ### gold_airport_congestion
 
-| Query type | Filter applied | Bytes scanned | Estimated cost (USD at $6.25/TB) | Reduction |
-|---|---|---|---|---|
-| Full scan (BEFORE) | none | _______ B | $_______ | — |
-| Partition only (AFTER) | `DATE(window_start) = '2024-01-15'` | _______ B | $_______ | ____% |
-| Partition + cluster (AFTER) | above + `airport_icao = 'EGLL'` | _______ B | $_______ | ____% |
+| Query type | Filter applied | Bytes processed | Reduction |
+|---|---|---|---|
+| Full scan (BEFORE) | none | _______ B | - |
+| Partition only (AFTER) | `DATE(window_start) = '2024-06-03'` | _______ B | ____% |
+| Partition + cluster (AFTER) | above + `airport_icao = 'EBAR'` | _______ B | ____% |
 
 ### gold_sector_load
 
-| Query type | Filter applied | Bytes scanned | Estimated cost (USD) | Reduction |
-|---|---|---|---|---|
-| Full scan (BEFORE) | none | _______ B | $_______ | — |
-| Partition + cluster (AFTER) | `DATE(window_start)` + `h3_r4 = '...'` | _______ B | $_______ | ____% |
+| Query type | Filter applied | Bytes processed | Reduction |
+|---|---|---|---|
+| Full scan (BEFORE) | none | _______ B | - |
+| Partition + cluster (AFTER) | `DATE(window_start)` + `h3_r4 = '841e033ffffffff'` | _______ B | ____% |
 
 ### gold_emergency_events (no partition/cluster — reference)
 
@@ -109,28 +118,17 @@ Fill in from `bq query --dry-run` output line: `Query will process X bytes`.
 
 ---
 
-## Expected Outcomes
+## Interpretation
 
-Based on the incremental load pattern (daily partitions, one new day per run):
+Record what BigQuery reports. Small fixture tables may show no measurable
+clustering reduction because clustering block pruning becomes useful only once
+the table spans enough storage blocks.
 
-- **Partition pruning alone** should reduce scanned bytes by approximately
-  `(total_days - 1) / total_days` — e.g. for 30 days of data, ~97% reduction.
-- **Clustering** provides an additional reduction proportional to the
-  cardinality of the cluster key within a partition.  For `airport_icao` with
-  ~1,000 unique ICAO codes, expect an additional 10–50x reduction per filtered
-  query (BigQuery cluster blocks typically hold ~1–4 GB of sorted data).
+The dbt marts use full-snapshot keyed `MERGE` semantics. This intentionally
+allows late and corrected rows at existing timestamps to update; it does not
+claim that the dbt build itself is partition-pruned.
 
----
-
-## dbt Incremental Load Bytes
-
-The incremental predicate in each mart model uses a `max(window_start)` subquery
-on the destination table.  BigQuery executes this as a partition-pruned read of
-the _last_ partition rather than a full-table scan, so the overhead of the
-watermark lookup is minimal (typically a few MB on a sorted partition).
-
-To verify, capture the `dbt build` slot-time and bytes-billed from the BigQuery
-job history after a run:
+To inspect build cost separately, capture the dbt job statistics:
 
 ```bash
 # List recent dbt jobs (look for CREATE OR INSERT statements)
@@ -146,10 +144,8 @@ bq show --job --format=prettyjson "${BIGQUERY_PROJECT}:US.<job-id>" \
 
 ## Notes
 
-- Cost formula: `bytes_scanned_TB * $6.25` (on-demand pricing; confirm current
-  rate at https://cloud.google.com/bigquery/pricing).
-- Slot-based (flat-rate) pricing makes bytes-scanned less meaningful for cost
-  but still relevant for performance and quota management.
+- Pricing changes over time and depends on the billing model. This template
+  records bytes, not an estimated dollar value.
 - The `require_partition_filter` option is set to `false` in the dbt configs to
   allow unrestricted queries from dbt itself; the owner may set it to `true` on
   the tables directly after `dbt build` if they want to enforce partition filter

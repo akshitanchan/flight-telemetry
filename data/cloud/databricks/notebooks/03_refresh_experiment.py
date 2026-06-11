@@ -19,10 +19,9 @@
 #
 # Free Edition quota note
 # -----------------------
-# Databricks Free Edition clusters are limited in memory/compute.  Widget
+# Databricks Free Edition serverless compute is quota-limited. Widget
 # default sizes are kept deliberately modest (10_000 / 50_000 / 200_000 rows).
-# Do NOT exceed 1_000_000 rows on a single-node Free Edition cluster — use a
-# real cluster (Standard_DS3_v2 or equivalent) for higher scales.
+# Increase only after measuring the workspace runtime and quota envelope.
 #
 # Offline / py_compile guard
 # --------------------------
@@ -58,8 +57,8 @@
 # MAGIC `data/cloud/databricks/experiments/harness.py`.  Run it locally before
 # MAGIC bringing up a Databricks cluster to verify the experiment shape.
 # MAGIC
-# MAGIC **Free Edition quota**: keep widget `sizes` at or below `200000` on a
-# MAGIC single-node cluster.  Raise to `500000` on Standard_DS3_v2 or better.
+# MAGIC **Free Edition quota**: keep widget `sizes` at or below `200000` on
+# MAGIC serverless compute. Increase only after measuring the workspace envelope.
 
 # COMMAND ----------
 
@@ -473,13 +472,12 @@ else:
 # MAGIC 3. The `h3` Python library is installed on the cluster
 # MAGIC    (`%pip install h3` or via cluster init script).
 # MAGIC
-# MAGIC ### Cluster recommendation
+# MAGIC ### Compute recommendation
 # MAGIC
 # MAGIC | Edition | Recommended node | Max `sizes` widget |
 # MAGIC |---|---|---|
-# MAGIC | Free Edition (single-node) | DBR 13.3 LTS | 200_000 rows |
-# MAGIC | Standard (multi-node) | Standard_DS3_v2 × 2 workers | 1_000_000 rows |
-# MAGIC | Performance (multi-node) | Standard_DS4_v2 × 4 workers | 5_000_000+ rows |
+# MAGIC | Free Edition serverless | Managed runtime | 200_000 rows |
+# MAGIC | Paid serverless workspace | Managed runtime | Increase after measuring |
 # MAGIC
 # MAGIC ### Step 1 — Configure widgets
 # MAGIC

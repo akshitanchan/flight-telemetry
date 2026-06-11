@@ -18,6 +18,15 @@ already contains all three entries and dispatches by module path.
 """
 
 import importlib
+import sys
+from pathlib import Path
+
+# Streamlit executes this file with dashboard/ as sys.path[0]. Add the
+# repository root so lazy imports such as dashboard.views.operational resolve
+# under the documented `streamlit run dashboard/app.py` entrypoint.
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 import streamlit as st
 

@@ -1,121 +1,66 @@
 {
-  "_comment_owner_instructions": [
-    "This is the Databricks Jobs API v2.1 job definition for the full-scale PRC-2025 training run.",
-    "Before submitting, replace every <OWNER-FILL> placeholder with your concrete values.",
-    "Submit via: databricks jobs create --json @ml/configs/databricks_job.json",
-    "Then trigger: databricks jobs run-now --job-id <returned-job-id>",
-    "See docs/runbooks/ml-fullscale-databricks.md for the complete step-by-step runbook."
-  ],
-
   "name": "flight-telemetry-ml-fullscale-prc2025",
-
   "tasks": [
     {
       "task_key": "fullscale_train",
-
-      "description": "Resumable feature extraction + full-scale FuelBurnMLP training on PRC-2025 (11,037 flights).",
-
+      "description": "Resumable feature extraction and full-scale FuelBurnMLP training on all 11,037 PRC-2025 training flights.",
       "spark_python_task": {
-        "python_file": "dbfs:/FileStore/flight-telemetry/ml/train_fullscale.py",
+        "python_file": "ml/train_fullscale.py",
+        "source": "GIT",
         "parameters": [
-          "--config",   "dbfs:/FileStore/flight-telemetry/ml/configs/fullscale.yaml",
-          "--override", "data.data_dir=<OWNER-FILL: UC volume path, e.g. /Volumes/flight_telemetry/bronze/prc2025_raw/prc_2025>",
-          "--override", "data.checkpoint_dir=<OWNER-FILL: UC volume path, e.g. /Volumes/flight_telemetry/bronze/prc2025_raw/features_checkpoint_train>",
-          "--override", "mlflow.tracking_uri=databricks",
-          "--override", "training.epochs=50",
-          "--override", "training.batch_size=16",
-          "--override", "training.lr=0.001",
-          "--override", "training.device=auto",
-          "--override", "training.checkpoint_dir=<OWNER-FILL: UC volume path for epoch checkpoints, e.g. /Volumes/flight_telemetry/bronze/prc2025_raw/training_checkpoints>"
+          "--config",
+          "ml/configs/fullscale.yaml",
+          "--override",
+          "data.data_dir=/Volumes/main/default/flight_telemetry/prc_2025",
+          "--override",
+          "data.checkpoint_dir=/Volumes/main/default/flight_telemetry/features_checkpoint_train",
+          "--override",
+          "mlflow.tracking_uri=databricks",
+          "--override",
+          "training.epochs=50",
+          "--override",
+          "training.batch_size=16",
+          "--override",
+          "training.lr=0.001",
+          "--override",
+          "training.device=cpu",
+          "--override",
+          "training.checkpoint_dir=/Volumes/main/default/flight_telemetry/training_checkpoints"
         ]
       },
-
-      "new_cluster": {
-        "_comment_cluster": "Fill in your Databricks Free Edition cluster spec below.",
-
-        "spark_version": "<OWNER-FILL: e.g. 15.4.x-cpu-ml-scala2.12>",
-        "node_type_id":  "<OWNER-FILL: e.g. Standard_DS3_v2 (Azure) or i3.xlarge (AWS)>",
-        "num_workers": 0,
-
-        "spark_conf": {
-          "spark.databricks.cluster.profile": "singleNode",
-          "spark.master": "local[*]"
-        },
-        "custom_tags": {
-          "ResourceClass": "SingleNode",
-          "project": "flight-telemetry",
-          "task": "ml-fullscale-prc2025"
-        },
-        "autotermination_minutes": 120,
-
-        "libraries": [
-          { "pypi": { "package": "torch>=2.0.0" } },
-          { "pypi": { "package": "mlflow>=2.10.0" } },
-          { "pypi": { "package": "pandas>=2.0.0" } },
-          { "pypi": { "package": "pyarrow>=14.0.0" } },
-          { "pypi": { "package": "scikit-learn>=1.3.0" } },
-          { "pypi": { "package": "tqdm>=4.65.0" } },
-          { "pypi": { "package": "pyyaml>=6.0" } }
-        ]
-      },
-
+      "environment_key": "default",
       "timeout_seconds": 7200,
-
-      "email_notifications": {
-        "on_failure": ["<OWNER-FILL: your-email@example.com>"],
-        "on_success": ["<OWNER-FILL: your-email@example.com>"]
+      "max_retries": 1,
+      "min_retry_interval_millis": 60000
+    }
+  ],
+  "environments": [
+    {
+      "environment_key": "default",
+      "spec": {
+        "environment_version": "2",
+        "dependencies": [
+          "torch>=2.0.0",
+          "mlflow>=2.10.0",
+          "pandas>=2.0.0",
+          "pyarrow>=14.0.0",
+          "scikit-learn>=1.3.0",
+          "tqdm>=4.65.0",
+          "pyyaml>=6.0"
+        ]
       }
     }
   ],
-
+  "git_source": {
+    "git_url": "https://github.com/akshitanchan/flight-telemetry",
+    "git_provider": "gitHub",
+    "git_branch": "main"
+  },
   "max_concurrent_runs": 1,
-
   "tags": {
     "project": "flight-telemetry",
     "wave": "W4.2",
-    "task": "ml-05"
-  },
-
-  "_note_mlflow": "When tracking_uri=databricks, MLflow runs land in the workspace-embedded MLflow under the FuelBurn_Baseline experiment. Navigate to your Databricks workspace -> Machine Learning -> Experiments -> FuelBurn_Baseline to see the run.",
-
-  "_note_files": "Before submitting the job, upload the following files to DBFS using: databricks fs cp <local-path> <dbfs-path>. See the runbook for the exact commands.",
-
-  "_files_to_upload": [
-    {
-      "local":  "ml/train_fullscale.py",
-      "dbfs":   "dbfs:/FileStore/flight-telemetry/ml/train_fullscale.py"
-    },
-    {
-      "local":  "ml/train.py",
-      "dbfs":   "dbfs:/FileStore/flight-telemetry/ml/train.py"
-    },
-    {
-      "local":  "ml/__init__.py",
-      "dbfs":   "dbfs:/FileStore/flight-telemetry/ml/__init__.py"
-    },
-    {
-      "local":  "ml/dataset.py",
-      "dbfs":   "dbfs:/FileStore/flight-telemetry/ml/dataset.py"
-    },
-    {
-      "local":  "ml/model.py",
-      "dbfs":   "dbfs:/FileStore/flight-telemetry/ml/model.py"
-    },
-    {
-      "local":  "ml/features.py",
-      "dbfs":   "dbfs:/FileStore/flight-telemetry/ml/features.py"
-    },
-    {
-      "local":  "ml/extract_features.py",
-      "dbfs":   "dbfs:/FileStore/flight-telemetry/ml/extract_features.py"
-    },
-    {
-      "local":  "ml/mock_data.py",
-      "dbfs":   "dbfs:/FileStore/flight-telemetry/ml/mock_data.py"
-    },
-    {
-      "local":  "ml/configs/fullscale.yaml",
-      "dbfs":   "dbfs:/FileStore/flight-telemetry/ml/configs/fullscale.yaml"
-    }
-  ]
+    "task": "ml-05",
+    "compute": "serverless"
+  }
 }

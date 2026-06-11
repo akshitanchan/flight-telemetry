@@ -26,13 +26,7 @@ except ModuleNotFoundError:
 
     class _DltStub:
         @staticmethod
-        def expect_or_drop(name: str, constraint: str):
-            def decorator(fn):
-                return fn
-            return decorator
-
-        @staticmethod
-        def expect_all(expectations: dict, on_violation: str = "drop"):
+        def expect_all_or_drop(expectations: dict):
             def decorator(fn):
                 return fn
             return decorator
@@ -219,7 +213,6 @@ GOLD_ROUTING_EXPECTATIONS: dict[str, str] = {
 # DLT table functions — one per gold table
 # ===========================================================================
 
-@dlt.expect_all(GOLD_CONGESTION_EXPECTATIONS, on_violation="drop")  # type: ignore[misc]
 @dlt.table(  # type: ignore[misc]
     name="gold_airport_congestion_validated",
     comment=(
@@ -228,13 +221,13 @@ GOLD_ROUTING_EXPECTATIONS: dict[str, str] = {
         "Violating rows are dropped and counted in expectation metrics."
     ),
 )
+@dlt.expect_all_or_drop(GOLD_CONGESTION_EXPECTATIONS)  # type: ignore[misc]
 def gold_airport_congestion_validated():
     if not _ON_DATABRICKS:
         raise RuntimeError("DLT table function — not callable offline.")
     return dlt.read_stream("gold_airport_congestion")  # type: ignore[union-attr]
 
 
-@dlt.expect_all(GOLD_SECTOR_EXPECTATIONS, on_violation="drop")  # type: ignore[misc]
 @dlt.table(  # type: ignore[misc]
     name="gold_sector_load_validated",
     comment=(
@@ -242,13 +235,13 @@ def gold_airport_congestion_validated():
         "Violating rows are dropped and counted in expectation metrics."
     ),
 )
+@dlt.expect_all_or_drop(GOLD_SECTOR_EXPECTATIONS)  # type: ignore[misc]
 def gold_sector_load_validated():
     if not _ON_DATABRICKS:
         raise RuntimeError("DLT table function — not callable offline.")
     return dlt.read_stream("gold_sector_load")  # type: ignore[union-attr]
 
 
-@dlt.expect_all(GOLD_EMERGENCY_EXPECTATIONS, on_violation="drop")  # type: ignore[misc]
 @dlt.table(  # type: ignore[misc]
     name="gold_emergency_events_validated",
     comment=(
@@ -257,13 +250,13 @@ def gold_sector_load_validated():
         "Violating rows are dropped and counted in expectation metrics."
     ),
 )
+@dlt.expect_all_or_drop(GOLD_EMERGENCY_EXPECTATIONS)  # type: ignore[misc]
 def gold_emergency_events_validated():
     if not _ON_DATABRICKS:
         raise RuntimeError("DLT table function — not callable offline.")
     return dlt.read_stream("gold_emergency_events")  # type: ignore[union-attr]
 
 
-@dlt.expect_all(GOLD_ROUTING_EXPECTATIONS, on_violation="drop")  # type: ignore[misc]
 @dlt.table(  # type: ignore[misc]
     name="gold_routing_stats_validated",
     comment=(
@@ -272,6 +265,7 @@ def gold_emergency_events_validated():
         "Violating rows are dropped and counted in expectation metrics."
     ),
 )
+@dlt.expect_all_or_drop(GOLD_ROUTING_EXPECTATIONS)  # type: ignore[misc]
 def gold_routing_stats_validated():
     if not _ON_DATABRICKS:
         raise RuntimeError("DLT table function — not callable offline.")

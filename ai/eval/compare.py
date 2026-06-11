@@ -111,14 +111,15 @@ def _run_strategy(strategy, questions, faithfulness_checker):
         # Token/cost accounting.
         q_tokens = ans.meta.get("tokens", 0)
         q_calls = ans.meta.get("llm_calls", 0)
+        q_provider = ans.meta.get("provider", "")
+        q_cost = cost_usd(q_provider or "unknown", q_tokens)
         tokens_total += q_tokens
         calls_total += q_calls
 
         # Infer model from meta for cost lookup (use first non-empty provider).
         if model_for_cost == "unknown":
-            provider = ans.meta.get("provider", "")
-            if provider:
-                model_for_cost = provider
+            if q_provider:
+                model_for_cost = q_provider
 
         results.append({
             "id": q["id"],
@@ -129,6 +130,9 @@ def _run_strategy(strategy, questions, faithfulness_checker):
             "route": ans.route,
             "latency_ms": round(dt_ms, 2),
             "tokens": q_tokens,
+            "llm_calls": q_calls,
+            "provider": q_provider,
+            "cost_usd": round(q_cost, 8),
             "faithfulness": round(faith_result.score, 4),
         })
 
@@ -144,6 +148,7 @@ def _run_strategy(strategy, questions, faithfulness_checker):
 
     return {
         "strategy": strategy.name,
+        "provider": model_for_cost,
         "total": n,
         "passed": sum(1 for r in results if r["passed"]),
         "accuracy": round(sum(r["passed"] for r in results) / n, 3) if n else 0.0,
@@ -156,6 +161,46 @@ def _run_strategy(strategy, questions, faithfulness_checker):
         "tokens": tokens_total,
         "cost_usd": round(total_cost, 8),
         "per_question": results,
+    }
+
+
+def _tier_summary(summary, tier):
+    """Aggregate one strategy summary over only the requested golden-set tier."""
+    rows = [row for row in summary.get("per_question", []) if row.get("tier") == tier]
+    latencies = sorted(float(row.get("latency_ms", 0.0)) for row in rows)
+    providers = sorted(
+        {row.get("provider") for row in rows if row.get("provider")}
+    )
+    n = len(rows)
+
+    return {
+        "strategy": summary.get("strategy", ""),
+        "provider": ", ".join(providers) or summary.get("provider", "unknown"),
+        "tier": tier,
+        "total": n,
+        "passed": sum(1 for row in rows if row.get("passed")),
+        "accuracy": round(sum(bool(row.get("passed")) for row in rows) / n, 3)
+        if n
+        else 0.0,
+        "citation_coverage": round(
+            sum(bool(row.get("cited")) for row in rows) / n, 3
+        )
+        if n
+        else 0.0,
+        "faithfulness_mean": round(
+            statistics.mean(float(row.get("faithfulness", 0.0)) for row in rows), 4
+        )
+        if rows
+        else 0.0,
+        "p50_latency_ms": round(_percentile(latencies, 50), 2),
+        "p95_latency_ms": round(_percentile(latencies, 95), 2),
+        "mean_latency_ms": round(statistics.mean(latencies), 2)
+        if latencies
+        else 0.0,
+        "llm_calls": sum(int(row.get("llm_calls", 0)) for row in rows),
+        "tokens": sum(int(row.get("tokens", 0)) for row in rows),
+        "cost_usd": round(sum(float(row.get("cost_usd", 0.0)) for row in rows), 8),
+        "per_question": rows,
     }
 
 
@@ -296,8 +341,8 @@ def compare(
         Summaries for deterministic strategies over CORE-tier questions only.
         This is the authoritative gate: accuracy==1.0 AND citation==1.0 required.
     all_summaries:
-        Summaries for all strategies (deterministic + available LLM) over the
-        full golden set (core + extended). Used for the advisory metrics table.
+        Deterministic summaries over the full golden set and available LLM
+        summaries over the extended tier. Used for advisory metrics.
     injection_result:
         Block-rate dict from running the injection suite (ADVISORY).
     notes:
@@ -307,6 +352,9 @@ def compare(
         golden_data = json.load(f)
     all_questions = golden_data.get("questions", [])
     core_questions = [q for q in all_questions if q.get("tier") == "core"]
+    extended_questions = [
+        q for q in all_questions if q.get("tier") == "extended"
+    ]
 
     analytics = AnalyticsTool(gold_dir)
     retrieval = RetrievalTool(corpus_path)
@@ -371,13 +419,17 @@ def compare(
         for s in det_strategies
     ]
 
-    # -- ADVISORY: all strategies on full golden set (core + extended) --
+    # Deterministic routers retain full-set advisory coverage. Live LLM
+    # architectures run only the 25-question extended tier that the public
+    # head-to-head claims, avoiding unreported calls and cost.
     all_summaries = [
         _run_strategy(s, all_questions, faith_checker)
         for s in det_strategies
     ]
     for s in llm_strategies:
-        all_summaries.append(_run_strategy(s, all_questions, faith_checker))
+        all_summaries.append(
+            _run_strategy(s, extended_questions, faith_checker)
+        )
 
     # -- ADVISORY: injection metrics (active_block_rate + attack_neutralized_rate) --
     injection_result = compute_injection_metrics(
@@ -407,7 +459,7 @@ def _print_table(core_summaries, all_summaries, notes, injection_result):
         Deterministic strategy summaries over CORE-tier questions only.
         Shown in the AUTHORITATIVE section.
     all_summaries:
-        All strategy summaries over the full golden set (core + extended).
+        Deterministic full-set summaries and live extended-tier summaries.
         Shown in the ADVISORY section.
     notes:
         Human-readable notes (skipped strategies, etc.).
@@ -423,14 +475,26 @@ def _print_table(core_summaries, all_summaries, notes, injection_result):
 
     # -- ADVISORY section --
     print("\n" + "-" * 100)
-    print("  ADVISORY METRICS  |  All strategies, full golden set (core + extended)")
+    print("  ADVISORY METRICS  |  Deterministic full set; live strategies extended tier")
     print("-" * 100)
     advisory_cols = [
-        "strategy", "total", "accuracy", "citation_coverage",
+        "strategy", "provider", "total", "accuracy", "citation_coverage",
         "faithfulness_mean", "p50_latency_ms", "p95_latency_ms",
         "tokens", "cost_usd",
     ]
     _print_md_table(all_summaries, advisory_cols)
+
+    # -- Live architecture comparison: extended tier only --
+    architecture_names = {"single_shot_rag", "react", "plan_execute"}
+    extended_architecture_summaries = [
+        _tier_summary(summary, "extended")
+        for summary in all_summaries
+        if summary.get("strategy") in architecture_names
+    ]
+    print("\n" + "-" * 100)
+    print("  LIVE ARCHITECTURE HEAD-TO-HEAD  |  Extended tier only")
+    print("-" * 100)
+    _print_md_table(extended_architecture_summaries, advisory_cols)
 
     # -- Injection metrics --
     print("\n" + "-" * 100)
@@ -495,6 +559,13 @@ def main():
 
     # Persist JSON output.
     args.out.parent.mkdir(parents=True, exist_ok=True)
+    architecture_names = {"single_shot_rag", "react", "plan_execute"}
+    extended_architecture_summaries = [
+        _tier_summary(summary, "extended")
+        for summary in all_summaries
+        if summary.get("strategy") in architecture_names
+    ]
+
     output = {
         "gate": "authoritative",
         "core_gate": {
@@ -506,13 +577,15 @@ def main():
         },
         "advisory": {
             "description": (
-                "All strategies over the full golden set. "
+                "Deterministic strategies use the full golden set; live LLM "
+                "strategies use only the 25-question extended tier. "
                 "Faithfulness + injection metrics (active_block_rate and "
                 "attack_neutralized_rate) are measured and reported but never fail CI."
             ),
             "summaries": all_summaries,
             "injection_block_rate": injection_result,
         },
+        "extended_architecture_summaries": extended_architecture_summaries,
         "notes": notes,
     }
     with open(args.out, "w") as f:

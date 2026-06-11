@@ -47,10 +47,9 @@ These are the exact checks performed.  All thresholds match the ml-05 runbook:
     The run must have logged the per-epoch training RMSE history as "train_rmse"
     (step-indexed).  This confirms the training loop ran to completion.
 
-  CHECK 6 — DECREASING TRAIN RMSE
-    The train_rmse curve across logged epochs must be non-increasing on average
-    (i.e. final logged train_rmse <= first logged train_rmse).  A flat or
-    increasing curve indicates a broken optimiser or a very under-fit model.
+  CHECK 6 — FIRST-TO-LAST TRAIN RMSE IMPROVEMENT
+    The final logged train_rmse must be <= the first logged train_rmse. This is
+    an endpoint sanity check, not a claim that every epoch is monotonic.
 
 Registry Handoff (ml-09)
 ------------------------
@@ -280,12 +279,12 @@ def _check_train_rmse_present(client: MlflowClient, run_id: str, metrics: dict) 
         "train_rmse_history_present",
         _FAIL,
         f"Metric '{METRIC_TRAIN_RMSE}' not found in run. "
-        "The training loop must log per-epoch train_rmse for monotonicity check.",
+        "The training loop must log per-epoch train_rmse for the endpoint check.",
     )
 
 
 def _check_decreasing_train_rmse(client: MlflowClient, run_id: str) -> dict:
-    """CHECK 6 — train_rmse history must be non-increasing (first >= last).
+    """CHECK 6 — final train_rmse must be no higher than the first.
 
     Fetches the full step-indexed metric history.  If only one step is present,
     or the history is unavailable, the check is skipped (WARN).
@@ -296,14 +295,14 @@ def _check_decreasing_train_rmse(client: MlflowClient, run_id: str) -> dict:
         return _result(
             "train_rmse_decreasing",
             _WARN,
-            f"Could not fetch train_rmse history: {exc}. Skipping monotonicity check.",
+            f"Could not fetch train_rmse history: {exc}. Skipping endpoint check.",
         )
 
     if not history:
         return _result(
             "train_rmse_decreasing",
             _WARN,
-            "train_rmse history is empty. Skipping monotonicity check.",
+            "train_rmse history is empty. Skipping endpoint check.",
         )
 
     # Sort by step to get chronological order.
@@ -313,7 +312,7 @@ def _check_decreasing_train_rmse(client: MlflowClient, run_id: str) -> dict:
         return _result(
             "train_rmse_decreasing",
             _WARN,
-            "Only one train_rmse data point logged. Cannot check monotonicity.",
+            "Only one train_rmse data point logged. Cannot compare endpoints.",
         )
 
     first_val = sorted_history[0].value

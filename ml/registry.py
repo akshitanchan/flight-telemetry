@@ -58,25 +58,16 @@ If you also point MLFLOW_TRACKING_URI at the shared tracking server, serve.py
 will resolve the alias and load the correct champion version automatically.
 
 Stale-run tagging strategy
----------------------------
-Pre-leakage runs (before ml-01) were logged to the FuelBurn_Baseline
-experiment and report an optimistic ~395 kg RMSE — not comparable to the
-post-fix CV RMSE 442.65 ± 36.36 kg.
-
-tag_stale_pre_leakage_runs() identifies stale runs by one or more of:
-  - An explicit run tag ``data.leakage_fix = "pre"`` that was never set on
-    new runs (opt-in whitelist approach); OR
-  - best_val_rmse < STALE_RMSE_THRESHOLD (395 kg) — the optimistic number
-    that is only achievable with the old leaky split (hard to forge on honest
-    data).
+--------------------------
+Pre-leakage runs are identified only by explicit provenance tags:
+``data.leakage_fix = "pre"`` or ``registry.stale = "true"``. Metric values
+are never used as a proxy for lineage; a genuinely improved model can score
+below an old leaky run and must not be rejected for being better.
 
 For each stale run the function sets these MLflow run tags:
   registry.stale = "true"
   registry.stale_reason = "pre_leakage_fix_ml01"
   registry.stale_since = <ISO timestamp>
-
-And sets this experiment-level tag (once):
-  registry.stale_baseline_threshold = str(STALE_RMSE_THRESHOLD)
 
 These tags surface in the MLflow UI and are checked by compare_and_promote()
 so that stale runs are never registered as champions.
@@ -123,11 +114,6 @@ ALIAS_CHALLENGER: str = "challenger"
 PRIMARY_METRIC: str = "cv_mean_rmse_kg"
 FALLBACK_METRIC: str = "best_val_rmse"
 
-#: Pre-leakage runs show an optimistic RMSE below this threshold (kg).
-#: Any run with best_val_rmse < threshold AND no explicit post-fix tag is
-#: considered stale.  Set slightly above 400 to give headroom.
-STALE_RMSE_THRESHOLD: float = 410.0
-
 #: Exact production URI that serving (ml-10 / ML_MODEL_URI) must use.
 PRODUCTION_URI: str = f"models:/{REGISTRY_NAME}@{ALIAS_PRODUCTION}"
 
@@ -168,10 +154,8 @@ def _is_stale(client: MlflowClient, run_id: str) -> bool:
     """Return True if a run should be considered a pre-leakage stale run.
 
     Stale criteria (OR):
-    1. Run tag ``data.leakage_fix`` == ``"pre"``  (explicit opt-in whitelist).
-    2. Any RMSE metric < STALE_RMSE_THRESHOLD — only achievable with the
-       old leaky train/val split; post-fix honest models score higher.
-    3. Run tag ``registry.stale`` == ``"true"`` (previously tagged by this fn).
+    1. Run tag ``data.leakage_fix`` == ``"pre"``.
+    2. Run tag ``registry.stale`` == ``"true"``.
     """
     run = client.get_run(run_id)
     tags = run.data.tags
@@ -180,12 +164,6 @@ def _is_stale(client: MlflowClient, run_id: str) -> bool:
         return True
     if tags.get("data.leakage_fix") == "pre":
         return True
-
-    metrics = run.data.metrics
-    for metric in (PRIMARY_METRIC, FALLBACK_METRIC):
-        val = metrics.get(metric)
-        if val is not None and float(val) < STALE_RMSE_THRESHOLD:
-            return True
 
     return False
 
@@ -458,18 +436,14 @@ def tag_stale_pre_leakage_runs(
 ) -> list[str]:
     """Tag pre-leakage stale runs in the given experiment.
 
-    Stale identification criteria (OR, applied per run):
-    1. Run tag ``data.leakage_fix == "pre"`` (explicit pre-fix marker).
-    2. ``best_val_rmse`` or ``cv_mean_rmse_kg`` < STALE_RMSE_THRESHOLD
-       (optimistic ~395 kg — only achievable with the old leaky split).
+    Stale identification criteria:
+    Run tag ``data.leakage_fix == "pre"`` (explicit pre-fix marker), or a
+    pre-existing ``registry.stale == "true"`` tag.
 
     For each stale run the following tags are set:
       registry.stale          = "true"
       registry.stale_reason   = "pre_leakage_fix_ml01"
       registry.stale_since    = <UTC ISO timestamp>
-
-    Additionally, a single experiment-level tag is set (once):
-      registry.stale_baseline_threshold = str(STALE_RMSE_THRESHOLD)
 
     Parameters
     ----------
@@ -507,8 +481,6 @@ def tag_stale_pre_leakage_runs(
     for run in runs_df:
         run_id = run.info.run_id
         tags = run.data.tags
-        metrics = run.data.metrics
-
         # Already tagged — count it but don't re-tag.
         if tags.get("registry.stale") == "true":
             stale_run_ids.append(run_id)
@@ -518,23 +490,10 @@ def tag_stale_pre_leakage_runs(
         is_stale_flag = False
         stale_reason = "unknown"
 
-        # Criterion 1: explicit pre-fix tag.
+        # Explicit provenance is the only safe stale-run signal.
         if tags.get("data.leakage_fix") == "pre":
             is_stale_flag = True
             stale_reason = "pre_leakage_fix_ml01 (explicit tag)"
-
-        # Criterion 2: optimistic RMSE below threshold.
-        if not is_stale_flag:
-            for metric_key in (PRIMARY_METRIC, FALLBACK_METRIC):
-                val = metrics.get(metric_key)
-                if val is not None and float(val) < STALE_RMSE_THRESHOLD:
-                    is_stale_flag = True
-                    stale_reason = (
-                        f"pre_leakage_fix_ml01 "
-                        f"({metric_key}={float(val):.2f} < threshold "
-                        f"{STALE_RMSE_THRESHOLD})"
-                    )
-                    break
 
         if is_stale_flag:
             stale_run_ids.append(run_id)
@@ -547,18 +506,7 @@ def tag_stale_pre_leakage_runs(
                 client.set_tag(run_id, "registry.stale_reason", "pre_leakage_fix_ml01")
                 client.set_tag(run_id, "registry.stale_since", now_iso)
         else:
-            logger.debug("Run %s is not stale (RMSE >= threshold).", run_id)
-
-    # Set experiment-level tag once (idempotent).
-    if stale_run_ids and not dry_run:
-        try:
-            client.set_experiment_tag(
-                experiment_id,
-                "registry.stale_baseline_threshold",
-                str(STALE_RMSE_THRESHOLD),
-            )
-        except mlflow.exceptions.MlflowException as exc:
-            logger.warning("Could not set experiment tag: %s", exc)
+            logger.debug("Run %s has no explicit stale provenance tag.", run_id)
 
     logger.info(
         "tag_stale_pre_leakage_runs: %d stale run(s) found in '%s' "

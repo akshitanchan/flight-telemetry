@@ -33,10 +33,9 @@ Coverage
    - ValueError is raised immediately; no new model version is created.
 
 7. tag_stale_pre_leakage_runs
-   - Runs with RMSE below STALE_RMSE_THRESHOLD are tagged stale.
-   - Runs with RMSE above the threshold are NOT tagged.
+   - Only runs with explicit stale provenance are tagged.
+   - Low RMSE alone is never treated as stale.
    - dry_run=True identifies stale runs without writing any tags.
-   - A run with the explicit "data.leakage_fix=pre" tag is always stale.
 
 8. URI contract
    - After promotion the production alias resolves to the correct version.
@@ -62,7 +61,6 @@ from ml.registry import (
     ALIAS_PRODUCTION,
     PRODUCTION_URI,
     REGISTRY_NAME,
-    STALE_RMSE_THRESHOLD,
     compare_and_promote,
     promote_to_production,
     register_run,
@@ -173,8 +171,10 @@ class TestRegisterRun:
 
     def test_stale_run_raises_value_error(self, isolated_mlflow):
         """Registering a stale (pre-leakage) run raises ValueError."""
-        stale_rmse = STALE_RMSE_THRESHOLD - 1.0  # below threshold → stale
-        run_id = _log_model_run(rmse=stale_rmse)
+        run_id = _log_model_run(
+            rmse=390.0,
+            extra_tags={"data.leakage_fix": "pre"},
+        )
         with pytest.raises(ValueError, match="stale"):
             register_run(run_id)
 
@@ -387,11 +387,13 @@ class TestNoPriorChampion:
 # ---------------------------------------------------------------------------
 
 class TestStaleRunRejection:
-    def test_stale_rmse_run_raises_before_registration(self, isolated_mlflow):
+    def test_explicit_stale_run_raises_before_registration(self, isolated_mlflow):
         """A stale run is rejected before any model version is created."""
         client = MlflowClient()
-        stale_rmse = STALE_RMSE_THRESHOLD - 5.0
-        run_id = _log_model_run(rmse=stale_rmse)
+        run_id = _log_model_run(
+            rmse=390.0,
+            extra_tags={"data.leakage_fix": "pre"},
+        )
 
         with pytest.raises(ValueError, match="stale"):
             compare_and_promote(run_id)
@@ -420,7 +422,10 @@ class TestStaleRunRejection:
         champ_version = register_run(champ_run_id)
         promote_to_production(champ_version)
 
-        stale_run_id = _log_model_run(rmse=STALE_RMSE_THRESHOLD - 1.0)
+        stale_run_id = _log_model_run(
+            rmse=390.0,
+            extra_tags={"data.leakage_fix": "pre"},
+        )
         with pytest.raises(ValueError, match="stale"):
             compare_and_promote(stale_run_id)
 
@@ -435,10 +440,12 @@ class TestStaleRunRejection:
 
 class TestTagStaleRuns:
     def test_stale_runs_tagged(self, isolated_mlflow):
-        """Runs below the threshold receive the registry.stale=true tag."""
+        """Explicit pre-fix runs receive the registry.stale=true tag."""
         client = MlflowClient()
-        stale_rmse = STALE_RMSE_THRESHOLD - 20.0
-        run_id = _log_model_run(rmse=stale_rmse)
+        run_id = _log_model_run(
+            rmse=390.0,
+            extra_tags={"data.leakage_fix": "pre"},
+        )
 
         stale_ids = tag_stale_pre_leakage_runs("FuelBurn_Baseline")
         assert run_id in stale_ids
@@ -448,11 +455,10 @@ class TestTagStaleRuns:
         assert run.data.tags.get("registry.stale_reason") == "pre_leakage_fix_ml01"
         assert "registry.stale_since" in run.data.tags
 
-    def test_valid_runs_not_tagged(self, isolated_mlflow):
-        """Runs with RMSE >= threshold are NOT tagged stale."""
+    def test_low_rmse_without_provenance_is_not_tagged(self, isolated_mlflow):
+        """A strong metric is not evidence that a run is stale."""
         client = MlflowClient()
-        valid_rmse = STALE_RMSE_THRESHOLD + 10.0
-        run_id = _log_model_run(rmse=valid_rmse)
+        run_id = _log_model_run(rmse=350.0)
 
         stale_ids = tag_stale_pre_leakage_runs("FuelBurn_Baseline")
         assert run_id not in stale_ids
@@ -463,8 +469,10 @@ class TestTagStaleRuns:
     def test_dry_run_does_not_write_tags(self, isolated_mlflow):
         """dry_run=True identifies stale runs without writing tags."""
         client = MlflowClient()
-        stale_rmse = STALE_RMSE_THRESHOLD - 20.0
-        run_id = _log_model_run(rmse=stale_rmse)
+        run_id = _log_model_run(
+            rmse=390.0,
+            extra_tags={"data.leakage_fix": "pre"},
+        )
 
         stale_ids = tag_stale_pre_leakage_runs("FuelBurn_Baseline", dry_run=True)
         assert run_id in stale_ids
@@ -477,9 +485,8 @@ class TestTagStaleRuns:
     def test_explicit_leakage_tag_identified(self, isolated_mlflow):
         """A run tagged data.leakage_fix=pre is always flagged stale."""
         client = MlflowClient()
-        # RMSE is above threshold — explicit tag must still fire.
         run_id = _log_model_run(
-            rmse=STALE_RMSE_THRESHOLD + 50.0,
+            rmse=500.0,
             extra_tags={"data.leakage_fix": "pre"},
         )
 
@@ -497,8 +504,11 @@ class TestTagStaleRuns:
     def test_mixed_run_set(self, isolated_mlflow):
         """Only the stale run in a mixed batch gets tagged."""
         client = MlflowClient()
-        stale_run = _log_model_run(rmse=STALE_RMSE_THRESHOLD - 15.0)
-        valid_run = _log_model_run(rmse=STALE_RMSE_THRESHOLD + 15.0)
+        stale_run = _log_model_run(
+            rmse=450.0,
+            extra_tags={"data.leakage_fix": "pre"},
+        )
+        valid_run = _log_model_run(rmse=350.0)
 
         stale_ids = tag_stale_pre_leakage_runs("FuelBurn_Baseline")
         assert stale_run in stale_ids
@@ -511,8 +521,10 @@ class TestTagStaleRuns:
 
     def test_idempotent_tagging(self, isolated_mlflow):
         """Calling tag_stale_pre_leakage_runs twice does not error."""
-        stale_rmse = STALE_RMSE_THRESHOLD - 20.0
-        run_id = _log_model_run(rmse=stale_rmse)
+        run_id = _log_model_run(
+            rmse=390.0,
+            extra_tags={"data.leakage_fix": "pre"},
+        )
 
         ids1 = tag_stale_pre_leakage_runs("FuelBurn_Baseline")
         ids2 = tag_stale_pre_leakage_runs("FuelBurn_Baseline")
@@ -520,19 +532,19 @@ class TestTagStaleRuns:
         assert run_id in ids1
         assert run_id in ids2
 
-    def test_cv_mean_rmse_metric_detected(self, isolated_mlflow):
-        """Stale detection works on cv_mean_rmse_kg metric (not just best_val_rmse)."""
+    def test_low_cv_mean_rmse_is_not_treated_as_stale(self, isolated_mlflow):
+        """Metric values never substitute for lineage."""
         client = MlflowClient()
         run_id = _log_model_run(
-            rmse=STALE_RMSE_THRESHOLD - 30.0,
+            rmse=300.0,
             metric_key="cv_mean_rmse_kg",  # primary metric
         )
 
         stale_ids = tag_stale_pre_leakage_runs("FuelBurn_Baseline")
-        assert run_id in stale_ids
+        assert run_id not in stale_ids
 
         run = client.get_run(run_id)
-        assert run.data.tags.get("registry.stale") == "true"
+        assert run.data.tags.get("registry.stale") != "true"
 
 
 # ---------------------------------------------------------------------------

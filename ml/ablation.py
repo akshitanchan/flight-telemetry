@@ -38,11 +38,10 @@ six natural groups:
                          holding patterns.
 
   G5  mach_tas_cas     : ["avg_mach", "avg_tas", "avg_cas"]
-                         Airspeed / Mach metrics.  NOTE: these are 0-filled for
-                         ~100% of real ADS-B tracks (see ml/features.py); their
-                         contribution is expected to be negligible on real data.
-                         On mock data (where they are also 0.0) the expectation
-                         is the same.
+                         Airspeed / Mach metrics, zero-filled only when source
+                         values are unavailable. The mock fixture leaves them
+                         at 0.0; the full real extraction contains many
+                         nonzero values.
 
   G6  aircraft_type    : all 27 "ac_*" one-hot columns
                          Aircraft type identity — captures airframe-level fuel
@@ -71,8 +70,9 @@ How to run
 # On mock data (offline, no real PRC data needed):
 python -m ml.ablation --mock --epochs 5 --output-dir outputs/ablation
 
-# On real data:
-python -m ml.ablation --data-dir data/raw/prc_2025 --epochs 10 --output-dir outputs/ablation
+# On real data, matching the four-fold bounded CV baseline:
+python -m ml.ablation --data-dir data/raw/prc_2025 --epochs 10 --n-folds 4 \
+  --model histgbr --output-dir outputs/ablation
 
 Outputs
 -------
@@ -156,7 +156,7 @@ FEATURE_GROUPS: list[tuple[str, str, list[str]]] = [
     ),
     (
         "G5_mach_tas_cas",
-        "Airspeed metrics — 0-filled in ADS-B (avg_mach, avg_tas, avg_cas)",
+        "Airspeed metrics, zero-filled when unavailable (avg_mach, avg_tas, avg_cas)",
         ["avg_mach", "avg_tas", "avg_cas"],
     ),
     (
@@ -268,24 +268,25 @@ class _AblationDataset(torch.utils.data.Dataset):
     """
 
     def __init__(self, df: pd.DataFrame, zeroed_cols: set[str] | None = None):
-        self._df = df.reset_index(drop=True)
-        self._zeroed = zeroed_cols or set()
-        # Pre-fill missing feature columns with 0.0
-        for col in FEATURE_COLUMNS:
-            if col not in self._df.columns:
-                self._df[col] = 0.0
+        zeroed = zeroed_cols or set()
+        feature_frame = df.reindex(columns=FEATURE_COLUMNS, fill_value=0.0).copy()
+        if zeroed:
+            feature_frame.loc[:, list(zeroed)] = 0.0
+
+        # Materialize once. Pandas row access in __getitem__ made a full-data
+        # run rebuild 38 Python floats for every sample and every epoch.
+        self._features = torch.from_numpy(
+            feature_frame.to_numpy(dtype=np.float32, copy=True)
+        )
+        self._targets = torch.from_numpy(
+            df["fuel_kg"].to_numpy(dtype=np.float32, copy=True)
+        )
 
     def __len__(self) -> int:
-        return len(self._df)
+        return len(self._targets)
 
     def __getitem__(self, idx: int):
-        row = self._df.iloc[idx]
-        feat_vals = []
-        for col in FEATURE_COLUMNS:
-            feat_vals.append(0.0 if col in self._zeroed else float(row[col]))
-        features = torch.tensor(feat_vals, dtype=torch.float32)
-        target = torch.tensor(float(row["fuel_kg"]), dtype=torch.float32)
-        return features, target
+        return self._features[idx], self._targets[idx]
 
 
 # ---------------------------------------------------------------------------
@@ -396,6 +397,7 @@ def run_mlp_cv(
         "fold_rmses": fold_rmses,
         "mean_rmse_kg": mean_rmse,
         "std_rmse_kg": std_rmse,
+        "n_folds": len(folds),
     }
 
 
@@ -474,6 +476,7 @@ def run_histgbr_cv(
         "fold_rmses": fold_rmses,
         "mean_rmse_kg": mean_rmse,
         "std_rmse_kg": std_rmse,
+        "n_folds": len(folds),
         "active_features": active_cols,
     }
 
@@ -687,13 +690,23 @@ def format_ablation_table_md(
     # Sort by delta descending (most important group first)
     sorted_groups = sorted(groups, key=lambda r: r["delta_rmse_kg"], reverse=True)
 
+    note_lines = (
+        [
+            "NOTE: On mock data, absolute RMSE values reflect synthetic fuel_kg distribution,",
+            "not the real PRC-2025 distribution. Authoritative numbers require real data.",
+        ]
+        if data_label == "mock"
+        else [
+            "Measured on the full 11,037-flight PRC-2025 training set.",
+            f"Protocol: last {baseline['n_folds']} expanding-window chronological folds.",
+        ]
+    )
     lines = [
         f"## Feature-Group Ablation — {model_type.upper()} ({data_label} data)",
         "",
         f"Baseline (full features): **{baseline['mean_rmse_kg']:.2f} ± {baseline['std_rmse_kg']:.2f} kg RMSE**",
         "",
-        "NOTE: On mock data, absolute RMSE values reflect synthetic fuel_kg distribution,",
-        "not the real PRC-2025 distribution. Authoritative numbers require real data.",
+        *note_lines,
         "Delta direction: positive = removing group hurts (group is important).",
         "",
         "| # | Group | Description | Cols Removed | RMSE (kg) | Std (kg) | Delta vs Baseline |",
@@ -724,11 +737,21 @@ def format_challenger_table_md(
     per_fold_mlp = " / ".join(f"{r:.2f}" for r in mlp["fold_rmses"])
     per_fold_gbr = " / ".join(f"{r:.2f}" for r in histgbr["fold_rmses"])
 
+    note_lines = (
+        [
+            "NOTE: On mock data, absolute RMSE values reflect synthetic distribution.",
+            "Authoritative comparison requires real PRC-2025 data.",
+        ]
+        if data_label == "mock"
+        else [
+            "Measured on the full 11,037-flight PRC-2025 training set.",
+            f"Protocol: last {mlp['n_folds']} expanding-window chronological folds.",
+        ]
+    )
     lines = [
         f"## MLP vs HistGBR Challenger Comparison ({data_label} data)",
         "",
-        f"NOTE: On mock data, absolute RMSE values reflect synthetic distribution.",
-        "Authoritative comparison requires real PRC-2025 data via `ml/cv.py`.",
+        *note_lines,
         "",
         "| Model | CV RMSE (kg) | Std (kg) | Per-fold RMSE (kg) |",
         "|-------|-------------|----------|-------------------|",
@@ -806,7 +829,10 @@ def main():
         "--n-folds",
         type=int,
         default=None,
-        help="Cap the number of CV folds (default: all D-1 folds).",
+        help=(
+            "Cap the number of CV folds (default: all D-1 folds). "
+            "Use --n-folds 4 for comparison with the published bounded baseline."
+        ),
     )
     parser.add_argument(
         "--seed",
@@ -879,6 +905,14 @@ def main():
                 "histgbr": {
                     k: v for k, v in comparison["histgbr"].items()
                     if k != "active_features"
+                },
+                "protocol": {
+                    "cv": "expanding_window_last_n_folds",
+                    "n_folds": comparison["mlp"]["n_folds"],
+                    "epochs": args.epochs,
+                    "batch_size": args.batch_size,
+                    "learning_rate": args.lr,
+                    "seed": args.seed,
                 },
                 "winner": comparison["winner"],
                 "delta_rmse_kg": comparison["delta_rmse_kg"],
@@ -953,9 +987,18 @@ def main():
                 "mean_rmse_kg": abl_result["baseline"]["mean_rmse_kg"],
                 "std_rmse_kg": abl_result["baseline"]["std_rmse_kg"],
                 "fold_rmses": abl_result["baseline"]["fold_rmses"],
+                "n_folds": abl_result["baseline"]["n_folds"],
             },
             "groups": abl_result["groups"],
         }
+    json_out["protocol"] = {
+        "cv": "expanding_window_last_n_folds",
+        "n_folds": comparison["mlp"]["n_folds"],
+        "epochs": args.epochs,
+        "batch_size": args.batch_size,
+        "learning_rate": args.lr,
+        "seed": args.seed,
+    }
 
     json_path = out_dir / "ablation_results.json"
     with open(json_path, "w") as f:

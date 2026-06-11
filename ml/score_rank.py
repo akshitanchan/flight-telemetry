@@ -1,11 +1,11 @@
 """
-ml/score_rank.py — PRC-2025 rank-phase head-to-head scoring harness.
+ml/score_rank.py — PRC-2025 rank-phase scoring harness.
 =====================================================================
 
 Loads the production fuel-burn model, predicts on the PRC-2025 rank phase,
 computes the official per-interval RMSE in kg against the TRUE rank labels
-(fuel_rank.parquet), and reports it head-to-head vs the published
-JOAS-2026 baseline.
+(fuel_rank.parquet), and optionally compares it with a user-supplied reference
+measured on the same rank split.
 
 Official metric
 ---------------
@@ -46,8 +46,7 @@ Usage
 # Real run (owner, against production registry):
 python -m ml.score_rank \\
     --data-dir data/raw/prc_2025 \\
-    --model-uri models:/FuelBurn@production \\
-    --baseline-rmse <published_joas_value>
+    --model-uri models:/FuelBurn@production
 
 # Offline test (local checkpoint, mock data):
 python -m ml.score_rank \\
@@ -200,8 +199,8 @@ def score_rank(
     model_path    : path to a local .pth checkpoint (takes priority over URI).
     model_uri     : MLflow model URI (default: models:/FuelBurn@production).
                     Ignored when model_path is set.
-    baseline_rmse : published JOAS-2026 baseline RMSE-kg.
-                    When None, baseline comparison is skipped.
+    baseline_rmse : optional RMSE measured on the same rank labels.
+                    When None, reference comparison is skipped.
     batch_size    : number of intervals per inference batch.
 
     Returns
@@ -380,7 +379,7 @@ def _print_report(
 ) -> None:
     sep = "=" * 60
     print(sep)
-    print("PRC-2025 RANK PHASE — HEAD-TO-HEAD SCORING RESULT")
+    print("PRC-2025 RANK PHASE — SCORING RESULT")
     print(sep)
     print(f"  Intervals evaluated : {n_intervals:,}")
     print(f"  Flights evaluated   : {n_flights:,}")
@@ -388,14 +387,14 @@ def _print_report(
     print()
     print(f"  Our RMSE (kg)       : {our_rmse:.4f}")
     if baseline_rmse is not None:
-        print(f"  Baseline RMSE (kg)  : {baseline_rmse:.4f}  [JOAS-2026]")
+        print(f"  Reference RMSE (kg) : {baseline_rmse:.4f}  [same split]")
         sign = "-" if (delta or 0) < 0 else "+"
         print(f"  Delta (ours - base) : {sign}{abs(delta or 0):.4f} kg")
         print()
         print(f"  VERDICT: {verdict}")
     else:
         print()
-        print("  VERDICT: N/A (supply --baseline-rmse for head-to-head)")
+        print("  VERDICT: N/A (no same-split reference supplied)")
     print(sep)
 
 
@@ -407,7 +406,7 @@ def _write_artefacts(data_path: Path, result: dict) -> None:
     logger.info("JSON result written to %s", json_path)
 
     md_lines = [
-        "# PRC-2025 Rank Phase — Head-to-Head Result",
+        "# PRC-2025 Rank Phase — Scoring Result",
         "",
         f"| Metric | Value |",
         f"|--------|-------|",
@@ -418,12 +417,12 @@ def _write_artefacts(data_path: Path, result: dict) -> None:
     ]
     if result["baseline_rmse"] is not None:
         md_lines += [
-            f"| Baseline RMSE — JOAS-2026 (kg) | {result['baseline_rmse']:.4f} |",
+            f"| Same-split reference RMSE (kg) | {result['baseline_rmse']:.4f} |",
             f"| Delta (ours − baseline) | {result['delta']:+.4f} |",
             f"| **Verdict** | **{result['verdict']}** |",
         ]
     else:
-        md_lines.append("| Baseline | not supplied |")
+        md_lines.append("| Same-split reference | not supplied |")
 
     md_path = data_path / _RESULT_MD
     with open(md_path, "w") as fh:
@@ -439,7 +438,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
             "Score the PRC-2025 rank phase: compute per-interval RMSE-kg "
-            "vs TRUE rank labels and compare against the published JOAS-2026 baseline."
+            "against TRUE rank labels."
         )
     )
     parser.add_argument(
@@ -478,9 +477,8 @@ def main() -> None:
         type=float,
         default=None,
         help=(
-            "Published JOAS-2026 rank-phase RMSE-kg figure "
-            "(Sun, Spinielli & Strohmeier 2026).  "
-            "Omit to skip the head-to-head comparison."
+            "Optional RMSE from another model evaluated on these exact rank labels. "
+            "Omit when no apples-to-apples reference exists."
         ),
     )
     parser.add_argument(

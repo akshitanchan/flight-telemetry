@@ -23,11 +23,11 @@
   Cluster   : h3_r4
   Unique key: (h3_r4, window_start)
 
-  Incremental predicate
-  ---------------------
-  Selects only landing rows whose window_start exceeds the max already stored.
-  Because the partition field is window_start, both the read from the landing
-  table and the merge check on the destination table are partition-pruned.
+  Incremental behavior
+  --------------------
+  The landing table is a complete replacement snapshot. The incremental model
+  MERGEs every source key so late or corrected rows at an existing timestamp
+  are updated rather than silently skipped by a strict max-watermark filter.
 
   Schema contract (C3 locked):
     h3_r4          STRING    NOT NULL
@@ -42,10 +42,3 @@ select
     window_end,
     aircraft_count
 from {{ source('gold_landing', 'gold_sector_load_landing') }}
-
-{% if is_incremental() %}
-where window_start > (
-    select coalesce(max(window_start), cast('1970-01-01' as timestamp))
-    from {{ this }}
-)
-{% endif %}

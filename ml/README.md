@@ -21,8 +21,8 @@ CV (`ml/cv.py`), which groups all intervals of a flight into one side of every
 fold. The post-fix honest RMSE is higher because the split no longer leaks.
 
 The ~395 kg figure is **stale and must not be cited as a current result**.
-`ml/registry.py` automatically tags any run with `best_val_rmse < 410 kg` as
-pre-leakage (`registry.stale = "true"`) to prevent accidental promotion.
+Stale lineage is identified only through explicit tags such as
+`data.leakage_fix=pre`; a low RMSE is never treated as proof of leakage.
 
 ---
 
@@ -34,8 +34,10 @@ pre-leakage (`registry.stale = "true"`) to prevent accidental promotion.
 | Single-split val RMSE | 444.78 kg | `ml/train.py` run (500-flight bounded set) |
 | Serving latency p99 | **< 50 ms** (observed ~1.1 ms single-request CPU) | `ml/serve.py` smoke |
 | Serving smoke | 2/2 (health + fake-mode prediction bounds) | `make ml-serve-smoke` |
+| Full-data MLP CV RMSE | **355.04 ± 89.12 kg** (4 folds, 11,037 flights) | `outputs/ablation-full/challenger_results.json` |
+| Full-data HistGBR CV RMSE | **142.20 ± 22.68 kg** (4 folds, 11,037 flights) | `outputs/ablation-full/challenger_results.json` |
 | Full-scale RMSE (11,037 flights) | **pending owner Databricks run** | `ml/train_fullscale.py` |
-| Head-to-head vs JOAS-2026 baseline | **pending owner Databricks run** | `ml/score_rank.py` |
+| PRC-2025 rank-phase RMSE | **pending owner Databricks run** | `ml/score_rank.py` |
 
 ---
 
@@ -50,10 +52,10 @@ Single source of truth for the 38-feature input schema shared by all consumers
 | Aircraft-type one-hot | `ac_A20N` … `ac___unknown__` (26 PRC-2025 types + 1 unknown bucket, alphabetical) | 27 |
 | **Total** | `FEATURE_COLUMNS` / `INPUT_DIM` | **38** |
 
-NaN-fill policy: `avg_mach`, `avg_tas`, `avg_cas` are `~100%` NaN in real PRC-2025
-ADS-B data and fill to `0.0`. All other numerics fill to `0.0` for isolated dropouts.
-The MLP is therefore NaN-safe. `aircraft_type` (previously unused) is the strongest
-predictor; it is now one-hot encoded.
+NaN-fill policy: `avg_mach`, `avg_tas`, and `avg_cas` fill to `0.0` only when
+unavailable. In the completed extraction they are nonzero in 84,325, 44,511,
+and 21,296 intervals respectively. All numerics fill to `0.0` for isolated
+dropouts, so the MLP is NaN-safe. `aircraft_type` is one-hot encoded.
 
 ---
 
@@ -91,24 +93,29 @@ challenger, both scored through the same chronological CV folds.
 | G2 | altitude | `alt_change`, `avg_altitude`, `max_altitude`, `alt_std` |
 | G3 | speed / vertical rate | `avg_speed`, `max_vrate` |
 | G4 | track / turning | `avg_track_change` |
-| G5 | Mach / TAS / CAS | `avg_mach`, `avg_tas`, `avg_cas` (all 0-filled in ADS-B) |
+| G5 | Mach / TAS / CAS | `avg_mach`, `avg_tas`, `avg_cas` (0-filled only when unavailable) |
 | G6 | aircraft type | all 27 `ac_*` one-hot columns |
 
 MLP ablation zeros out the group's columns (input dimension stays at 38).
 HistGBR ablation drops the columns entirely.
 
-**Honesty note — mock data only so far:** the offline `--mock` path runs on 30
-synthetic flights across 3 dates; absolute RMSE values reflect the synthetic
-fuel distribution, not real PRC-2025 data. The ablation deltas and HistGBR
-challenger comparison on real data are **pending the owner's run** via
-`--data-dir data/raw/prc_2025`. Do not cite mock-data numbers as results.
+The authoritative local run used 131,530 intervals from all 11,037 training
+flights and the last four expanding-window chronological folds. HistGBR scored
+**142.20 ± 22.68 kg**, versus **355.04 ± 89.12 kg** for the MLP. Removing
+duration hurt HistGBR most (**+382.33 kg**), followed by aircraft type
+(**+87.85 kg**) and altitude (**+26.64 kg**).
 
 ```bash
 # Offline illustration (no real data needed):
 python -m ml.ablation --mock --epochs 5 --output-dir outputs/ablation
 
-# Authoritative run (requires real PRC-2025 data):
-python -m ml.ablation --data-dir data/raw/prc_2025 --epochs 10 --output-dir outputs/ablation
+# Authoritative run (full-data challenger + HistGBR feature ablation):
+python -m ml.ablation \
+  --data-dir data/raw/prc_2025 \
+  --epochs 10 \
+  --n-folds 4 \
+  --model histgbr \
+  --output-dir outputs/ablation-full
 ```
 
 ---
@@ -165,30 +172,29 @@ the expected-output contract and then calls `ml.registry.compare_and_promote()`:
 | `best_val_rmse` at or below CV re-baseline | <= 442.65 kg | WARN (or FAIL with `--strict`) |
 | `model/` artifact present | must exist | Yes |
 | `train_rmse` per-epoch history present | must exist | Yes |
-| `train_rmse` is non-increasing | last <= first | Yes |
+| `train_rmse` improves first-to-last | last <= first | Yes |
 
 On PASS the script promotes the run to the registry. On FAIL the registry is
 not touched. Invoked as part of the Databricks runbook (Step 11).
 
 ---
 
-## Head-to-head scoring (`ml/score_rank.py`)
+## Rank-phase scoring (`ml/score_rank.py`)
 
 Loads the production model from `models:/FuelBurn@production`, predicts on the
 PRC-2025 rank phase (24,289 intervals, 1,888 flights from `fuel_rank.parquet`),
-computes per-interval RMSE-kg against TRUE labels, and compares against the
-published JOAS-2026 baseline (Sun, Spinielli & Strohmeier, JOAS 4(3) 2026).
+computes per-interval RMSE-kg against TRUE labels, and reports the held-out score.
 
-**Comparison result is pending the owner's run.** Do not state the model beats
-or matches the baseline until `ml/score_rank.py` is run with real data.
+The JOAS paper's 201 kg winning score is for the separate final phase and is not
+a same-split rank baseline. Use `--baseline-rmse` only for a reference evaluated
+against the exact same rank labels.
 
 See runbook: [`docs/runbooks/ml-headtohead.md`](../docs/runbooks/ml-headtohead.md)
 
 ```bash
 python -m ml.score_rank \
     --data-dir data/raw/prc_2025 \
-    --model-uri models:/FuelBurn@production \
-    --baseline-rmse <published_joas_value>
+    --model-uri models:/FuelBurn@production
 ```
 
 ---
@@ -226,8 +232,8 @@ MLflow 3.x **alias-based** registry under registered model name **`FuelBurn`**.
 | `challenger` | ephemeral alias during evaluation; removed after promotion decision |
 
 Champion/challenger promotion compares `cv_mean_rmse_kg` (preferred) or
-`best_val_rmse` (fallback). Lower is better. Pre-leakage stale runs
-(`best_val_rmse < 410 kg`) are rejected at registration time.
+`best_val_rmse` (fallback). Lower is better. Pre-leakage stale runs are rejected
+only when explicit provenance tags identify them; metric values are not lineage.
 
 **Production URI (canonical):** `models:/FuelBurn@production`
 
@@ -295,9 +301,9 @@ make ml-serve-smoke      # start FastAPI serving + run smoke test (2/2 expected)
 | `ml/ablation.py` | 6-group feature ablation + HistGBR challenger |
 | `ml/train_fullscale.py` | Databricks-ready full-scale wrapper (11,037 flights) |
 | `ml/configs/fullscale.yaml` | Full-scale training config |
-| `ml/configs/databricks_job.json` | Databricks job spec (owner fills placeholders) |
+| `ml/configs/databricks_job.json` | Git-backed Databricks serverless job spec |
 | `ml/validate_fullscale_run.py` | Post-run contract validation + registry handoff |
-| `ml/score_rank.py` | Rank-phase head-to-head vs JOAS-2026 baseline |
+| `ml/score_rank.py` | Standalone rank-phase scoring |
 | `ml/drift.py` | Evidently drift monitor + retrain trigger |
 | `ml/registry.py` | MLflow 3.x alias-based promotion (`models:/FuelBurn@production`) |
 | `ml/serve.py` | FastAPI serving endpoint (38-feature schema, C2 logging) |
@@ -325,7 +331,7 @@ The following results require the owner to run the full-scale pipeline on Databr
 with real PRC-2025 data:
 
 1. **Full-scale RMSE** (`ml/train_fullscale.py` on 11,037 flights)
-2. **Ablation deltas and HistGBR challenger result** on real data (`ml/ablation.py --data-dir`)
-3. **Head-to-head verdict** vs JOAS-2026 baseline (`ml/score_rank.py`)
+2. **Standalone rank-phase RMSE** (`ml/score_rank.py`)
 
-All three are clearly labeled as pending in this README and in `docs/research-findings.md`.
+Both are clearly labeled as pending in this README and in
+`docs/research-findings.md`.

@@ -228,12 +228,15 @@ def _run_train(cfg: dict, data_dir: str) -> None:
     epochs = _get(cfg, "training.epochs", 50)
     batch_size = _get(cfg, "training.batch_size", 16)
     lr = _get(cfg, "training.lr", 0.001)
+    seed = _get(cfg, "training.seed", 42)
     device = _get(cfg, "training.device", "auto")
     # training.checkpoint_dir — added by rem-ml-03.  None (default) = off;
     # set to a durable directory path to enable epoch checkpointing + resume.
     checkpoint_dir = _get(cfg, "training.checkpoint_dir", None)
+    hidden_dim = _get(cfg, "model.hidden_dim", 64)
     tracking_uri = _get(cfg, "mlflow.tracking_uri", "sqlite:///mlflow.db")
     experiment_name = _get(cfg, "mlflow.experiment_name", "FuelBurn_Baseline")
+    run_name = _get(cfg, "mlflow.run_name", "fullscale_prc2025")
 
     # Set MLflow tracking URI before train() calls mlflow.set_experiment()
     # internally — the URI must be configured first so the experiment lands
@@ -247,18 +250,24 @@ def _run_train(cfg: dict, data_dir: str) -> None:
         epochs=int(epochs),
         batch_size=int(batch_size),
         lr=float(lr),
+        seed=int(seed),
         device=str(device),
         # checkpoint_dir is passed through as-is (None or a path string).
         # train() reads it via getattr(args, "checkpoint_dir", None) so the
         # field is optional — existing callers that don't set it are unaffected.
         checkpoint_dir=checkpoint_dir if checkpoint_dir is None else str(checkpoint_dir),
+        hidden_dim=int(hidden_dim),
+        experiment_name=str(experiment_name),
+        run_name=str(run_name) if run_name else None,
     )
 
     logger.info(
         f"Invoking ml.train.train() with: "
         f"data_dir={ns.data_dir}, epochs={ns.epochs}, "
-        f"batch_size={ns.batch_size}, lr={ns.lr}, device={ns.device!r}, "
-        f"checkpoint_dir={ns.checkpoint_dir!r}"
+        f"batch_size={ns.batch_size}, lr={ns.lr}, seed={ns.seed}, "
+        f"device={ns.device!r}, "
+        f"hidden_dim={ns.hidden_dim}, experiment_name={ns.experiment_name!r}, "
+        f"run_name={ns.run_name!r}, checkpoint_dir={ns.checkpoint_dir!r}"
     )
 
     _train(ns)

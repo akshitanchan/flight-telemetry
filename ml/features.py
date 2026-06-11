@@ -19,8 +19,6 @@ Trajectory-derived (11 numeric):
   avg_track_change — mean absolute per-step change in track angle (deg/step);
                      captures turning intensity; fill 0 if < 2 pts
   avg_mach         — mean Mach number over interval; fill 0.0 when all NaN
-                     (real PRC-2025 ADS-B data has Mach 100% NaN for most
-                      flights; fill is documented and deliberate)
   avg_tas          — mean True Air Speed over interval (kts); fill 0.0 (NaN)
   avg_cas          — mean Calibrated Air Speed over interval (kts); fill 0.0 (NaN)
 

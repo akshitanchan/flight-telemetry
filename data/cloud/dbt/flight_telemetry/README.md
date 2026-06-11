@@ -132,11 +132,11 @@ dbt test \
 ```
 
 Expected: all 5 unit tests pass:
-- `ut_airport_congestion_incremental_filter` (PASS)
+- `ut_airport_congestion_incremental_snapshot` (PASS)
 - `ut_airport_congestion_full_refresh` (PASS)
-- `ut_sector_load_incremental_filter` (PASS)
-- `ut_emergency_events_incremental_filter` (PASS)
-- `ut_routing_stats_incremental_filter` (PASS)
+- `ut_sector_load_incremental_snapshot` (PASS)
+- `ut_emergency_events_incremental_snapshot` (PASS)
+- `ut_routing_stats_incremental_snapshot` (PASS)
 
 ### 6. Run all schema tests (online — requires BigQuery)
 
@@ -163,33 +163,24 @@ export DBT_PROFILES_DIR=/path/to/data/cloud/dbt/flight_telemetry
 Terraform must have already provisioned the dataset and service account
 (`infra/terraform/bigquery/`).  dbt owns table creation inside the dataset.
 
-### Step 1: Load gold Parquet files into landing tables
+### Step 1: Export and load gold Parquet files into landing tables
 
 ```bash
-# Repeat for each table, substituting <bucket> and <date>
-bq load \
-  --source_format=PARQUET \
-  --replace \
-  "${BIGQUERY_PROJECT}:flight_telemetry.gold_airport_congestion_landing" \
-  "gs://<bucket>/gold/airport_congestion/dt=<date>/*.parquet"
+make data-export-gold-parquet
 
-bq load \
-  --source_format=PARQUET \
-  --replace \
-  "${BIGQUERY_PROJECT}:flight_telemetry.gold_sector_load_landing" \
-  "gs://<bucket>/gold/sector_load/dt=<date>/*.parquet"
-
-bq load \
-  --source_format=PARQUET \
-  --replace \
-  "${BIGQUERY_PROJECT}:flight_telemetry.gold_emergency_events_landing" \
-  "gs://<bucket>/gold/emergency_events/dt=<date>/*.parquet"
-
-bq load \
-  --source_format=PARQUET \
-  --replace \
-  "${BIGQUERY_PROJECT}:flight_telemetry.gold_routing_stats_landing" \
-  "gs://<bucket>/gold/routing_stats/dt=<date>/*.parquet"
+for table in \
+  gold_airport_congestion \
+  gold_sector_load \
+  gold_emergency_events \
+  gold_routing_stats
+do
+  bq load \
+    --project_id="${BIGQUERY_PROJECT}" \
+    --source_format=PARQUET \
+    --replace \
+    "${BIGQUERY_PROJECT}:flight_telemetry.${table}_landing" \
+    "outputs/bigquery_landing/${table}.parquet"
+done
 ```
 
 ### Step 2: dbt deps + build
@@ -202,8 +193,7 @@ dbt deps --profiles-dir . --profile flight_telemetry --target prod
 dbt build \
   --profiles-dir . \
   --profile flight_telemetry \
-  --target prod \
-  --select "models/marts/*"
+  --target prod
 ```
 
 `dbt build` runs: compile → create/insert incremental tables → run schema tests.
@@ -214,8 +204,7 @@ dbt build \
   --full-refresh \
   --profiles-dir . \
   --profile flight_telemetry \
-  --target prod \
-  --select "models/marts/*"
+  --target prod
 ```
 
 ### Step 3: Capture bytes-scanned (for bytes_scanned_writeup.md)
@@ -228,12 +217,12 @@ bq query --dry-run --use_legacy_sql=false --project_id="${BIGQUERY_PROJECT}" \
 # Partition-filtered query
 bq query --dry-run --use_legacy_sql=false --project_id="${BIGQUERY_PROJECT}" \
   'SELECT * FROM `flight_telemetry.gold_airport_congestion`
-   WHERE DATE(window_start) = "2024-01-15"'
+   WHERE DATE(window_start) = "2024-06-03"'
 
 # Partition + cluster filtered query
 bq query --dry-run --use_legacy_sql=false --project_id="${BIGQUERY_PROJECT}" \
   'SELECT * FROM `flight_telemetry.gold_airport_congestion`
-   WHERE DATE(window_start) = "2024-01-15" AND airport_icao = "EGLL"'
+   WHERE DATE(window_start) = "2024-06-03" AND airport_icao = "EBAR"'
 ```
 
 Record results in `analyses/bytes_scanned_writeup.md`.
@@ -250,36 +239,16 @@ dbt test \
 
 ---
 
-## Incremental predicate strategy
+## Incremental snapshot strategy
 
-Each mart uses a `max(watermark_column)` subquery on the destination table
-inside the `is_incremental()` guard:
+`bq load --replace` makes each landing table a complete current snapshot. The
+dbt models read the full landing snapshot and use their `unique_key` settings to
+MERGE into the destination tables. This is intentionally late-data safe:
+corrected rows at an existing timestamp remain eligible for update.
 
-```sql
-{% if is_incremental() %}
-where window_start > (
-    select coalesce(max(window_start), timestamp('1970-01-01'))
-    from {{ this }}
-)
-{% endif %}
-```
-
-**Why this guarantees partition pruning:**
-
-1. `window_start` is the partition column for `gold_airport_congestion` and
-   `gold_sector_load`.
-2. The `max(window_start)` sub-select on `{{ this }}` reads only the latest
-   day-partition in the destination (BigQuery optimises `MAX` on the partition
-   column to a metadata read — typically 0 bytes scanned).
-3. The outer `WHERE window_start > <watermark>` on the landing source similarly
-   prunes to only partitions after the watermark.
-4. On first run `coalesce(max(...), timestamp('1970-01-01'))` returns the epoch
-   so all source rows are selected (equivalent to a full load).
-
-For `gold_emergency_events` and `gold_routing_stats` there is no partition, so
-the `max()` sub-select is a full-table scan on the destination — acceptable
-because these tables are small (emergency events are rare; routing stats have
-short retention windows).
+The query benchmark in `analyses/bytes_scanned_writeup.md` measures partition
+and clustering behavior of downstream reads. It does not claim the dbt build
+itself is partition-pruned.
 
 ---
 

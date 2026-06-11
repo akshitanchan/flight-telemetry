@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 import unittest
 from datetime import datetime, timezone
+from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
@@ -429,6 +430,46 @@ class TestPostGISIndexUnavailable(unittest.TestCase):
             self.assertIn("index_size_bytes", stats)
         finally:
             PostGISIndex.is_available = original
+
+
+class TestPostGISIndexBuildUnit(unittest.TestCase):
+    """Offline coverage for the psycopg3 cursor-based batch write path."""
+
+    def test_build_uses_cursor_executemany(self):
+        conn_context = MagicMock()
+        conn = conn_context.__enter__.return_value
+        cursor = conn.cursor.return_value.__enter__.return_value
+
+        def execute(sql):
+            result = MagicMock()
+            result.fetchone.return_value = (
+                (3,) if "COUNT" in sql else (4096,)
+            )
+            return result
+
+        conn.execute.side_effect = execute
+        records = [
+            {
+                "icao24": f"abc00{i}",
+                "event_ts": f"2024-06-03T12:0{i}:00+00:00",
+                "lon": 4.7 + i,
+                "lat": 52.3,
+            }
+            for i in range(3)
+        ]
+
+        index = PostGISIndex(batch_size=2)
+        with (
+            patch.object(PostGISIndex, "is_available", return_value=True),
+            patch("shared.store.pg.get_conn", return_value=conn_context),
+        ):
+            index.build(records)
+            stats = index.stats()
+
+        self.assertEqual(cursor.executemany.call_count, 2)
+        self.assertEqual(stats["record_count"], 3)
+        self.assertEqual(stats["index_size_bytes"], 4096)
+        conn.commit.assert_called_once_with()
 
 
 class TestSyntheticRecordGenerator(unittest.TestCase):

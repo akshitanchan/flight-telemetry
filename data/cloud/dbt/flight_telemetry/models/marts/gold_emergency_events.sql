@@ -16,13 +16,10 @@
 
   No partition or cluster — C3 locked contract for event-grain table.
 
-  Incremental predicate
-  ---------------------
-  Uses first_seen_ts as the watermark.  On each run we select only events
-  whose first_seen_ts is later than the latest event already loaded.  Because
-  there is no partition column on this table, BigQuery will full-scan the
-  destination for the max() check — acceptable given the typically small
-  cardinality of emergency events.  The landing table is similarly unpartitioned.
+  Incremental behavior
+  --------------------
+  The landing table is a complete replacement snapshot. Every source key is
+  included in the MERGE so corrected events remain updateable.
 
   Squawk domain: {"7500", "7600", "7700"} — enforced by schema.yml accepted_values test.
 
@@ -51,10 +48,3 @@ select
     nearest_airport,
     duration_s
 from {{ source('gold_landing', 'gold_emergency_events_landing') }}
-
-{% if is_incremental() %}
-where first_seen_ts > (
-    select coalesce(max(first_seen_ts), cast('1970-01-01' as timestamp))
-    from {{ this }}
-)
-{% endif %}

@@ -208,18 +208,21 @@ class PostGISIndex(SpatiotemporalIndex):
         self._record_count = 0
 
         with get_conn() as conn:
-            # Use executemany with batching for throughput.
-            for batch_start in range(0, len(valid_records), self._batch_size):
-                batch = valid_records[batch_start: batch_start + self._batch_size]
-                rows = [_record_to_row(r) for r in batch]
-                conn.executemany(_UPSERT_SQL, rows)
-                self._record_count += len(batch)
-                logger.debug(
-                    "Upserted batch %d-%d (%d rows)",
-                    batch_start,
-                    batch_start + len(batch),
-                    len(batch),
-                )
+            # psycopg3 exposes executemany() on Cursor, not Connection.
+            with conn.cursor() as cursor:
+                for batch_start in range(0, len(valid_records), self._batch_size):
+                    batch = valid_records[
+                        batch_start: batch_start + self._batch_size
+                    ]
+                    rows = [_record_to_row(r) for r in batch]
+                    cursor.executemany(_UPSERT_SQL, rows)
+                    self._record_count += len(batch)
+                    logger.debug(
+                        "Upserted batch %d-%d (%d rows)",
+                        batch_start,
+                        batch_start + len(batch),
+                        len(batch),
+                    )
             conn.commit()
 
             # Cache index size right after build for stats().

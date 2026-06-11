@@ -1,23 +1,22 @@
 # Refresh Experiment Results — ds-05 (W4.3)
 
-**Instructions for the owner**: run `03_refresh_experiment.py` on a Databricks
-cluster, then copy the Section D output into the table below.  Fill the cluster
-spec section.  Commit this file as part of the ds-08 runbook PR.
+**Instructions for the owner**: run `03_refresh_experiment.py` in the serverless
+medallion job, then copy the Section D output into the table below.
 
 The DuckDB proxy (local smoke) numbers are in the row labelled `DuckDB proxy`
 at the bottom of each table.  They are a sanity reference, not the headline.
 
 ---
 
-## Cluster spec (fill in)
+## Compute spec (fill in)
 
 | Field | Value |
 |---|---|
 | Run date (UTC) | YYYY-MM-DD HH:MM |
-| Databricks Runtime | e.g. 13.3 LTS (Spark 3.4, Scala 2.12) |
-| Node type | e.g. Standard_DS3_v2 |
-| Driver | 1 node |
-| Workers | N nodes (or 0 for single-node) |
+| Compute type | Databricks serverless |
+| Environment version | `2` |
+| Runtime / Spark version shown by run | ??? |
+| Serverless performance mode | ??? |
 | silver_table | `<catalog>.<schema>.silver_flight_state` |
 | gold_congestion_table | `<catalog>.<schema>.gold_airport_congestion` |
 | inc_pct | 0.10 |

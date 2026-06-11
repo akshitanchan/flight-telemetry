@@ -147,12 +147,18 @@ def train(args: argparse.Namespace) -> None:
             Directory in which to write ``checkpoint.pt`` after each epoch.
             ``None`` (default) disables checkpointing entirely — behaviour is
             bit-identical to a run without this argument.
+        hidden_dim : int
+            Width of the first MLP hidden layer (default: 64).
+        experiment_name : str
+            MLflow experiment name (default: ``FuelBurn_Baseline``).
+        run_name : str or None
+            Optional MLflow run name.
 
     RNG / reproducibility contract
     --------------------------------
     The call sequence that determines numerical outputs is:
 
-      1. ``torch.manual_seed(42)``        — fixes weight-init and training RNG
+      1. ``torch.manual_seed(args.seed)`` — fixes weight-init and training RNG
       2. ``FuelBurnMLP()``                — consumes the torch RNG for init
       3. ``GroupShuffleSplit(…, random_state=0)``  — independent sklearn RNG
 
@@ -182,7 +188,10 @@ def train(args: argparse.Namespace) -> None:
     """
     # --- Reproducibility: fix torch RNG before any weight init ---
     # IMPORTANT: do not reorder the three steps in the contract above.
-    torch.manual_seed(42)
+    seed = int(getattr(args, "seed", 42))
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
 
     if args.data_dir == "data/ml/prc_2025_mock" and not Path(args.data_dir).exists():
         raise FileNotFoundError("Mock data missing. Run generate_mock in extract script.")
@@ -226,7 +235,8 @@ def train(args: argparse.Namespace) -> None:
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
     val_loader   = DataLoader(val_dataset,   batch_size=args.batch_size)
 
-    model = FuelBurnMLP().to(device)
+    hidden_dim = int(getattr(args, "hidden_dim", 64))
+    model = FuelBurnMLP(hidden_dim=hidden_dim).to(device)
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
@@ -273,16 +283,21 @@ def train(args: argparse.Namespace) -> None:
         ckpt_path = None
 
     # Initialize MLflow tracking
-    mlflow.set_experiment("FuelBurn_Baseline")
+    experiment_name = getattr(args, "experiment_name", "FuelBurn_Baseline")
+    run_name = getattr(args, "run_name", None)
+    mlflow.set_experiment(experiment_name)
 
-    with mlflow.start_run():
+    with mlflow.start_run(run_name=run_name):
         mlflow.log_params({
             "epochs": args.epochs,
             "batch_size": args.batch_size,
             "learning_rate": args.lr,
             "model_type": "MLP_Baseline",
+            "hidden_dim": hidden_dim,
+            "seed": seed,
             "device": str(device),
         })
+        mlflow.set_tag("data.leakage_fix", "post")
 
         logger.info(f"Starting training for {args.epochs} epochs (from epoch {start_epoch})...")
 

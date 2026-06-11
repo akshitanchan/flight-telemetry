@@ -5,7 +5,7 @@ W4.3 / ds-03 — DLT data-quality expectations for the silver_flight_state table
 Contract source: shared/contracts/silver_flight_state.schema.json v1.0.0
 
 Every expectation here encodes exactly one schema rule (marked inline).
-Action:  @dlt.expect_or_drop  — violating rows are dropped and counted;
+Action:  @dlt.expect_all_or_drop — violating rows are dropped and counted;
          the pipeline does NOT fail so genuine bad data is quarantined, not
          silently accepted or pipeline-aborting.
 
@@ -25,17 +25,10 @@ except ModuleNotFoundError:
 
     # Minimal stubs so the module is importable and py_compile-safe offline.
     class _DltStub:
-        """Stub that makes @dlt.expect_or_drop a no-op decorator offline."""
+        """Stub that makes DLT decorators no-ops offline."""
 
         @staticmethod
-        def expect_or_drop(name: str, constraint: str):
-            """Return a pass-through decorator."""
-            def decorator(fn):
-                return fn
-            return decorator
-
-        @staticmethod
-        def expect_all(expectations: dict, on_violation: str = "drop"):
+        def expect_all_or_drop(expectations: dict):
             """Return a pass-through decorator."""
             def decorator(fn):
                 return fn
@@ -52,11 +45,11 @@ except ModuleNotFoundError:
 
 # ---------------------------------------------------------------------------
 # Silver expectations — one dict per logical rule-set, attached as
-# @dlt.expect_all on the silver streaming table transformation function.
+# @dlt.expect_all_or_drop on the silver streaming table transformation function.
 #
 # Key   = human-readable expectation name (shown in DLT metrics UI)
 # Value = SQL predicate evaluated per row; rows where the predicate is FALSE
-#         are dropped (expect_or_drop semantics).
+#         are dropped.
 #
 # Schema rule traceability (silver_flight_state.schema.json):
 #   ICAO24_FORMAT    — properties.icao24.pattern ^[0-9a-f]{6}$
@@ -141,7 +134,7 @@ SILVER_RANGE_EXPECTATIONS: dict[str, str] = {
         "metar_ceiling_ft IS NULL OR metar_ceiling_ft >= 0",
 }
 
-# Merged expectation dict (used by @dlt.expect_all)
+# Merged expectation dict (used by @dlt.expect_all_or_drop)
 SILVER_ALL_EXPECTATIONS: dict[str, str] = {
     **SILVER_NOT_NULL_EXPECTATIONS,
     **SILVER_RANGE_EXPECTATIONS,
@@ -154,7 +147,6 @@ SILVER_ALL_EXPECTATIONS: dict[str, str] = {
 # function is still importable and callable for unit tests.
 # ---------------------------------------------------------------------------
 
-@dlt.expect_all(SILVER_ALL_EXPECTATIONS, on_violation="drop")  # type: ignore[misc]
 @dlt.table(  # type: ignore[misc]
     name="silver_flight_state_validated",
     comment=(
@@ -163,6 +155,7 @@ SILVER_ALL_EXPECTATIONS: dict[str, str] = {
         "expectation metrics dashboard."
     ),
 )
+@dlt.expect_all_or_drop(SILVER_ALL_EXPECTATIONS)  # type: ignore[misc]
 def silver_flight_state_validated():
     """
     Identity transform — expectations fire on every incoming row.

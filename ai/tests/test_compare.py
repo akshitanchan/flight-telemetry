@@ -6,7 +6,8 @@ suite stays offline and CI-safe; ai-compare-small exercises it when a server is 
 
 ai-07: compare() now returns (core_summaries, all_summaries, injection_result, notes).
   - core_summaries: deterministic strategies on CORE tier — the AUTHORITATIVE gate.
-  - all_summaries:  all strategies on the full golden set — for ADVISORY metrics.
+  - all_summaries: deterministic strategies on the full set; live strategies
+    on the extended tier — for ADVISORY metrics.
   - injection_result: block-rate dict from the injection suite — ADVISORY.
   - notes: list of human-readable notes (skipped strategies, etc.).
 """
@@ -22,7 +23,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from ai.tools.analytics import AnalyticsTool
 from ai.tools.retrieval import RetrievalTool
 from ai.agent.keyword_router import KeywordScoreStrategy
-from ai.eval.compare import compare
+from ai.eval.compare import _tier_summary, compare
 
 GOLD = PROJECT_ROOT / "ai" / "fixtures" / "gold"
 CORPUS = PROJECT_ROOT / "ai" / "fixtures" / "corpus" / "corpus.json"
@@ -138,7 +139,8 @@ class TestCompareReturnShape(unittest.TestCase):
         """Every summary must have the full set of metric columns including ai-07 additions."""
         _, all_summaries, _, _ = self.result
         required = {
-            "strategy", "total", "passed", "accuracy", "citation_coverage",
+            "strategy", "provider", "total", "passed", "accuracy",
+            "citation_coverage",
             "faithfulness_mean", "p50_latency_ms", "p95_latency_ms",
             "mean_latency_ms", "llm_calls", "tokens", "cost_usd", "per_question",
         }
@@ -211,6 +213,32 @@ class TestCompareReturnShape(unittest.TestCase):
                 f"core_summaries[{s['strategy']}].total={s['total']} "
                 f"but there are {core_count} core-tier questions"
             )
+
+    def test_tier_summary_filters_and_reaggregates(self):
+        _, all_summaries, _, _ = self.result
+        full = all_summaries[0]
+        extended = _tier_summary(full, "extended")
+        expected = [
+            row for row in full["per_question"] if row.get("tier") == "extended"
+        ]
+        self.assertEqual(extended["total"], len(expected))
+        self.assertTrue(
+            all(row["tier"] == "extended" for row in extended["per_question"])
+        )
+        self.assertEqual(
+            extended["tokens"],
+            sum(row.get("tokens", 0) for row in expected),
+        )
+        self.assertEqual(extended["provider"], "unknown")
+
+    def test_golden_set_has_exactly_25_extended_questions(self):
+        with open(GOLDEN) as f:
+            questions = json.load(f).get("questions", [])
+        self.assertEqual(
+            sum(q.get("tier") == "extended" for q in questions),
+            25,
+            "the live architecture comparison contract is exactly 25 questions",
+        )
 
 
 if __name__ == "__main__":

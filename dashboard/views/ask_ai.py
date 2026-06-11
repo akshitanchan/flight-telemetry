@@ -167,14 +167,14 @@ def render() -> None:
         for q in example_questions:
             st.markdown(f"- {q}")
 
-    question = st.text_input(
-        "Ask a question about the telemetry data",
-        placeholder="e.g. How many emergency squawk events were there?",
-        key="ask_ai_question_input",
-        label_visibility="collapsed",
-    )
-
-    submit = st.button("Ask", type="primary", disabled=not bool(question and question.strip()))
+    with st.form("ask_ai_form"):
+        question = st.text_input(
+            "Ask a question about the telemetry data",
+            placeholder="e.g. How many emergency squawk events were there?",
+            key="ask_ai_question_input",
+            label_visibility="collapsed",
+        )
+        submit = st.form_submit_button("Ask", type="primary")
 
     # ---- Answer rendering ----
     if submit and question and question.strip():

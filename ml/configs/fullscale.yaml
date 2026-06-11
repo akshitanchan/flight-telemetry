@@ -6,9 +6,9 @@
 #
 # Schema contract
 # ---------------
-# Every key here is read by ml/train_fullscale.py.  Overrides are accepted via
-# CLI flags (--override key=value) or environment variables prefixed FULLSCALE_
-# (e.g. FULLSCALE_DATA_DIR=/Volumes/...).
+# Runtime keys are read by ml/train_fullscale.py. Overrides are accepted via
+# CLI flags (--override key=value). The databricks and expected_output sections
+# are documentation-only.
 #
 # Owner: fill in the three OWNER-FILL blocks before submitting the Databricks
 #        job.  All other keys have production-ready defaults.
@@ -46,29 +46,26 @@ data:
 # ---------------------------------------------------------------------------
 training:
   # Number of training epochs.
-  # Full-scale recommendation: 50 epochs delivers convergence in ~30 min on
-  # a Standard_DS3_v2 single-node Databricks cluster (CPU-only).
+  # Full-scale default: 50 epochs on Databricks serverless CPU compute.
   # The existing train.py default is 5; the CV re-baseline used 10.
   # Increase to 100 for a longer run; best_val_rmse is tracked so early stopping
   # via the logged metric is trivial to add later.
   epochs: 50
 
   # Mini-batch size.  16 is the validated default from the CV re-baseline.
-  # On a GPU-enabled Databricks cluster, increase to 256 for higher throughput.
   batch_size: 16
 
   # Adam learning rate.  0.001 is the validated default.
   # With batch_size >64 apply the sqrt-scaling rule: lr = 0.001 * sqrt(bs/16).
   lr: 0.001
 
-  # Random seed — fixes weight init and train/val split.
+  # Random seed for model initialization and training randomness. The
+  # flight-level train/val split retains its frozen random_state=0 protocol.
   seed: 42
 
   # Compute device passed to ml.train.train() (rem-ml-02).
   # "auto" resolves to: cuda (if available) -> mps -> cpu.
-  # On a GPU Databricks cluster override to "cuda" via:
-  #   --override training.device=cuda
-  # Leave as "auto" for CPU-only clusters; resolve_device() handles the probe.
+  # Databricks Free Edition is serverless CPU-only, so use "cpu" there.
   device: "auto"
 
   # Epoch-level checkpoint directory for resumable training (rem-ml-03).
@@ -96,8 +93,7 @@ model:
   #              NotImplementedError if selected, prompting a future ml-trainer.
   type: "mlp"
 
-  # Hidden layer width for the MLP.  Default matches the current architecture.
-  # Changing this changes model.py's hidden_dim; requires model.py edit (ml-09+).
+  # Hidden layer width for the MLP.
   hidden_dim: 64
 
 # ---------------------------------------------------------------------------
@@ -113,14 +109,11 @@ mlflow:
   # OWNER-FILL: change to "databricks" when running on Databricks.
   tracking_uri: "sqlite:///mlflow.db"
 
-  # Run name shown in the MLflow UI.  The entrypoint appends a timestamp.
+  # Run name shown in the MLflow UI.
   run_name: "fullscale_prc2025"
 
-  # Log every N epochs (to reduce MLflow overhead on long runs).
-  log_every_n_epochs: 5
-
 # ---------------------------------------------------------------------------
-# Databricks compute envelope (OWNER-FILL before job submission)
+# Databricks deployment reference
 # ---------------------------------------------------------------------------
 # These keys are documentation-only — train_fullscale.py does NOT read them
 # at runtime.  They exist so the owner has a single canonical place to record
@@ -128,30 +121,17 @@ mlflow:
 # (ml/configs/databricks_job.json) is the authoritative compute spec sent to
 # the API.
 databricks:
-  # OWNER-FILL: node type for the driver and worker nodes.
-  # Databricks Free Edition recommended: Standard_DS3_v2 (14 GB RAM, 4 cores)
-  # For GPU acceleration: Standard_NC6 (K80) or Standard_NC6s_v3 (V100)
-  node_type_id: "Standard_DS3_v2"
-
-  # OWNER-FILL: number of worker nodes.  0 = single-node (driver-only) cluster.
-  # Single-node is sufficient for 11,037 flights on CPU.
-  num_workers: 0
-
-  # OWNER-FILL: Databricks Runtime version.
-  # Recommend: "15.4.x-cpu-ml-scala2.12" (includes MLflow, torch, scikit-learn)
-  # For GPU: "15.4.x-gpu-ml-scala2.12"
-  runtime_version: "15.4.x-cpu-ml-scala2.12"
-
-  # OWNER-FILL: auto-termination in minutes (prevent runaway billing).
-  autotermination_minutes: 120
+  compute: "serverless"
+  environment_version: "2"
+  gpu_supported_in_free_edition: false
 
   # OWNER-FILL: Unity Catalog volume path where PRC-2025 raw data lives.
   # Example: /Volumes/flight_telemetry/bronze/prc2025_raw/prc_2025
-  uc_data_volume: "/Volumes/<catalog>/<schema>/<volume>/prc_2025"
+  uc_data_volume: "/Volumes/main/default/flight_telemetry/prc_2025"
 
   # OWNER-FILL: Unity Catalog volume path for feature checkpoint shards.
   # Example: /Volumes/flight_telemetry/bronze/prc2025_raw/features_checkpoint_train
-  uc_checkpoint_volume: "/Volumes/<catalog>/<schema>/<volume>/features_checkpoint_train"
+  uc_checkpoint_volume: "/Volumes/main/default/flight_telemetry/features_checkpoint_train"
 
 # ---------------------------------------------------------------------------
 # Expected-output contract (for owner sanity check after the run)
