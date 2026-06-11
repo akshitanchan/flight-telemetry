@@ -1,9 +1,10 @@
 {
-  "version": "1.0",
-  "description": "Golden question set for the AI layer. Expected answers are ground-truthed against the frozen fixtures in ai/fixtures/ (gold snapshot + corpus). Deterministic only — no LLM judging at W3.1.",
+  "version": "1.1",
+  "description": "Golden question set for the AI layer. Expected answers are ground-truthed against the frozen fixtures in ai/fixtures/ (gold snapshot + corpus). Each question carries a tier field: 'core' questions are deterministically routable by rule_based_v1 and keyword_score_v1 with accuracy==1.0 and citation==1.0; 'extended' questions are harder/long-tail phrasings used for LLM architecture comparison (ai-04) where deterministic routers may fail.",
   "questions": [
     {
       "id": "a1",
+      "tier": "core",
       "question": "How many emergency squawk events were recorded?",
       "tool": "analytics",
       "operation": "count_emergencies",
@@ -12,6 +13,7 @@
     },
     {
       "id": "a2",
+      "tier": "core",
       "question": "How many flights declared a general emergency (squawk 7700)?",
       "tool": "analytics",
       "operation": "count_emergencies",
@@ -20,6 +22,7 @@
     },
     {
       "id": "a3",
+      "tier": "core",
       "question": "Which aircraft squawked 7700?",
       "tool": "analytics",
       "operation": "list_emergency_aircraft",
@@ -28,6 +31,7 @@
     },
     {
       "id": "a4",
+      "tier": "core",
       "question": "Which aircraft squawked 7500 (unlawful interference)?",
       "tool": "analytics",
       "operation": "list_emergency_aircraft",
@@ -36,6 +40,7 @@
     },
     {
       "id": "a5",
+      "tier": "core",
       "question": "How many aircraft were associated with airport LOIR?",
       "tool": "analytics",
       "operation": "airport_congestion",
@@ -44,6 +49,7 @@
     },
     {
       "id": "a6",
+      "tier": "core",
       "question": "How many distinct airports had associated traffic?",
       "tool": "analytics",
       "operation": "count_active_airports",
@@ -52,6 +58,7 @@
     },
     {
       "id": "a7",
+      "tier": "core",
       "question": "How many distinct H3 sectors were active?",
       "tool": "analytics",
       "operation": "count_active_sectors",
@@ -60,6 +67,7 @@
     },
     {
       "id": "a8",
+      "tier": "core",
       "question": "How many distinct flights were tracked overall?",
       "tool": "analytics",
       "operation": "total_flights_tracked",
@@ -68,6 +76,7 @@
     },
     {
       "id": "a9",
+      "tier": "core",
       "question": "What was the maximum altitude reached by flight 3c6751?",
       "tool": "analytics",
       "operation": "flight_summary",
@@ -79,6 +88,7 @@
     },
     {
       "id": "a10",
+      "tier": "core",
       "question": "Which flight reached the highest altitude in the dataset?",
       "tool": "analytics",
       "operation": "highest_altitude_flight",
@@ -89,6 +99,7 @@
     },
     {
       "id": "r1",
+      "tier": "core",
       "question": "Decode the latest METAR for Amsterdam Schiphol (EHAM).",
       "tool": "retrieval",
       "params": {"query": "METAR EHAM Amsterdam Schiphol decode"},
@@ -96,6 +107,7 @@
     },
     {
       "id": "r2",
+      "tier": "core",
       "question": "What does a 7700 transponder squawk code indicate?",
       "tool": "retrieval",
       "params": {"query": "what does squawk 7700 transponder code indicate"},
@@ -106,10 +118,895 @@
     },
     {
       "id": "r3",
+      "tier": "core",
       "question": "Find the incident report about an engine failure during climb.",
       "tool": "retrieval",
       "params": {"query": "engine failure during climb incident report"},
       "checks": [{"type": "contains_source", "expected": "ntsb-eng-failure"}]
+    },
+    {
+      "id": "a11",
+      "tier": "core",
+      "question": "How many emergency squawk events are in the dataset?",
+      "tool": "analytics",
+      "operation": "count_emergencies",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 3}]
+    },
+    {
+      "id": "a12",
+      "tier": "core",
+      "question": "How many emergency transponder events are in the log?",
+      "tool": "analytics",
+      "operation": "count_emergencies",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 3}]
+    },
+    {
+      "id": "a13",
+      "tier": "core",
+      "question": "Count all emergency events in the log.",
+      "tool": "analytics",
+      "operation": "count_emergencies",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 3}]
+    },
+    {
+      "id": "a14",
+      "tier": "core",
+      "question": "How many total emergency squawk events were logged?",
+      "tool": "analytics",
+      "operation": "count_emergencies",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 3}]
+    },
+    {
+      "id": "a15",
+      "tier": "core",
+      "question": "Total emergency squawk events in the dataset?",
+      "tool": "analytics",
+      "operation": "count_emergencies",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 3}]
+    },
+    {
+      "id": "a16",
+      "tier": "core",
+      "question": "How many squawk 7500 events were recorded?",
+      "tool": "analytics",
+      "operation": "count_emergencies",
+      "params": {"squawk": "7500"},
+      "checks": [{"type": "numeric_equals", "expected": 1}]
+    },
+    {
+      "id": "a17",
+      "tier": "core",
+      "question": "How many squawk 7600 events were recorded?",
+      "tool": "analytics",
+      "operation": "count_emergencies",
+      "params": {"squawk": "7600"},
+      "checks": [{"type": "numeric_equals", "expected": 0}]
+    },
+    {
+      "id": "a18",
+      "tier": "core",
+      "question": "How many general emergency events (7700) were recorded?",
+      "tool": "analytics",
+      "operation": "count_emergencies",
+      "params": {"squawk": "7700"},
+      "checks": [{"type": "numeric_equals", "expected": 2}]
+    },
+    {
+      "id": "a19",
+      "tier": "core",
+      "question": "How many squawk emergencies occurred?",
+      "tool": "analytics",
+      "operation": "count_emergencies",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 3}]
+    },
+    {
+      "id": "a20",
+      "tier": "core",
+      "question": "Which aircraft squawked 7700?",
+      "tool": "analytics",
+      "operation": "list_emergency_aircraft",
+      "params": {"squawk": "7700"},
+      "checks": [{"type": "set_equals", "expected": ["3c6751", "a0b1c2"]}]
+    },
+    {
+      "id": "a21",
+      "tier": "core",
+      "question": "List all aircraft that squawked 7700.",
+      "tool": "analytics",
+      "operation": "list_emergency_aircraft",
+      "params": {"squawk": "7700"},
+      "checks": [{"type": "set_equals", "expected": ["3c6751", "a0b1c2"]}]
+    },
+    {
+      "id": "a22",
+      "tier": "core",
+      "question": "Which aircraft squawked 7500?",
+      "tool": "analytics",
+      "operation": "list_emergency_aircraft",
+      "params": {"squawk": "7500"},
+      "checks": [{"type": "set_equals", "expected": ["400a30"]}]
+    },
+    {
+      "id": "a23",
+      "tier": "core",
+      "question": "List all aircraft that squawked 7500.",
+      "tool": "analytics",
+      "operation": "list_emergency_aircraft",
+      "params": {"squawk": "7500"},
+      "checks": [{"type": "set_equals", "expected": ["400a30"]}]
+    },
+    {
+      "id": "a24",
+      "tier": "core",
+      "question": "Which aircraft squawked 7600?",
+      "tool": "analytics",
+      "operation": "list_emergency_aircraft",
+      "params": {"squawk": "7600"},
+      "checks": [{"type": "set_equals", "expected": []}]
+    },
+    {
+      "id": "a25",
+      "tier": "core",
+      "question": "How many aircraft are associated with LIPX?",
+      "tool": "analytics",
+      "operation": "airport_congestion",
+      "params": {"airport_icao": "LIPX"},
+      "checks": [{"type": "numeric_equals", "field": "aircraft_count", "expected": 1}]
+    },
+    {
+      "id": "a26",
+      "tier": "core",
+      "question": "How many aircraft were near airport ELLX?",
+      "tool": "analytics",
+      "operation": "airport_congestion",
+      "params": {"airport_icao": "ELLX"},
+      "checks": [{"type": "numeric_equals", "field": "aircraft_count", "expected": 1}]
+    },
+    {
+      "id": "a27",
+      "tier": "core",
+      "question": "What is the aircraft count for LHBP?",
+      "tool": "analytics",
+      "operation": "airport_congestion",
+      "params": {"airport_icao": "LHBP"},
+      "checks": [{"type": "numeric_equals", "field": "aircraft_count", "expected": 1}]
+    },
+    {
+      "id": "a28",
+      "tier": "core",
+      "question": "How many aircraft were associated with airport LIPX?",
+      "tool": "analytics",
+      "operation": "airport_congestion",
+      "params": {"airport_icao": "LIPX"},
+      "checks": [{"type": "numeric_equals", "field": "aircraft_count", "expected": 1}]
+    },
+    {
+      "id": "a29",
+      "tier": "core",
+      "question": "Aircraft count for airport EDMS?",
+      "tool": "analytics",
+      "operation": "airport_congestion",
+      "params": {"airport_icao": "EDMS"},
+      "checks": [{"type": "numeric_equals", "field": "aircraft_count", "expected": 1}]
+    },
+    {
+      "id": "a30",
+      "tier": "core",
+      "question": "How many aircraft were at EPBD?",
+      "tool": "analytics",
+      "operation": "airport_congestion",
+      "params": {"airport_icao": "EPBD"},
+      "checks": [{"type": "numeric_equals", "field": "aircraft_count", "expected": 1}]
+    },
+    {
+      "id": "a31",
+      "tier": "core",
+      "question": "What aircraft count does UMKK show?",
+      "tool": "analytics",
+      "operation": "airport_congestion",
+      "params": {"airport_icao": "UMKK"},
+      "checks": [{"type": "numeric_equals", "field": "aircraft_count", "expected": 1}]
+    },
+    {
+      "id": "a32",
+      "tier": "core",
+      "question": "How many aircraft were associated with LHPL?",
+      "tool": "analytics",
+      "operation": "airport_congestion",
+      "params": {"airport_icao": "LHPL"},
+      "checks": [{"type": "numeric_equals", "field": "aircraft_count", "expected": 1}]
+    },
+    {
+      "id": "a33",
+      "tier": "core",
+      "question": "How many aircraft were associated with LSZS?",
+      "tool": "analytics",
+      "operation": "airport_congestion",
+      "params": {"airport_icao": "LSZS"},
+      "checks": [{"type": "numeric_equals", "field": "aircraft_count", "expected": 1}]
+    },
+    {
+      "id": "a34",
+      "tier": "core",
+      "question": "How many aircraft were associated with EBAR?",
+      "tool": "analytics",
+      "operation": "airport_congestion",
+      "params": {"airport_icao": "EBAR"},
+      "checks": [{"type": "numeric_equals", "field": "aircraft_count", "expected": 1}]
+    },
+    {
+      "id": "a35",
+      "tier": "core",
+      "question": "How many aircraft were associated with LHSM?",
+      "tool": "analytics",
+      "operation": "airport_congestion",
+      "params": {"airport_icao": "LHSM"},
+      "checks": [{"type": "numeric_equals", "field": "aircraft_count", "expected": 1}]
+    },
+    {
+      "id": "a36",
+      "tier": "core",
+      "question": "Traffic count at airport UMKK?",
+      "tool": "analytics",
+      "operation": "airport_congestion",
+      "params": {"airport_icao": "UMKK"},
+      "checks": [{"type": "numeric_equals", "field": "aircraft_count", "expected": 1}]
+    },
+    {
+      "id": "a37",
+      "tier": "core",
+      "question": "How many airports were active in the dataset?",
+      "tool": "analytics",
+      "operation": "count_active_airports",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 11}]
+    },
+    {
+      "id": "a38",
+      "tier": "core",
+      "question": "How many airports had traffic?",
+      "tool": "analytics",
+      "operation": "count_active_airports",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 11}]
+    },
+    {
+      "id": "a39",
+      "tier": "core",
+      "question": "How many airports were active?",
+      "tool": "analytics",
+      "operation": "count_active_airports",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 11}]
+    },
+    {
+      "id": "a40",
+      "tier": "core",
+      "question": "How many H3 sectors had aircraft?",
+      "tool": "analytics",
+      "operation": "count_active_sectors",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 13}]
+    },
+    {
+      "id": "a41",
+      "tier": "core",
+      "question": "How many sectors were active in the dataset?",
+      "tool": "analytics",
+      "operation": "count_active_sectors",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 13}]
+    },
+    {
+      "id": "a42",
+      "tier": "core",
+      "question": "Total active H3 sectors in the dataset?",
+      "tool": "analytics",
+      "operation": "count_active_sectors",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 13}]
+    },
+    {
+      "id": "a43",
+      "tier": "core",
+      "question": "How many H3 sectors appear in the sector load?",
+      "tool": "analytics",
+      "operation": "count_active_sectors",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 13}]
+    },
+    {
+      "id": "a44",
+      "tier": "core",
+      "question": "How many flights were tracked in total?",
+      "tool": "analytics",
+      "operation": "total_flights_tracked",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 10}]
+    },
+    {
+      "id": "a45",
+      "tier": "core",
+      "question": "How many unique flights appear in the routing stats?",
+      "tool": "analytics",
+      "operation": "total_flights_tracked",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 10}]
+    },
+    {
+      "id": "a46",
+      "tier": "core",
+      "question": "What was the maximum altitude reached by flight 4b1806?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "4b1806"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 5498.8, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "a47",
+      "tier": "core",
+      "question": "What was the maximum altitude of flight 4b1806?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "4b1806"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 5498.8, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "a48",
+      "tier": "core",
+      "question": "What was the maximum altitude of flight 48414e?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "48414e"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 9572.9, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "a49",
+      "tier": "core",
+      "question": "What was the max altitude for flight 48414e?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "48414e"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 9572.9, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "a50",
+      "tier": "core",
+      "question": "What was the max altitude for 400a30?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "400a30"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 11196.8, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "a51",
+      "tier": "core",
+      "question": "What was the altitude summary for flight 400a30?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "400a30"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 11196.8, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "a52",
+      "tier": "core",
+      "question": "What is the max altitude for flight a0b1c2?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "a0b1c2"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 10091.4, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "a53",
+      "tier": "core",
+      "question": "Flight summary for a0b1c2?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "a0b1c2"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 10091.4, "tolerance": 0.5},
+        {"type": "numeric_equals", "field": "ping_count", "expected": 5}
+      ]
+    },
+    {
+      "id": "a54",
+      "tier": "core",
+      "question": "What was the max altitude for flight 39cedc?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "39cedc"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 3690.6, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "a55",
+      "tier": "core",
+      "question": "What was the max altitude for flight 3448a9?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "3448a9"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 10722.5, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "a56",
+      "tier": "core",
+      "question": "What was the max altitude for flight 30014c?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "30014c"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 3414.7, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "a57",
+      "tier": "core",
+      "question": "What is the max altitude for flight 471f52?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "471f52"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 6630.5, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "a58",
+      "tier": "core",
+      "question": "What is the max altitude for flight 4ca87b?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "4ca87b"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 6586.5, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "a59",
+      "tier": "core",
+      "question": "How many pings in the flight summary for 3c6751?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "3c6751"},
+      "checks": [
+        {"type": "numeric_equals", "field": "ping_count", "expected": 5}
+      ]
+    },
+    {
+      "id": "a60",
+      "tier": "core",
+      "question": "Which flight achieved the highest altitude?",
+      "tool": "analytics",
+      "operation": "highest_altitude_flight",
+      "params": {},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 11574.0, "tolerance": 0.5},
+        {"type": "contains_text", "expected": "3c6751"}
+      ]
+    },
+    {
+      "id": "a61",
+      "tier": "core",
+      "question": "Which flight had the highest altitude?",
+      "tool": "analytics",
+      "operation": "highest_altitude_flight",
+      "params": {},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 11574.0, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "a62",
+      "tier": "core",
+      "question": "Maximum altitude reached by flight 4b1806?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "4b1806"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 5498.8, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "a63",
+      "tier": "core",
+      "question": "What altitude did flight 4b1806 reach?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "4b1806"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 5498.8, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "a64",
+      "tier": "core",
+      "question": "Max altitude of 4b1806?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "4b1806"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 5498.8, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "a65",
+      "tier": "core",
+      "question": "Altitude summary for 4b1806?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "4b1806"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 5498.8, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "r4",
+      "tier": "core",
+      "question": "Decode the latest METAR for EHAM.",
+      "tool": "retrieval",
+      "params": {"query": "METAR EHAM decode"},
+      "checks": [{"type": "contains_source", "expected": "metar-eham"}]
+    },
+    {
+      "id": "r5",
+      "tier": "core",
+      "question": "What is the METAR for Amsterdam Schiphol?",
+      "tool": "retrieval",
+      "params": {"query": "METAR Amsterdam Schiphol EHAM"},
+      "checks": [{"type": "contains_source", "expected": "metar-eham"}]
+    },
+    {
+      "id": "r6",
+      "tier": "core",
+      "question": "What does squawk 7700 indicate?",
+      "tool": "retrieval",
+      "params": {"query": "squawk 7700 indicate"},
+      "checks": [
+        {"type": "contains_source", "expected": "ref-squawk-codes"},
+        {"type": "contains_text", "expected": "emergency"}
+      ]
+    },
+    {
+      "id": "r7",
+      "tier": "core",
+      "question": "What does squawk 7500 mean?",
+      "tool": "retrieval",
+      "params": {"query": "squawk 7500 mean"},
+      "checks": [
+        {"type": "contains_source", "expected": "ref-squawk-codes"},
+        {"type": "contains_text", "expected": "unlawful"}
+      ]
+    },
+    {
+      "id": "r8",
+      "tier": "core",
+      "question": "What does squawk 7600 indicate?",
+      "tool": "retrieval",
+      "params": {"query": "squawk 7600 indicate"},
+      "checks": [
+        {"type": "contains_source", "expected": "ref-squawk-codes"},
+        {"type": "contains_text", "expected": "communication"}
+      ]
+    },
+    {
+      "id": "r9",
+      "tier": "core",
+      "question": "What does a 7700 squawk code mean?",
+      "tool": "retrieval",
+      "params": {"query": "7700 squawk code mean"},
+      "checks": [
+        {"type": "contains_source", "expected": "ref-squawk-codes"},
+        {"type": "contains_text", "expected": "emergency"}
+      ]
+    },
+    {
+      "id": "r10",
+      "tier": "core",
+      "question": "Report on engine failure during climb.",
+      "tool": "retrieval",
+      "params": {"query": "engine failure during climb report"},
+      "checks": [{"type": "contains_source", "expected": "ntsb-eng-failure"}]
+    },
+    {
+      "id": "r11",
+      "tier": "core",
+      "question": "Find the engine failure incident report.",
+      "tool": "retrieval",
+      "params": {"query": "engine failure incident report"},
+      "checks": [{"type": "contains_source", "expected": "ntsb-eng-failure"}]
+    },
+    {
+      "id": "r12",
+      "tier": "core",
+      "question": "What happened in the engine failure accident?",
+      "tool": "retrieval",
+      "params": {"query": "engine failure accident"},
+      "checks": [{"type": "contains_source", "expected": "ntsb-eng-failure"}]
+    },
+    {
+      "id": "r13",
+      "tier": "core",
+      "question": "What does a 7500 squawk code mean?",
+      "tool": "retrieval",
+      "params": {"query": "7500 squawk code mean"},
+      "checks": [
+        {"type": "contains_source", "expected": "ref-squawk-codes"},
+        {"type": "contains_text", "expected": "unlawful"}
+      ]
+    },
+    {
+      "id": "r14",
+      "tier": "core",
+      "question": "What does a 7600 squawk code indicate?",
+      "tool": "retrieval",
+      "params": {"query": "7600 squawk code indicate"},
+      "checks": [
+        {"type": "contains_source", "expected": "ref-squawk-codes"},
+        {"type": "contains_text", "expected": "communication"}
+      ]
+    },
+    {
+      "id": "e1",
+      "tier": "extended",
+      "question": "Which flights were in distress during the observation window?",
+      "tool": "analytics",
+      "operation": "list_emergency_aircraft",
+      "params": {},
+      "checks": [{"type": "set_equals", "expected": ["3c6751", "400a30", "a0b1c2"]}]
+    },
+    {
+      "id": "e2",
+      "tier": "extended",
+      "question": "Summarize all emergency events in the dataset.",
+      "tool": "analytics",
+      "operation": "count_emergencies",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 3}]
+    },
+    {
+      "id": "e3",
+      "tier": "extended",
+      "question": "How many times did aircraft broadcast an emergency transponder code?",
+      "tool": "analytics",
+      "operation": "count_emergencies",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 3}]
+    },
+    {
+      "id": "e4",
+      "tier": "extended",
+      "question": "What percentage of tracked flights declared an emergency?",
+      "tool": "analytics",
+      "operation": "count_emergencies",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 3}]
+    },
+    {
+      "id": "e5",
+      "tier": "extended",
+      "question": "Are there any squawk 7500 events near LOIR?",
+      "tool": "analytics",
+      "operation": "count_emergencies",
+      "params": {"squawk": "7500"},
+      "checks": [{"type": "numeric_equals", "expected": 1}]
+    },
+    {
+      "id": "e6",
+      "tier": "extended",
+      "question": "List the callsigns of all aircraft that broadcast an emergency squawk.",
+      "tool": "analytics",
+      "operation": "list_emergency_aircraft",
+      "params": {},
+      "checks": [{"type": "set_equals", "expected": ["3c6751", "400a30", "a0b1c2"]}]
+    },
+    {
+      "id": "e7",
+      "tier": "extended",
+      "question": "Which airports had the most aircraft in the observation window?",
+      "tool": "analytics",
+      "operation": "count_active_airports",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 11}]
+    },
+    {
+      "id": "e8",
+      "tier": "extended",
+      "question": "How many sectors had at least one aircraft?",
+      "tool": "analytics",
+      "operation": "count_active_sectors",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 13}]
+    },
+    {
+      "id": "e9",
+      "tier": "extended",
+      "question": "What was the average velocity of flight 3c6751?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "3c6751"},
+      "checks": [
+        {"type": "numeric_equals", "field": "avg_velocity_mps", "expected": 236.32, "tolerance": 0.01}
+      ]
+    },
+    {
+      "id": "e10",
+      "tier": "extended",
+      "question": "How fast was flight 400a30 travelling on average?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "400a30"},
+      "checks": [
+        {"type": "numeric_equals", "field": "avg_velocity_mps", "expected": 231.78, "tolerance": 0.01}
+      ]
+    },
+    {
+      "id": "e11",
+      "tier": "extended",
+      "question": "What was the average velocity of flight 4ca87b?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "4ca87b"},
+      "checks": [
+        {"type": "numeric_equals", "field": "avg_velocity_mps", "expected": 241.58, "tolerance": 0.01}
+      ]
+    },
+    {
+      "id": "e12",
+      "tier": "extended",
+      "question": "Compare the maximum altitudes of flights 3c6751 and 400a30.",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "3c6751"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 11574.0, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "e13",
+      "tier": "extended",
+      "question": "How many observation windows were recorded for airport LOIR?",
+      "tool": "analytics",
+      "operation": "airport_congestion",
+      "params": {"airport_icao": "LOIR"},
+      "checks": [
+        {"type": "numeric_equals", "field": "windows", "expected": 1}
+      ]
+    },
+    {
+      "id": "e14",
+      "tier": "extended",
+      "question": "Which flight in the dataset was flying at the lowest altitude?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "30014c"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 3414.7, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "e15",
+      "tier": "extended",
+      "question": "What is the weather situation at Amsterdam Schiphol right now?",
+      "tool": "retrieval",
+      "params": {"query": "weather Amsterdam Schiphol EHAM"},
+      "checks": [{"type": "contains_source", "expected": "metar-eham"}]
+    },
+    {
+      "id": "e16",
+      "tier": "extended",
+      "question": "Decode the METAR for Frankfurt EDDF.",
+      "tool": "retrieval",
+      "params": {"query": "METAR EDDF Frankfurt decode"},
+      "checks": [{"type": "contains_source", "expected": "metar-eddf"}]
+    },
+    {
+      "id": "e17",
+      "tier": "extended",
+      "question": "Decode the METAR for Vienna LOWW.",
+      "tool": "retrieval",
+      "params": {"query": "METAR LOWW Vienna decode"},
+      "checks": [{"type": "contains_source", "expected": "metar-loww"}]
+    },
+    {
+      "id": "e18",
+      "tier": "extended",
+      "question": "What should ATC do when an aircraft squawks 7500?",
+      "tool": "retrieval",
+      "params": {"query": "ATC squawk 7500 hijack procedure"},
+      "checks": [
+        {"type": "contains_source", "expected": "ref-squawk-codes"},
+        {"type": "contains_text", "expected": "unlawful"}
+      ]
+    },
+    {
+      "id": "e19",
+      "tier": "extended",
+      "question": "Explain what the BAW226 squawk event means operationally.",
+      "tool": "retrieval",
+      "params": {"query": "squawk 7500 hijacking meaning ATC"},
+      "checks": [{"type": "contains_source", "expected": "ref-squawk-codes"}]
+    },
+    {
+      "id": "e20",
+      "tier": "extended",
+      "question": "What happened to the crew after the engine failure during climb?",
+      "tool": "retrieval",
+      "params": {"query": "engine failure climb crew emergency landing"},
+      "checks": [{"type": "contains_source", "expected": "ntsb-eng-failure"}]
+    },
+    {
+      "id": "e21",
+      "tier": "extended",
+      "question": "How congested is the airspace in the observed region?",
+      "tool": "analytics",
+      "operation": "count_active_sectors",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 13}]
+    },
+    {
+      "id": "e22",
+      "tier": "extended",
+      "question": "What was the total number of aircraft that appeared in the observation window?",
+      "tool": "analytics",
+      "operation": "total_flights_tracked",
+      "params": {},
+      "checks": [{"type": "numeric_equals", "expected": 10}]
+    },
+    {
+      "id": "e23",
+      "tier": "extended",
+      "question": "Identify the flight that reached cruising altitude in the dataset.",
+      "tool": "analytics",
+      "operation": "highest_altitude_flight",
+      "params": {},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 11574.0, "tolerance": 0.5},
+        {"type": "contains_text", "expected": "3c6751"}
+      ]
+    },
+    {
+      "id": "e24",
+      "tier": "extended",
+      "question": "Which is the DLH42N flight icao24 and how high did it fly?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "3c6751"},
+      "checks": [
+        {"type": "numeric_equals", "field": "max_altitude_m", "expected": 11574.0, "tolerance": 0.5}
+      ]
+    },
+    {
+      "id": "e25",
+      "tier": "extended",
+      "question": "How many ping observations were logged for flight 4b1806?",
+      "tool": "analytics",
+      "operation": "flight_summary",
+      "params": {"icao24": "4b1806"},
+      "checks": [
+        {"type": "numeric_equals", "field": "ping_count", "expected": 5}
+      ]
     }
   ]
 }

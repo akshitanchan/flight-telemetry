@@ -28,6 +28,8 @@ def numeric_equals(result, expected, field=None, tolerance=0):
     val = _extract(result, field)
     if val is None:
         return False, f"got None, expected {expected}"
+    if not isinstance(val, (int, float)):
+        return False, f"got non-numeric type {type(val).__name__!r}, expected {expected}"
     ok = abs(val - expected) <= tolerance
     return ok, f"got {val}, expected {expected} (tol {tolerance})"
 
@@ -36,6 +38,8 @@ def set_equals(result, expected, field=None):
     val = _extract(result, field)
     if val is None:
         return False, f"got None, expected {expected}"
+    if not isinstance(val, (list, set, tuple)):
+        return False, f"got non-iterable type {type(val).__name__!r}, expected set {expected}"
     ok = set(val) == set(expected)
     return ok, f"got {sorted(val)}, expected {sorted(expected)}"
 

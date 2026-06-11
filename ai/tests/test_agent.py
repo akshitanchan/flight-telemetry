@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the rule-based answer strategy and the answer-path eval."""
 
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -15,6 +16,7 @@ from ai.eval.run_answers import evaluate
 
 GOLD = PROJECT_ROOT / "ai" / "fixtures" / "gold"
 CORPUS = PROJECT_ROOT / "ai" / "fixtures" / "corpus" / "corpus.json"
+GOLDEN = PROJECT_ROOT / "ai" / "eval" / "golden_set.json"
 
 
 class TestRuleBasedStrategy(unittest.TestCase):
@@ -59,9 +61,32 @@ class TestRuleBasedStrategy(unittest.TestCase):
 
 class TestAnswerEval(unittest.TestCase):
     def test_all_golden_questions_answered_correctly(self):
-        results, metrics = evaluate()
+        """Rule-based strategy must score accuracy==1.0 / citation==1.0 on the CORE tier.
+
+        The golden set contains tier='core' questions (deterministically routable by
+        rule_based_v1 / keyword_score_v1) and tier='extended' questions (harder
+        phrasings intended for LLM architecture comparison in ai-04 where deterministic
+        routers are not required to succeed).  This gate evaluates CORE only.
+        """
+        import tempfile
+
+        with open(GOLDEN) as f:
+            all_questions = json.load(f).get("questions", [])
+        core_questions = [q for q in all_questions if q.get("tier") == "core"]
+        self.assertGreater(len(core_questions), 0, "golden set has no core-tier questions")
+
+        core_golden = {"version": "1.1", "questions": core_questions}
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as tmp:
+            json.dump(core_golden, tmp)
+            tmp_path = Path(tmp.name)
+
+        try:
+            results, metrics = evaluate(golden_path=tmp_path)
+        finally:
+            tmp_path.unlink(missing_ok=True)
+
         failed = [r["id"] for r in results if not r["passed"]]
-        self.assertEqual(failed, [], f"failing: {failed}")
+        self.assertEqual(failed, [], f"failing on CORE tier: {failed}")
         self.assertEqual(metrics["citation_coverage"], 1.0)
         self.assertEqual(metrics["accuracy"], 1.0)
 

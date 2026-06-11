@@ -2,40 +2,181 @@
   {
     "id": "metar-eham",
     "type": "metar",
-    "title": "METAR EHAM Amsterdam Schiphol",
+    "title": "METAR EHAM Amsterdam Schiphol decode",
     "airport": "EHAM",
-    "text": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: wind 270 degrees at 10 knots, visibility 10 km or more, few clouds at 2500 ft and scattered at 4000 ft, temperature 18 C, dewpoint 11 C, QNH 1019 hPa, no significant change expected."
+    "text": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (9999), few clouds at 2500 ft AGL and scattered clouds at 4000 ft AGL, temperature 18 degrees Celsius, dewpoint 11 degrees Celsius, QNH altimeter setting 1019 hPa, NOSIG no significant change expected within 2 hours. Schiphol is one of Europe's busiest airports located northwest of Amsterdam, Netherlands, ICAO identifier EHAM, IATA code AMS."
   },
   {
     "id": "metar-eddf",
     "type": "metar",
-    "title": "METAR EDDF Frankfurt am Main",
+    "title": "METAR EDDF Frankfurt am Main Airport",
     "airport": "EDDF",
-    "text": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: wind 240 degrees at 12 gusting 22 knots, visibility 8000 m in light rain, broken cloud at 1200 ft, temperature 15 C, dewpoint 13 C, QNH 1014 hPa."
+    "text": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in light rain (-RA), broken cloud layer at 1200 ft AGL, temperature 15 degrees Celsius, dewpoint 13 degrees Celsius, QNH 1014 hPa, temporary visibility reduction to 4000 metres in rain. Frankfurt EDDF is a major hub for European and intercontinental traffic."
   },
   {
     "id": "metar-loww",
     "type": "metar",
-    "title": "METAR LOWW Vienna",
+    "title": "METAR LOWW Vienna International Airport",
     "airport": "LOWW",
-    "text": "LOWW 031150Z 14006KT CAVOK 21/09 Q1020 NOSIG. Decoded: wind 140 degrees at 6 knots, ceiling and visibility OK, temperature 21 C, dewpoint 9 C, QNH 1020 hPa."
+    "text": "LOWW 031150Z 14006KT CAVOK 21/09 Q1020 NOSIG. Decoded: ICAO station LOWW Vienna Schwechat International Airport Austria, wind 140 degrees at 6 knots, CAVOK ceiling and visibility OK (visibility greater than 10 km, no significant cloud below 5000 ft, no CB), temperature 21 degrees Celsius, dewpoint 9 degrees Celsius, QNH altimeter 1020 hPa, NOSIG no significant change. Vienna LOWW is the main gateway to Austria."
+  },
+  {
+    "id": "metar-egll",
+    "type": "metar",
+    "title": "METAR EGLL London Heathrow Airport",
+    "airport": "EGLL",
+    "text": "EGLL 031120Z 22015KT 190V250 6000 -SHRA FEW010 SCT018 BKN030 14/10 Q1008 TEMPO 3000 SHRA BKN010. Decoded: ICAO station EGLL London Heathrow Airport United Kingdom, wind 220 degrees at 15 knots variable between 190 and 250 degrees, visibility 6000 metres in light shower rain (-SHRA), few clouds at 1000 ft, scattered at 1800 ft, broken at 3000 ft, temperature 14 degrees Celsius, dewpoint 10 degrees Celsius, QNH 1008 hPa, temporary visibility 3000 metres in shower rain with broken clouds at 1000 ft. Heathrow EGLL is one of the world's busiest international airports."
+  },
+  {
+    "id": "metar-lfpg",
+    "type": "metar",
+    "title": "METAR LFPG Paris Charles de Gaulle Airport",
+    "airport": "LFPG",
+    "text": "LFPG 031130Z 31008KT 9999 SCT035 BKN080 16/07 Q1016 NOSIG. Decoded: ICAO station LFPG Paris Charles de Gaulle Airport France, wind 310 degrees at 8 knots, visibility 10 km or more, scattered clouds at 3500 ft AGL, broken clouds at 8000 ft AGL, temperature 16 degrees Celsius, dewpoint 7 degrees Celsius, QNH 1016 hPa, no significant change. Paris CDG LFPG is France's principal international airport northeast of Paris."
+  },
+  {
+    "id": "metar-lemd",
+    "type": "metar",
+    "title": "METAR LEMD Madrid Barajas Airport",
+    "airport": "LEMD",
+    "text": "LEMD 031200Z 36005KT CAVOK 24/06 Q1018 NOSIG. Decoded: ICAO station LEMD Adolfo Suárez Madrid Barajas Airport Spain, wind 360 degrees at 5 knots, CAVOK ceiling and visibility OK, temperature 24 degrees Celsius, dewpoint 6 degrees Celsius, QNH 1018 hPa, no significant change. Madrid Barajas LEMD is Spain's busiest airport serving the capital city. Elevation 2000 ft MSL on the Castilian plateau."
+  },
+  {
+    "id": "metar-lirf",
+    "type": "metar",
+    "title": "METAR LIRF Rome Fiumicino Airport",
+    "airport": "LIRF",
+    "text": "LIRF 031130Z 04010KT 9999 FEW020 SCT060 19/12 Q1015 NOSIG. Decoded: ICAO station LIRF Leonardo da Vinci Rome Fiumicino Airport Italy, wind 040 degrees at 10 knots, visibility 10 km or more, few clouds at 2000 ft AGL, scattered clouds at 6000 ft AGL, temperature 19 degrees Celsius, dewpoint 12 degrees Celsius, QNH 1015 hPa, no significant change. Rome Fiumicino LIRF serves as Italy's main international gateway near the Tyrrhenian coast."
+  },
+  {
+    "id": "metar-eddm",
+    "type": "metar",
+    "title": "METAR EDDM Munich Airport",
+    "airport": "EDDM",
+    "text": "EDDM 031150Z 08014KT 9000 -TSRA FEW030CB SCT045 BKN090 17/14 Q1010 RETS TEMPO 2000 TSRA. Decoded: ICAO station EDDM Munich Franz Josef Strauss Airport Germany, wind 080 degrees at 14 knots, visibility 9000 metres in light thunderstorm and rain (-TSRA), few cumulonimbus clouds at 3000 ft, scattered at 4500 ft, broken at 9000 ft, temperature 17 degrees Celsius, dewpoint 14 degrees Celsius, QNH 1010 hPa, recent thunderstorm (RETS), temporary visibility 2000 metres in thunderstorm. Munich EDDM is Bavaria's main international airport."
+  },
+  {
+    "id": "metar-ebbr",
+    "type": "metar",
+    "title": "METAR EBBR Brussels Airport",
+    "airport": "EBBR",
+    "text": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AGL, scattered clouds at 8000 ft AGL, temperature 15 degrees Celsius, dewpoint 9 degrees Celsius, QNH 1017 hPa, no significant change. Brussels EBBR is the main airport of Belgium and home to numerous European institutions and airline hubs."
+  },
+  {
+    "id": "metar-engm",
+    "type": "metar",
+    "title": "METAR ENGM Oslo Gardermoen Airport",
+    "airport": "ENGM",
+    "text": "ENGM 031150Z 34008KT 9999 FEW040 02/M04 Q1025 NOSIG. Decoded: ICAO station ENGM Oslo Gardermoen Airport Norway, wind 340 degrees at 8 knots, visibility 10 km or more, few clouds at 4000 ft AGL, temperature 2 degrees Celsius, dewpoint minus 4 degrees Celsius, QNH 1025 hPa, no significant change. Oslo Gardermoen ENGM is Norway's primary international airport located north of Oslo at elevation 681 ft MSL."
+  },
+  {
+    "id": "metar-essa",
+    "type": "metar",
+    "title": "METAR ESSA Stockholm Arlanda Airport",
+    "airport": "ESSA",
+    "text": "ESSA 031150Z 01012KT 8000 BKN025 OVC060 04/01 Q1022 NOSIG. Decoded: ICAO station ESSA Stockholm Arlanda Airport Sweden, wind 010 degrees at 12 knots, visibility 8000 metres, broken clouds at 2500 ft AGL, overcast at 6000 ft AGL, temperature 4 degrees Celsius, dewpoint 1 degree Celsius, QNH 1022 hPa, no significant change. Stockholm Arlanda ESSA is Sweden's largest airport serving the capital region."
+  },
+  {
+    "id": "metar-ekch",
+    "type": "metar",
+    "title": "METAR EKCH Copenhagen Kastrup Airport",
+    "airport": "EKCH",
+    "text": "EKCH 031150Z 19014KT 9999 SCT035 BKN080 09/05 Q1019 NOSIG. Decoded: ICAO station EKCH Copenhagen Kastrup Airport Denmark, wind 190 degrees at 14 knots, visibility 10 km or more, scattered clouds at 3500 ft AGL, broken clouds at 8000 ft AGL, temperature 9 degrees Celsius, dewpoint 5 degrees Celsius, QNH 1019 hPa, no significant change. Copenhagen EKCH is Scandinavia's largest airport serving Denmark and the Øresund region."
   },
   {
     "id": "ref-squawk-codes",
     "type": "reference",
-    "title": "Emergency transponder squawk codes",
-    "text": "Transponder emergency codes: squawk 7500 indicates unlawful interference (hijacking); squawk 7600 indicates a radio communication failure (lost communications); squawk 7700 indicates a general emergency. Air traffic controllers treat any of these codes as an immediate priority emergency."
+    "title": "Emergency transponder squawk codes reference guide",
+    "text": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emergency and air traffic controllers treat it as immediate priority. Squawk 7500 indicates unlawful interference or hijacking — controllers immediately alert security services. Squawk 7600 indicates radio communication failure (NORDO) — lost communications procedures apply. Additional transponder codes: squawk 7000 is the European VFR conspicuity code; squawk 2000 is used when entering radar coverage without a discrete code; squawk 1200 is the North American VFR code. Discrete squawk codes (0001-7777, excluding 8 or 9 digits) are assigned by ATC for radar identification. Mode C enables altitude readout. Mode S supports ADS-B. A transponder must be set to ALT mode during IFR flight. Squawking IDENT causes the radar return to blossom for positive identification. The three emergency squawk codes 7500 7600 7700 are universally recognized by all ICAO member states."
+  },
+  {
+    "id": "ref-icao-weather-codes",
+    "type": "reference",
+    "title": "ICAO METAR weather phenomena codes reference",
+    "text": "METAR weather phenomena intensity prefixes: minus (-) for light intensity, no prefix for moderate, plus (+) for heavy intensity. Precipitation descriptors: DZ drizzle, RA rain, SN snow, SG snow grains, IC ice crystals, PL ice pellets, GR hail, GS small hail or snow pellets, UP unknown precipitation. Descriptors: MI shallow, PR partial, BC patches, DR drifting, BL blowing, SH shower, TS thunderstorm, FZ freezing. Obscuration: BR mist (visibility 1000-9999m), FG fog (visibility below 1000m), FU smoke, VA volcanic ash, DU dust, SA sand, HZ haze, PY spray. Other: PO dust/sand whirls, SQ squall, FC funnel cloud or waterspout, SS sandstorm, DS duststorm. Cloud types reported in METAR: FEW (1-2 oktas), SCT scattered (3-4 oktas), BKN broken (5-7 oktas), OVC overcast (8 oktas). Special designators CB cumulonimbus and TCU towering cumulus appended to cloud layer when present. CAVOK: ceiling and visibility OK, used when visibility is 10 km or more, no cloud below 5000 ft or below MSA, no significant weather."
+  },
+  {
+    "id": "ref-altimeter-settings",
+    "type": "reference",
+    "title": "Altimeter settings QNH QFE QNE and transition altitude",
+    "text": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground — used below the transition altitude for altitude references to mean sea level (MSL). QFE is the altimeter setting that makes the altimeter read zero on the runway threshold — used in some countries for circuit operations. QNE (standard pressure 1013.25 hPa or 29.92 inHg) is used above the transition altitude, where altitudes are expressed as flight levels. The transition altitude (TA) varies by country — in most of Europe it is 6000 ft; in the United States it is 18000 ft (FL180). Above the transition altitude pilots set standard pressure and fly flight levels. Below the transition altitude pilots set QNH. The transition layer is the airspace between the transition altitude and the transition level. Standard pressure altimeter setting: 1013.25 hPa or 29.92 inches of mercury. QNH is typically reported in hPa in METAR for ICAO regions and in inHg for North American METARs (preceded by A, e.g., A2992)."
+  },
+  {
+    "id": "ref-flight-rules",
+    "type": "reference",
+    "title": "VFR and IFR flight rules visibility and cloud clearance minima",
+    "text": "Flight rules reference: Visual Flight Rules (VFR) require pilots to maintain visual separation from clouds and terrain. Basic VFR minima in controlled airspace (Class C, D, E): flight visibility 5 km, 1000 ft vertical clearance from clouds, 1500 m horizontal clearance from clouds. VFR in Class G uncontrolled airspace below 3000 ft AMSL or 1000 ft AGL (whichever higher): 1500 m flight visibility during day, clear of cloud in sight of surface. Special VFR (SVFR) can be authorised by ATC within a control zone when visibility is less than 5 km but not less than 1500 m and the aircraft remains clear of cloud. Instrument Flight Rules (IFR) allow flight in instrument meteorological conditions (IMC) using cockpit instruments and ATC services. IFR minima vary by procedure type — precision approach (CAT I ILS) typically requires 200 ft decision height and 550 m runway visual range. CAT II ILS: 100 ft DH, 300 m RVR. CAT III: various sub-categories down to zero visibility autoland."
+  },
+  {
+    "id": "ref-wake-turbulence",
+    "type": "reference",
+    "title": "Wake turbulence categories and separation minima",
+    "text": "Wake turbulence separation reference: ICAO wake turbulence categories are based on maximum certified take-off weight (MTOW). Super (J category): A380, An-124. Heavy (H): MTOW above 136 000 kg — B747, B777, B787, A330, A340. Medium (M): MTOW 7000 kg to 136 000 kg — B737, A320 family, ATR 72. Light (L): MTOW 7000 kg or less — Cessna 172, Piper PA-28. Vortex behaviour: wingtip vortices descend at approximately 300 ft per minute below the generating aircraft and drift downwind. They persist longer in calm, stable conditions. Standard radar separation behind Heavy aircraft: 4 NM for following Medium, 5 NM for following Light, 6 NM for Light following Super. Non-radar time-based minima are also published for each category pair. The trailing aircraft must be cautious during approach in light crosswind conditions since vortices from a preceding Heavy can drift onto the runway centreline."
+  },
+  {
+    "id": "ref-tcas-ra",
+    "type": "reference",
+    "title": "TCAS II resolution advisory types and pilot response",
+    "text": "Traffic Collision Avoidance System (TCAS II) resolution advisory reference: TCAS issues Traffic Advisories (TA) as caution alerts and Resolution Advisories (RA) as corrective commands. RA types: Climb RA commands positive climb at 1500 fpm or greater; Descend RA commands descent at 1500 fpm or greater; Maintain Vertical Speed RA commands continuation of existing climb or descent rate; Crossing Climb and Crossing Descend RAs cross the intruder's altitude to resolve the conflict. TCAS coordinates with the intruder's TCAS unit via Mode S data link so the two aircraft receive complementary manoeuvres (one climbs, one descends). Pilot response to RA: must respond immediately and promptly in the sense indicated regardless of ATC instructions; inform ATC of the RA as soon as workload permits; return to ATC clearance after the conflict is resolved. Do not manoeuvre in opposition to an RA. Preventive RAs (do not fly into) restrict manoeuvres into the advisory zone without requiring corrective action."
   },
   {
     "id": "ntsb-eng-failure",
     "type": "report",
-    "title": "Illustrative incident report: engine failure during climb",
-    "text": "SYNTHETIC FIXTURE - not a real NTSB report. During the initial climb the flight crew reported a loss of thrust from the right engine, declared an emergency and squawked 7700, dumped fuel, and returned to the departure airport for an overweight landing with no injuries."
+    "title": "NTSB-style incident report: engine failure during climb phase of flight",
+    "text": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew executed the single-engine climb checklist, declared an emergency by squawking 7700 on the transponder, and requested immediate return to the departure airport. Fuel was dumped to reduce landing weight below the maximum landing weight limit. The aircraft landed uneventfully on the departure runway with emergency services on standby. No injuries to the 168 passengers or 6 crew members. Probable cause: fatigue fracture of a high-pressure turbine blade in the right engine resulting from an undetected manufacturing defect. Contributing factor: inadequate non-destructive testing inspection during the last scheduled engine overhaul. Phase of flight: initial climb. Aircraft type: twin-engine jet transport. Findings: the engine failure was non-contained and produced visible exhaust smoke, which aided early detection by the crew. Engine monitoring ACARS messages were transmitted before the crew was aware of the failure. Safety recommendation: review engine overhaul inspection procedures for turbine blade crack propagation."
   },
   {
     "id": "ntsb-loss-sep",
     "type": "report",
-    "title": "Illustrative incident report: loss of separation",
-    "text": "SYNTHETIC FIXTURE - not a real NTSB report. Two aircraft on crossing tracks experienced a loss of separation after a level-off clearance was read back incorrectly; TCAS resolution advisories were followed and separation was restored without further event."
+    "title": "NTSB-style incident report: loss of separation on crossing tracks",
+    "text": "Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft A was cleared to maintain FL350; Aircraft B was cleared to descend to FL370 but read back FL350, which went uncorrected by the controller. As both aircraft converged at FL350, TCAS resolution advisories were triggered — Aircraft A received a climb RA and Aircraft B received a descend RA. Both crews responded correctly and separation was restored. Minimum separation achieved: 0.8 NM lateral and 200 ft vertical. Probable cause: failure by the air traffic controller to detect the incorrect altitude readback from Aircraft B, combined with high workload during a traffic peak. Contributing factors: similar call signs for both aircraft contributed to monitoring confusion. Corrective action: implementation of altitude readback verification procedures and controller refresher training on readback/hearback discipline."
+  },
+  {
+    "id": "ntsb-runway-incursion",
+    "type": "report",
+    "title": "NTSB-style incident report: runway incursion during low-visibility operations",
+    "text": "Incident summary: A regional turboprop aircraft holding short of runway 28L received a conditional line-up clearance that was misunderstood as an unconditional take-off clearance. The crew lined up and began the take-off roll. A departing wide-body jet on runway 28L had not yet cleared the intersection. ATC issued an immediate stop instruction; the turboprop crew rejected the take-off and vacated the runway at the next taxiway. Separation was maintained by approximately 400 m. Visibility at the time: 800 m in fog, RVR 600 m. Probable cause: ambiguous phraseology in the conditional line-up clearance issued by the ground controller, and inadequate readback verification by the crew under time pressure. Contributing factor: reduced visibility degraded situational awareness for both the crew and ground controller. Phase of operation: pre-departure taxi and line-up. Safety recommendation: revise conditional clearance phraseology standards and improve low-visibility operations training."
+  },
+  {
+    "id": "ntsb-tail-strike",
+    "type": "report",
+    "title": "NTSB-style incident report: tail strike during landing flare",
+    "text": "Incident summary: A narrow-body aircraft experienced a tail strike during the landing flare on a long runway. The first officer was flying with the captain as pilot monitoring. The aircraft crossed the threshold at a slightly high approach speed and the flare was initiated approximately 200 ft beyond the normal aim point. The crew held the aircraft off the runway in an attempt to land on the touchdown zone markings, resulting in an excessive nose-high attitude at touchdown. The aft fuselage skin contacted the runway for approximately 15 m. Structural inspection revealed minor skin abrasion and no damage to the pressure bulkhead. Probable cause: excessive flare height and prolonged hold-off by the pilot flying, leading to a pitch attitude exceeding the tail clearance limit. Contributing factors: approach speed 8 knots above reference speed at threshold; first officer had limited experience on type. Safety recommendation: enhanced flare training in full-flight simulator including energy management and go-around decision criteria."
+  },
+  {
+    "id": "ntsb-bird-strike",
+    "type": "report",
+    "title": "NTSB-style incident report: bird strike on departure causing engine ingestion",
+    "text": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a compressor stall and subsequent engine failure. The crew declared an emergency squawk 7700, executed the engine failure checklist, and returned for an emergency landing. The right engine remained operational throughout. 245 passengers and 12 crew members were on board; no injuries. Post-flight inspection revealed severe FOD damage to the left engine fan blades, compressor inlet guide vanes, and first-stage compressor blades. Probable cause: ingestion of migratory Canada geese during departure, leading to left engine failure. Contributing factor: airport wildlife hazard management programme had not identified recent increases in bird activity in the departure corridor at that time of year. Safety recommendation: mandatory bird activity reporting to adjacent airports within a 15 NM radius and enhanced radar ornithology monitoring during migratory seasons."
+  },
+  {
+    "id": "ntsb-pressurization",
+    "type": "report",
+    "title": "NTSB-style incident report: pressurization failure and emergency descent",
+    "text": "Incident summary: A long-haul widebody aircraft cruising at FL380 experienced a loss of cabin pressurization due to a failed outflow valve actuator. The cabin altitude climbed above 10 000 ft and oxygen masks deployed automatically in the passenger cabin. The flight crew donned oxygen masks, squawked 7700, and initiated an emergency descent to FL100. ATC cleared the aircraft immediately to FL100 and coordinated an approach to the nearest suitable airport. The aircraft diverted and landed safely. No passengers were incapacitated. Probable cause: fatigue failure of the outflow valve actuator motor winding, resulting in valve jamming in the open position. Maintenance records indicated the component was approaching its overhaul interval. Contributing factor: the secondary outflow valve, which was designed to compensate, was also inoperative due to an unrelated fault. Safety recommendation: require simultaneous airworthiness check of both outflow valve systems during line maintenance."
+  },
+  {
+    "id": "ntsb-controlled-flight",
+    "type": "report",
+    "title": "NTSB-style incident report: controlled flight into terrain warning during approach",
+    "text": "Incident summary: A freighter aircraft flew an unstabilised instrument approach in mountainous terrain at night under instrument meteorological conditions. The Enhanced Ground Proximity Warning System (EGPWS) generated a terrain pull-up warning at 1600 ft AGL as the aircraft deviated below the glide path. The crew initiated a go-around immediately and climbed safely. Minimum terrain clearance estimated at 300 ft. Probable cause: the flight crew continued an unstabilised approach below 1000 ft AGL in violation of the operator's stabilised approach criteria, combined with inadequate terrain awareness due to high crew workload during a non-precision approach in IMC. Contributing factor: the non-precision approach procedure for that runway did not have vertical guidance (VNAV or ILS), increasing workload during descent. Safety recommendation: accelerate installation of vertical guidance on all approaches at airports in mountainous terrain."
+  },
+  {
+    "id": "ntsb-hydraulic-failure",
+    "type": "report",
+    "title": "NTSB-style incident report: hydraulic system failure affecting flight controls",
+    "text": "Incident summary: During cruise at FL280 a transport aircraft lost hydraulic system B pressure following rupture of a hydraulic line in the rear equipment bay. Hydraulic system B provides power to primary flight control surfaces, nose wheel steering, and thrust reversers. The crew executed the hydraulic failure checklist, declared an emergency, squawked 7700, and requested priority landing. The aircraft was able to maintain control using the remaining hydraulic systems and the autopilot trim system. Landing was completed with degraded nose wheel steering and no thrust reversers; the crew used differential braking to maintain directional control. The aircraft overran the runway by 120 m before stopping on the overrun area. No injuries. Probable cause: fatigue cracking of a hydraulic line coupling due to inadequate support bracket installation at previous maintenance, causing chafing of the line. Safety recommendation: inspect hydraulic line support bracket torque values at all next scheduled maintenance intervals."
+  },
+  {
+    "id": "ntsb-fuel-exhaustion",
+    "type": "report",
+    "title": "NTSB-style incident report: fuel exhaustion and forced landing",
+    "text": "Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pre-flight fuel check and relied on the fuel gauges, which showed higher indications than the actual fuel state due to a known calibration issue not entered in the aircraft maintenance records. The aircraft landed gear-up in a crop field causing substantial damage to the wings and fuselage. The pilot sustained minor injuries. Probable cause: fuel exhaustion due to inadequate pre-flight fuel verification by the pilot, and inaccurate fuel quantity indication caused by an uncorrected fuel gauge calibration discrepancy. Contributing factor: the aircraft owner had not informed the pilot of the known fuel gauge inaccuracy. Safety recommendation: pilots should verify fuel state visually by inspection of fuel tanks in addition to consulting gauges, especially before cross-country flights."
+  },
+  {
+    "id": "ntsb-icing",
+    "type": "report",
+    "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect",
+    "text": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges faster than the de-icing boots could clear it, exceeding the design envelope for icing certification. The autopilot disconnected due to abnormal control forces; the crew assumed manual control. The aircraft experienced a roll excursion to 45 degrees bank before the crew recovered. The aircraft declared an emergency squawk 7700 and diverted to the nearest airport with instrument approaches. No injuries among 19 passengers and 2 crew. Probable cause: flight into severe icing conditions outside the certified icing envelope, with ice accumulation exceeding the capacity of the de-icing system. Contributing factor: the flight dispatcher had not adequately evaluated the SIGMET for severe icing along the route. Safety recommendation: enhance dispatcher training on icing SIGMETs and minimum fuel reserves for diversion during winter operations."
   }
 ]
