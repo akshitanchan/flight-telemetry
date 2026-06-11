@@ -195,6 +195,29 @@ class SingleShotRAGStrategy(AnswerStrategy):
             self._provider = name
         return self._llm, self._provider
 
+    @staticmethod
+    def _coerce_params(raw) -> dict:
+        """Coerce an LLM-supplied params value to a plain dict.
+
+        The LLM is untrusted and occasionally emits params as a JSON string,
+        a bare scalar, or None instead of an object.  We normalise defensively:
+          - dict           → returned as-is (common case, zero overhead).
+          - str            → attempt json.loads; use result only if it is a dict.
+          - anything else  → empty dict (let the tool's own validation handle it).
+        A malformed params value degrades the step to an empty-params call rather
+        than crashing the whole answer() invocation.
+        """
+        if isinstance(raw, dict):
+            return raw
+        if isinstance(raw, str):
+            try:
+                parsed = json.loads(raw)
+                if isinstance(parsed, dict):
+                    return parsed
+            except (json.JSONDecodeError, ValueError):
+                pass
+        return {}
+
     def _route(self, question: str):
         """Ask the LLM to pick a tool. Returns (call_dict, token_count)."""
         llm, _ = self._get_llm()
@@ -240,7 +263,7 @@ class SingleShotRAGStrategy(AnswerStrategy):
 
         tool = call.get("tool")
         operation = call.get("operation")
-        params = call.get("params") or {}
+        params = self._coerce_params(call.get("params"))
         if "squawk" in params and params["squawk"] is not None:
             params["squawk"] = str(params["squawk"])
 

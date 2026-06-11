@@ -198,11 +198,34 @@ class ReActStrategy(AnswerStrategy):
     # Tool execution (validate + dispatch)
     # ------------------------------------------------------------------
 
+    @staticmethod
+    def _coerce_params(raw) -> dict:
+        """Coerce an LLM-supplied params value to a plain dict.
+
+        The LLM is untrusted and occasionally emits params as a JSON string,
+        a bare scalar, or None instead of an object.  We normalise defensively:
+          - dict           → returned as-is (common case, zero overhead).
+          - str            → attempt json.loads; use result only if it is a dict.
+          - anything else  → empty dict (let the tool's own validation handle it).
+        A malformed params value degrades the step to an empty-params call rather
+        than crashing the whole answer() invocation.
+        """
+        if isinstance(raw, dict):
+            return raw
+        if isinstance(raw, str):
+            try:
+                parsed = json.loads(raw)
+                if isinstance(parsed, dict):
+                    return parsed
+            except (json.JSONDecodeError, ValueError):
+                pass
+        return {}
+
     def _execute_tool(self, action: dict) -> tuple[dict, str]:
         """Execute a validated tool action. Returns (result_dict, route_str)."""
         tool = action.get("tool", "")
         operation = action.get("operation", "")
-        params = action.get("params") or {}
+        params = self._coerce_params(action.get("params"))
         if "squawk" in params and params["squawk"] is not None:
             params["squawk"] = str(params["squawk"])
 

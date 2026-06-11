@@ -37,7 +37,8 @@ Stale lineage is identified only through explicit tags such as
 | Full-data MLP CV RMSE | **355.04 ± 89.12 kg** (4 folds, 11,037 flights) | `outputs/ablation-full/challenger_results.json` |
 | Full-data HistGBR CV RMSE | **142.20 ± 22.68 kg** (4 folds, 11,037 flights) | `outputs/ablation-full/challenger_results.json` |
 | Full-scale RMSE (11,037 flights) | **pending owner Databricks run** | `ml/train_fullscale.py` |
-| PRC-2025 rank-phase RMSE | **pending owner Databricks run** | `ml/score_rank.py` |
+| Rank-phase RMSE — HistGBR (held-out, 24,289 intervals / 1,888 flights) | **248.62 kg** | `ml/score_rank.py`; source: `data/raw/prc_2025/rank_score_result.json` |
+| Rank-phase RMSE — MLP (held-out, same set) | **411.79 kg** | `ml/score_rank.py` |
 
 ---
 
@@ -325,13 +326,32 @@ make ml-serve-smoke      # start FastAPI serving + run smoke test (2/2 expected)
 
 ---
 
+## Rank-phase results (close-out, 2026-06-11)
+
+The held-out rank score has been measured. Train on 131,530 training intervals;
+predict on **24,289 rank intervals / 1,888 flights** (`fuel_rank.parquet`, TRUE
+labels):
+
+| Model | Rank-phase RMSE (kg) |
+|---|---|
+| **HistGBR** | **248.62** |
+| MLP | 411.79 |
+
+HistGBR wins by approximately 163 kg. The held-out rank RMSE (248.62 kg) is
+higher than the in-sample CV RMSE (142.20 kg), which is expected — the rank
+phase is a true held-out generalization test on separate flights. Source
+artifact: `data/raw/prc_2025/rank_score_result.json`.
+
+The JOAS-2026 published baseline for the rank phase is not available in this
+repository. The 248.62 kg figure is reported standalone; a like-for-like
+comparison awaits the owner supplying that figure.
+
 ## Pending (owner-cloud)
 
-The following results require the owner to run the full-scale pipeline on Databricks
-with real PRC-2025 data:
+The following result still requires the owner to run the full-scale pipeline on
+Databricks:
 
-1. **Full-scale RMSE** (`ml/train_fullscale.py` on 11,037 flights)
-2. **Standalone rank-phase RMSE** (`ml/score_rank.py`)
+1. **Full-scale RMSE** (`ml/train_fullscale.py` on 11,037 flights, Databricks)
 
-Both are clearly labeled as pending in this README and in
-`docs/research-findings.md`.
+The standalone rank-phase RMSE has been measured (see above). The JOAS-2026
+rank-phase baseline comparison remains open pending that published figure.

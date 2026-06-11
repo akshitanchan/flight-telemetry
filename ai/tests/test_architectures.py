@@ -656,6 +656,62 @@ class TestPlanExecute(ArchTestBase):
         self.assertIn("plan_steps", a.meta)
         self.assertEqual(a.meta["plan_steps"], 1)
 
+    # -- Regression: non-dict params from live LLM must not crash (issue: live-LLM str params) --
+
+    def test_params_as_string_does_not_crash(self):
+        """A live LLM may emit params as a JSON string instead of an object.
+        _execute_step must coerce it and return a valid Answer without raising.
+        """
+        # params is a string — the exact shape that triggered the live crash
+        plan_with_str_params = json.dumps({
+            "steps": [{"tool": "analytics", "operation": "count_emergencies",
+                       "params": '{"squawk": "7700"}'}]
+        })
+        strat = self._make([plan_with_str_params, "Coerced fine."])
+        a = strat.answer("How many 7700 events?")
+        # Must not raise; the coerced params {"squawk": "7700"} yields the real answer.
+        self.assertIsInstance(a, __import__("ai.agent.base", fromlist=["Answer"]).Answer)
+        self.assertIn("source:", a.answer_text)
+        # params was a valid JSON-encoded dict, so coercion recovers the squawk filter
+        self.assertEqual(a.result["answer"], 2)
+
+    def test_params_as_bare_string_scalar_does_not_crash(self):
+        """A params value that is a plain string (not a JSON object) must degrade
+        to empty params rather than crash — the tool is called with no arguments.
+        """
+        plan_with_garbage_params = json.dumps({
+            "steps": [{"tool": "analytics", "operation": "count_emergencies",
+                       "params": "7700"}]
+        })
+        strat = self._make([plan_with_garbage_params, "Degraded fine."])
+        a = strat.answer("Emergency count?")
+        self.assertIsInstance(a, __import__("ai.agent.base", fromlist=["Answer"]).Answer)
+        self.assertIn("source:", a.answer_text)
+        # No squawk filter → total count
+        self.assertEqual(a.result["answer"], 3)
+
+    def test_params_as_none_does_not_crash(self):
+        """A params value of None (step omits params field) must degrade to {}."""
+        plan_with_none_params = json.dumps({
+            "steps": [{"tool": "analytics", "operation": "count_emergencies",
+                       "params": None}]
+        })
+        strat = self._make([plan_with_none_params, "None params fine."])
+        a = strat.answer("Emergency count?")
+        self.assertIsInstance(a, __import__("ai.agent.base", fromlist=["Answer"]).Answer)
+        self.assertIn("source:", a.answer_text)
+        self.assertEqual(a.result["answer"], 3)
+
+    def test_well_formed_dict_params_unaffected(self):
+        """Sanity guard: well-formed dict params behave exactly as before the fix."""
+        plan = json.dumps({
+            "steps": [{"tool": "analytics", "operation": "count_emergencies",
+                       "params": {"squawk": "7500"}}]
+        })
+        strat = self._make([plan, "1 hijack."])
+        a = strat.answer("Any 7500 events?")
+        self.assertEqual(a.result["answer"], 1)
+
 
 # ---------------------------------------------------------------------------
 # Cross-architecture grounding invariant
