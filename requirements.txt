@@ -38,6 +38,10 @@ opentelemetry-instrumentation-fastapi>=0.45b0
 # Drift monitoring (ml/drift.py — ml-08, W4.2)
 evidently>=0.7.21
 
+# Dashboard (ws5-01, W4.5) — Streamlit UI
+# streamlit supports Python 3.12+ including 3.14; no version marker needed.
+streamlit>=1.30
+
 # dbt (ds-06, W4.3) — BigQuery incremental models
 # dbt-core/dbt-bigquery/dbt-duckdb have no Python 3.14 wheels (mashumaro
 # dependency). The markers below make this file safe to install on Python 3.14
