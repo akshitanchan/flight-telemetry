@@ -72,22 +72,36 @@ ExperimentResult = dict[str, Any]
 # Data setup
 # ---------------------------------------------------------------------------
 
-def _setup_seed(con: duckdb.DuckDBPyConnection) -> None:
+def _setup_seed(
+    con: duckdb.DuckDBPyConnection,
+    silver_path: "Path | None" = None,
+) -> None:
     """Load the silver JSONL into a seed DuckDB table called raw_silver.
 
     Mirrors setup_base_data() in data/experiments/refresh_strategy.py.
     The seed is loaded only once per connection; subsequent calls to
     generate_scale() inflate it via CROSS JOIN.
+
+    Parameters
+    ----------
+    con:
+        Active DuckDB connection.
+    silver_path:
+        Path to the silver JSONL file.  When *None* (the production default)
+        the module-level ``SILVER_PATH`` (``data/processed/silver_flight_state.jsonl``)
+        is used.  Pass an explicit path in tests to avoid depending on the
+        generated artifact being present on disk.
     """
-    if not SILVER_PATH.exists():
+    path = silver_path if silver_path is not None else SILVER_PATH
+    if not path.exists():
         raise FileNotFoundError(
-            f"Silver data not found at {SILVER_PATH}. "
+            f"Silver data not found at {path}. "
             "Run 'make data-local-silver' first."
         )
-    logger.info("Loading silver seed from %s", SILVER_PATH)
+    logger.info("Loading silver seed from %s", path)
     con.execute(
         f"CREATE TABLE IF NOT EXISTS raw_silver "
-        f"AS SELECT * FROM read_json_auto('{SILVER_PATH}')"
+        f"AS SELECT * FROM read_json_auto('{path}')"
     )
 
 
@@ -356,6 +370,7 @@ def run_experiment(
     inc_pct: float = 0.10,
     *,
     save_json: bool = True,
+    silver_path: "Path | None" = None,
 ) -> list[ExperimentResult]:
     """Run the experiment over multiple row-count scales.
 
@@ -367,13 +382,16 @@ def run_experiment(
         Fraction of rows treated as the incremental batch.
     save_json:
         If True, write results to experiments/outputs/harness_results.json.
+    silver_path:
+        Override the silver JSONL path.  *None* uses the production default
+        (``data/processed/silver_flight_state.jsonl``).  Useful in tests.
 
     Returns
     -------
     List of ExperimentResult dicts, one per scale point.
     """
     con = duckdb.connect()
-    _setup_seed(con)
+    _setup_seed(con, silver_path=silver_path)
 
     results: list[ExperimentResult] = []
     for size in sizes:
