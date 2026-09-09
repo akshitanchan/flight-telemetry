@@ -96,6 +96,10 @@ test-data: ## Run data-layer tests
 test-cloud: ## Run cloud data-layer tests (237 tests, offline)
 	$(PYTHON) -m pytest data/cloud/ -v
 
+.PHONY: airflow-test
+airflow-test: ## Run the medallion dag structure tests inside the astro container
+	cd airflow && astro dev pytest
+
 # ---- Systems ----------------------------------------------
 .PHONY: systems-replay-sample
 systems-replay-sample: data-sample ## Replay historical sample through ingestion
