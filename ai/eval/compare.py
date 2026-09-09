@@ -15,8 +15,9 @@ latency, and tokens. The CI gate is split into two tiers:
     - Cost/latency/token metrics on the extended tier and LLM architectures
 
 LLM architectures (SingleShotRAGStrategy, ReActStrategy, PlanExecuteStrategy,
-OllamaStrategy) are AVAILABILITY-GATED: when no provider is reachable they are
-listed as "skipped (no provider)" and never cause CI failure.
+LangGraphPlanExecuteStrategy, OllamaStrategy) are AVAILABILITY-GATED: when no
+provider is reachable they are listed as "skipped (no provider)" and never
+cause CI failure.
 
 Usage:
     python -m ai.eval.compare
@@ -42,6 +43,9 @@ from ai.agent.ollama_llm import OllamaStrategy
 from ai.agent.single_shot_rag import SingleShotRAGStrategy
 from ai.agent.react import ReActStrategy
 from ai.agent.plan_execute import PlanExecuteStrategy
+# imported directly (not via ai.agent) so the dashboard's import of ai.agent
+# does not also pull in langgraph.
+from ai.agent.langgraph_plan_execute import LangGraphPlanExecuteStrategy
 from ai.eval.checks import run_check
 from ai.eval.faithfulness import FaithfulnessChecker
 from ai.obs.costs import cost_usd
@@ -410,6 +414,15 @@ def compare(
                 "plan_execute strategy skipped (no provider): "
                 "no OPENAI_API_KEY or OLLAMA_HOST reachable"
             )
+
+        # LangGraphPlanExecuteStrategy
+        if LangGraphPlanExecuteStrategy.is_available():
+            llm_strategies.append(LangGraphPlanExecuteStrategy(analytics, retrieval))
+        else:
+            notes.append(
+                "langgraph_plan_execute strategy skipped (no provider): "
+                "no OPENAI_API_KEY or OLLAMA_HOST reachable"
+            )
     else:
         notes.append("LLM strategies skipped (--no-llm flag set)")
 
@@ -485,7 +498,7 @@ def _print_table(core_summaries, all_summaries, notes, injection_result):
     _print_md_table(all_summaries, advisory_cols)
 
     # -- Live architecture comparison: extended tier only --
-    architecture_names = {"single_shot_rag", "react", "plan_execute"}
+    architecture_names = {"single_shot_rag", "react", "plan_execute", "langgraph_plan_execute"}
     extended_architecture_summaries = [
         _tier_summary(summary, "extended")
         for summary in all_summaries
@@ -559,7 +572,7 @@ def main():
 
     # Persist JSON output.
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    architecture_names = {"single_shot_rag", "react", "plan_execute"}
+    architecture_names = {"single_shot_rag", "react", "plan_execute", "langgraph_plan_execute"}
     extended_architecture_summaries = [
         _tier_summary(summary, "extended")
         for summary in all_summaries
