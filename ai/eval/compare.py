@@ -212,10 +212,12 @@ def _tier_summary(summary, tier):
 # Injection metrics — shared helper (used by both compare.py and test_guardrails.py)
 # ---------------------------------------------------------------------------
 
-def compute_injection_metrics(analytics, retrieval, corpus_path, injections_path):
+def compute_injection_metrics(analytics, retrieval, corpus_path, injections_path, inner=None):
     """Run the injection suite through GuardedStrategy and compute TWO honest metrics.
 
-    The inner strategy is RuleBasedStrategy (deterministic, always offline).
+    The inner strategy defaults to RuleBasedStrategy (deterministic, always
+    offline); pass ``inner`` to measure a different strategy's neutralisation
+    of the same probes (e.g. a provider-backed architecture for ai/eval/matrix.py).
 
     Metric definitions
     ------------------
@@ -267,7 +269,7 @@ def compute_injection_metrics(analytics, retrieval, corpus_path, injections_path
         inj_data = json.load(f)
     entries = inj_data.get("entries", [])
 
-    inner = RuleBasedStrategy(analytics, retrieval)
+    inner = inner or RuleBasedStrategy(analytics, retrieval)
     guarded = GuardedStrategy(inner, corpus_path=corpus_path)
 
     per_entry = []

@@ -13,6 +13,10 @@ PYTHON := $(shell if [ -x .venv/bin/python3 ]; then echo .venv/bin/python3; else
 # ---- Tunables (override on CLI, e.g. `make ml-baseline-real LIMIT=1000 EPOCHS=15`) ----
 LIMIT   ?= 500
 EPOCHS  ?= 10
+# DRY_RUN: set to any non-empty value to make `eval` replay cassettes offline
+DRY_RUN   ?=
+# EVAL_ARGS: extra flags passed through to ai.eval.matrix, e.g. --providers openai
+EVAL_ARGS ?=
 
 # ---- MLflow / registry tunables (override as needed) ------
 # RUN_ID: MLflow run_id for validate-fullscale-run and ml-promote
@@ -197,6 +201,10 @@ ai-eval-small: ## Run AI answer-path eval on the golden set (deterministic, offl
 .PHONY: ai-compare-small
 ai-compare-small: ## Compare AI answer strategies on golden set (deterministic + Ollama if available)
 	$(PYTHON) -m ai.eval.compare
+
+.PHONY: eval
+eval: ## Run the architecture x provider eval matrix and write ai/eval/results.md
+	$(PYTHON) -m ai.eval.matrix $(if $(DRY_RUN),--dry-run,) $(EVAL_ARGS)
 
 # ---- Dashboard --------------------------------------------
 .PHONY: test-dashboard
