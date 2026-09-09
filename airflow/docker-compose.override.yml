@@ -1,0 +1,26 @@
+# merged in by astro dev start. the repo root is mounted so the dag runs the
+# repo's own modules and the dbt profile checked in under data/cloud/dbt.
+# astro config cannot move the api-server port on this cli and runtime, so the
+# 8080 to 8090 remap lives here; !override replaces the base ports list instead
+# of appending to it.
+
+x-repo-mount: &repo-mount
+  volumes:
+    - ../:/usr/local/airflow/repo:rw
+  environment:
+    PYTHONPATH: /usr/local/airflow/repo
+    DBT_PROFILES_DIR: /usr/local/airflow/repo/data/cloud/dbt/flight_telemetry
+
+services:
+  api-server:
+    ports: !override
+      - 8090:8080
+
+  scheduler:
+    <<: *repo-mount
+
+  triggerer:
+    <<: *repo-mount
+
+  dag-processor:
+    <<: *repo-mount

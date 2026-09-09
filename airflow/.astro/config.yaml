@@ -1,0 +1,6 @@
+postgres:
+    port: "5440"
+project:
+    name: flight-telemetry
+# the api-server port is remapped in docker-compose.override.yml; this cli
+# ignores webserver.port with the airflow 3 runtime

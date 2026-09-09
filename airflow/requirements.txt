@@ -1,0 +1,21 @@
+# dependencies for the flight-telemetry DAG: medallion transforms + dbt run/test
+# kept minimal on purpose — do not add the root requirements.txt (torch, mlflow,
+# streamlit, etc. have no business in this image).
+
+# dbt against the warehouse (snowflake) and the existing bigquery marts
+dbt-snowflake>=1.12,<1.13
+dbt-bigquery>=1.12,<1.13
+
+# schema validation between medallion hops
+jsonschema>=4.20
+
+# spatial indexing (bronze-to-silver transform)
+h3>=4.0
+pygeohash>=3.0
+
+# dataframe / columnar IO shared with the repo's transform code
+pandas>=2.0.0
+pyarrow>=14.0.0
+
+# direct snowflake access outside of dbt (connection checks, loads)
+snowflake-connector-python>=3.6

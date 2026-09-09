@@ -286,3 +286,17 @@ crash.*.log
 # GCP service-account JSON keys — must never be committed
 *-sa-key.json
 *-credentials.json
+
+# ===========================================================
+# Airflow (astro cli project) — airflow/
+# ===========================================================
+
+# task/scheduler logs. astro cli 1.45 stores these in a docker volume rather
+# than bind-mounting a host directory, but this stays as a guard in case a
+# future cli version (or a manual override) writes them to disk again.
+airflow/logs/
+
+# per-machine lock file for .astro/config.yaml, not part of the checked-in
+# project config (project name and ports live in .astro/config.yaml itself,
+# which stays tracked)
+airflow/.astro/config.yaml.lock
