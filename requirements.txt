@@ -42,14 +42,15 @@ evidently>=0.7.21
 # streamlit supports Python 3.12+ including 3.14; no version marker needed.
 streamlit>=1.30
 
-# dbt (ds-06, W4.3) — BigQuery incremental models
-# dbt-core/dbt-bigquery/dbt-duckdb have no Python 3.14 wheels (mashumaro
-# dependency). The markers below make this file safe to install on Python 3.14
-# (packages are silently skipped). dbt runs in CI (Python 3.12) and any
-# dedicated 3.10–3.13 venv. dbt-bigquery pins a compatible dbt-core version.
-dbt-core>=1.8,<2.0 ; python_version < "3.14"
-dbt-bigquery>=1.8,<2.0 ; python_version < "3.14"
+# dbt (ds-06, W4.3) — BigQuery + Snowflake incremental models
+# dbt-core 1.12.4 and the 1.12 adapters install on Python 3.14; no version
+# markers needed.
+dbt-core>=1.8,<2.0
+dbt-bigquery>=1.8,<2.0
+dbt-snowflake>=1.8,<2.0
 # dbt-duckdb: required for offline native unit test execution (--target duckdb_unit).
 # dbt unit tests use DuckDB locally; the duckdb_unit profile avoids the
 # BigQuery adapter's mandatory relation-cache call that requires live credentials.
-dbt-duckdb>=1.8,<2.0 ; python_version < "3.14"
+dbt-duckdb>=1.8,<2.0
+# snowflake-connector-python: used directly by data/cloud/snowflake/load_landing.py.
+snowflake-connector-python>=3.12
