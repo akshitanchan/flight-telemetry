@@ -97,6 +97,9 @@ name produced `flight_telemetry_`. This does not affect correctness; adjust the
 `generate_schema_name` macro or set the custom schema to an empty string to
 land the marts directly in `flight_telemetry`.
 
+Fixed by removing the empty `+schema: ""` from `dbt_project.yml`; marts now
+land directly in the target dataset/schema with no trailing underscore.
+
 ### CLI flag correction
 
 The runbook uses `--dry-run` in the `bq query` examples. The correct BigQuery

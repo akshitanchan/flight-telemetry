@@ -17,8 +17,8 @@ sources:
       These are the raw-loaded counterparts of the aggregates produced by
       data/transforms/silver_to_gold.py.  dbt marts read from here and
       write into the final flight_telemetry.gold_* destination tables.
-    database: "{{ env_var('BIGQUERY_PROJECT', 'dummy-project') }}"
-    schema: flight_telemetry
+    database: "{{ target.database }}"
+    schema: "{{ target.schema }}"
 
     tables:
       - name: gold_airport_congestion_landing

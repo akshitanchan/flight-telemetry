@@ -2,8 +2,8 @@ name: "flight_telemetry"
 version: "1.0.0"
 config-version: 2
 
-# Profile matches profiles.example.yml (owner copies to ~/.dbt/profiles.yml or
-# points DBT_PROFILES_DIR at the directory containing a real profiles.yml).
+# Profile matches profiles.yml in this directory (dbt finds it automatically
+# since it lives in the invocation directory).
 profile: "flight_telemetry"
 
 # Project layout
@@ -29,7 +29,6 @@ models:
     # The staging/ directory contains only sources.yml (no SQL models).
     marts:
       +materialized: incremental
-      +schema: ""       # empty → writes directly into the profile dataset
       +on_schema_change: append_new_columns
 
 # ---------------------------------------------------------------------------
