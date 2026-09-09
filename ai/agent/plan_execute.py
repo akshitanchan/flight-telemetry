@@ -34,16 +34,15 @@ LLM client
 ----------
 Same injectable pattern as the other architectures: constructor arg ``llm``
 accepts any callable ``(messages) -> (str, int)``; None falls back to
-env-based provider resolution (OPENAI_API_KEY or OLLAMA_HOST).
+``ai.providers.build_default`` for env-based provider resolution.
 """
 
 import inspect
 import json
 import logging
-import os
-import urllib.request
 
 from ai.agent.base import Answer, AnswerStrategy
+from ai.providers import build_default
 
 logger = logging.getLogger(__name__)
 
@@ -87,74 +86,6 @@ in the results. If the results are insufficient, say so."""
 
 
 # ---------------------------------------------------------------------------
-# Shared LLM plumbing
-# ---------------------------------------------------------------------------
-
-def _openai_chat(messages, api_key, model="gpt-4o-mini", timeout=60):
-    payload = {
-        "model": model,
-        "messages": messages,
-        "temperature": 0,
-        "max_tokens": 512,
-    }
-    req = urllib.request.Request(
-        "https://api.openai.com/v1/chat/completions",
-        data=json.dumps(payload).encode(),
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}",
-        },
-    )
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        data = json.load(r)
-    content = data["choices"][0]["message"]["content"]
-    usage = data.get("usage", {})
-    tokens = usage.get("prompt_tokens", 0) + usage.get("completion_tokens", 0)
-    return content, tokens
-
-
-def _ollama_chat(messages, host, model, timeout=120):
-    payload = {
-        "model": model,
-        "messages": messages,
-        "stream": False,
-        "format": "json",
-        "options": {"temperature": 0},
-    }
-    req = urllib.request.Request(
-        f"{host}/api/chat",
-        data=json.dumps(payload).encode(),
-        headers={"Content-Type": "application/json"},
-    )
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        resp = json.load(r)
-    content = resp.get("message", {}).get("content", "")
-    tokens = resp.get("prompt_eval_count", 0) + resp.get("eval_count", 0)
-    return content, tokens
-
-
-def _build_default_llm():
-    api_key = os.environ.get("OPENAI_API_KEY", "")
-    if api_key:
-        model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
-        def _call(messages):
-            return _openai_chat(messages, api_key, model=model)
-        return _call, f"openai:{model}"
-    host = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
-    try:
-        from ai.agent.ollama_llm import _list_models, pick_model  # type: ignore
-        names = _list_models(host, timeout=2)
-        model = os.environ.get("OLLAMA_MODEL") or pick_model(names)
-        if model:
-            def _call(messages):
-                return _ollama_chat(messages, host, model)
-            return _call, f"ollama:{model}"
-    except Exception:
-        pass
-    return None, None
-
-
-# ---------------------------------------------------------------------------
 # Strategy
 # ---------------------------------------------------------------------------
 
@@ -185,14 +116,14 @@ class PlanExecuteStrategy(AnswerStrategy):
 
     @classmethod
     def is_available(cls) -> bool:
-        fn, _ = _build_default_llm()
+        fn, _ = build_default()
         return fn is not None
 
     def _get_llm(self):
         if self._llm_override is not None:
             return self._llm_override, "stub"
         if self._llm is None:
-            fn, name = _build_default_llm()
+            fn, name = build_default()
             if fn is None:
                 raise RuntimeError(
                     "PlanExecuteStrategy: no LLM provider available. "

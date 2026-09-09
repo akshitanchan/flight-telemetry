@@ -169,8 +169,9 @@ class TestAvailabilityGating(unittest.TestCase):
 
     def test_single_shot_rag_unavailable_without_env(self):
         import os
-        from ai.agent.single_shot_rag import SingleShotRAGStrategy, _build_default_llm
-        # Without real env vars and no reachable Ollama, _build_default_llm returns None.
+        from ai.agent.single_shot_rag import SingleShotRAGStrategy
+        from ai.providers import build_default  # noqa: F401
+        # Without real env vars and no reachable Ollama, build_default returns (None, None).
         # We can test this indirectly: with OPENAI_API_KEY unset and Ollama likely unreachable.
         # The test is defensive: if a real provider IS reachable in this environment, skip.
         api_key = os.environ.get("OPENAI_API_KEY", "")

@@ -23,10 +23,9 @@ LLM client
 ----------
 Injectable via the ``llm`` constructor argument (any callable that accepts
 ``messages: list[dict]`` and returns ``(content_str, token_count_int)``).
-When ``llm`` is None the class builds a default client from the environment:
-  - OPENAI_API_KEY present -> OpenAI via stdlib urllib (no openai package).
-  - OLLAMA_HOST present (or default reachable) and model available -> Ollama.
-  - Neither available -> strategy is unavailable; answer() raises RuntimeError.
+When ``llm`` is None the class resolves a default provider via
+``ai.providers.build_default`` (OpenAI if configured, else a reachable
+Ollama server, else unavailable; answer() raises RuntimeError).
 
 No sockets are opened at import time; the default client is built lazily on
 the first ``answer()`` call (or can be probed with ``is_available()``).
@@ -34,10 +33,9 @@ the first ``answer()`` call (or can be probed with ``is_available()``).
 
 import inspect
 import json
-import os
-import urllib.request
 
 from ai.agent.base import Answer, AnswerStrategy
+from ai.providers import build_default
 
 # ---------------------------------------------------------------------------
 # Shared routing system prompt (identical schema to ollama_llm for consistency)
@@ -66,78 +64,6 @@ The user asked a question. You are given retrieved document snippets from a
 trusted corpus as context. Answer concisely and factually, drawing ONLY on
 the provided context. Do not invent numbers or facts not present in the context.
 Keep the answer under 3 sentences."""
-
-
-# ---------------------------------------------------------------------------
-# Provider helpers (stdlib urllib only — no openai package)
-# ---------------------------------------------------------------------------
-
-def _openai_chat(messages, api_key, model="gpt-4o-mini", timeout=60):
-    """Call the OpenAI chat-completions endpoint via stdlib urllib."""
-    payload = {
-        "model": model,
-        "messages": messages,
-        "temperature": 0,
-        "max_tokens": 256,
-    }
-    req = urllib.request.Request(
-        "https://api.openai.com/v1/chat/completions",
-        data=json.dumps(payload).encode(),
-        headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}",
-        },
-    )
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        data = json.load(r)
-    content = data["choices"][0]["message"]["content"]
-    usage = data.get("usage", {})
-    tokens = usage.get("prompt_tokens", 0) + usage.get("completion_tokens", 0)
-    return content, tokens
-
-
-def _ollama_chat(messages, host, model, timeout=120):
-    """Call the Ollama chat endpoint via stdlib urllib."""
-    payload = {
-        "model": model,
-        "messages": messages,
-        "stream": False,
-        "options": {"temperature": 0},
-    }
-    req = urllib.request.Request(
-        f"{host}/api/chat",
-        data=json.dumps(payload).encode(),
-        headers={"Content-Type": "application/json"},
-    )
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        resp = json.load(r)
-    content = resp.get("message", {}).get("content", "")
-    tokens = resp.get("prompt_eval_count", 0) + resp.get("eval_count", 0)
-    return content, tokens
-
-
-def _build_default_llm():
-    """Return (callable, provider_name) or (None, None) if no provider available."""
-    api_key = os.environ.get("OPENAI_API_KEY", "")
-    if api_key:
-        model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
-        def _call(messages):
-            return _openai_chat(messages, api_key, model=model)
-        return _call, f"openai:{model}"
-
-    # Try Ollama
-    host = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
-    try:
-        from ai.agent.ollama_llm import _list_models, pick_model  # type: ignore
-        names = _list_models(host, timeout=2)
-        model = os.environ.get("OLLAMA_MODEL") or pick_model(names)
-        if model:
-            def _call(messages):
-                return _ollama_chat(messages, host, model)
-            return _call, f"ollama:{model}"
-    except Exception:
-        pass
-    return None, None
 
 
 # ---------------------------------------------------------------------------
@@ -174,7 +100,7 @@ class SingleShotRAGStrategy(AnswerStrategy):
     @classmethod
     def is_available(cls) -> bool:
         """Return True if at least one LLM provider is reachable."""
-        fn, _ = _build_default_llm()
+        fn, _ = build_default(max_tokens=256)
         return fn is not None
 
     # ------------------------------------------------------------------
@@ -185,7 +111,7 @@ class SingleShotRAGStrategy(AnswerStrategy):
         if self._llm_override is not None:
             return self._llm_override, "stub"
         if self._llm is None:
-            fn, name = _build_default_llm()
+            fn, name = build_default(max_tokens=256)
             if fn is None:
                 raise RuntimeError(
                     "SingleShotRAGStrategy: no LLM provider available. "
