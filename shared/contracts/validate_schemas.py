@@ -9,6 +9,7 @@ Usage:
     python validate_schemas.py                    # run all validations
     python validate_schemas.py --schema silver    # run only silver schema tests
     python validate_schemas.py --verbose          # show per-record detail
+    python validate_schemas.py --data f.jsonl --schema silver_flight_state  # validate a JSONL file
 
 Exit codes:
     0  all validations passed
@@ -65,6 +66,27 @@ SCHEMA_FIXTURE_MAP = [
 def load_json(path: Path) -> dict | list:
     with open(path) as f:
         return json.load(f)
+
+
+def validate_data_file(schema: dict, data_path: Path, verbose: bool) -> bool:
+    # stops at the first violation, unlike the fixture checks below
+    validator = Draft202012Validator(schema)
+    count = 0
+    with open(data_path) as f:
+        for lineno, line in enumerate(f, start=1):
+            line = line.strip()
+            if not line:
+                continue
+            record = json.loads(line)
+            errors = list(validator.iter_errors(record))
+            if errors:
+                print(f"FAIL line {lineno}: {errors[0].message}")
+                return False
+            count += 1
+            if verbose:
+                print(f"  OK line {lineno}")
+    print(f"{count} records validated, all passed")
+    return True
 
 
 def validate_valid_fixtures(
@@ -181,9 +203,26 @@ def main():
         help="Filter to schemas containing this substring (e.g. 'silver', 'gold')",
     )
     parser.add_argument(
+        "--data",
+        type=Path,
+        default=None,
+        help="JSONL file to validate against --schema (exact contract name)",
+    )
+    parser.add_argument(
         "--verbose", "-v", action="store_true", help="Show per-record detail"
     )
     args = parser.parse_args()
+
+    if args.data:
+        if not args.schema:
+            print("ERROR: --data requires --schema <name>")
+            sys.exit(1)
+        schema_path = CONTRACTS_DIR / f"{args.schema}.schema.json"
+        if not schema_path.exists():
+            print(f"ERROR: schema not found: {schema_path}")
+            sys.exit(1)
+        success = validate_data_file(load_json(schema_path), args.data, args.verbose)
+        sys.exit(0 if success else 1)
 
     success = run_tests(args.schema, args.verbose)
     sys.exit(0 if success else 1)
