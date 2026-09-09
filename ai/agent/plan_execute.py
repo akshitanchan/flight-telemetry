@@ -85,6 +85,41 @@ provided tool results. Do not invent numbers, aircraft IDs, or names not present
 in the results. If the results are insufficient, say so."""
 
 
+def _valid_step(step: dict, analytics) -> bool:
+    """True if step's tool/operation combination is whitelisted (else logs and returns False)."""
+    tool = step.get("tool", "")
+    operation = step.get("operation", "")
+    if tool == "analytics" and operation in analytics.operations:
+        return True
+    if tool == "retrieval" and operation in ("search",):
+        return True
+    logger.warning("plan_execute: dropping invalid step %r", step)
+    return False
+
+
+def _coerce_params(raw) -> dict:
+    """Coerce an LLM-supplied params value to a plain dict.
+
+    The LLM is untrusted and occasionally emits params as a JSON string,
+    a bare scalar, or None instead of an object.  We normalise defensively:
+      - dict           → returned as-is (common case, zero overhead).
+      - str            → attempt json.loads; use result only if it is a dict.
+      - anything else  → empty dict (let the tool's own validation handle it).
+    A malformed params value degrades the step to an empty-params call rather
+    than crashing the whole answer() invocation.
+    """
+    if isinstance(raw, dict):
+        return raw
+    if isinstance(raw, str):
+        try:
+            parsed = json.loads(raw)
+            if isinstance(parsed, dict):
+                return parsed
+        except (json.JSONDecodeError, ValueError):
+            pass
+    return {}
+
+
 # ---------------------------------------------------------------------------
 # Strategy
 # ---------------------------------------------------------------------------
@@ -156,50 +191,17 @@ class PlanExecuteStrategy(AnswerStrategy):
 
     def _validate_steps(self, steps: list[dict]) -> list[dict]:
         """Filter steps to only those with valid tool/operation combinations."""
-        valid = []
-        for step in steps:
-            tool = step.get("tool", "")
-            operation = step.get("operation", "")
-            if tool == "analytics" and operation in self.analytics.operations:
-                valid.append(step)
-            elif tool == "retrieval" and operation in ("search",):
-                valid.append(step)
-            else:
-                logger.warning("plan_execute: dropping invalid step %r", step)
-        return valid
+        return [step for step in steps if _valid_step(step, self.analytics)]
 
     # ------------------------------------------------------------------
     # Phase 2: Execute
     # ------------------------------------------------------------------
 
-    @staticmethod
-    def _coerce_params(raw) -> dict:
-        """Coerce an LLM-supplied params value to a plain dict.
-
-        The LLM is untrusted and occasionally emits params as a JSON string,
-        a bare scalar, or None instead of an object.  We normalise defensively:
-          - dict           → returned as-is (common case, zero overhead).
-          - str            → attempt json.loads; use result only if it is a dict.
-          - anything else  → empty dict (let the tool's own validation handle it).
-        A malformed params value degrades the step to an empty-params call rather
-        than crashing the whole answer() invocation.
-        """
-        if isinstance(raw, dict):
-            return raw
-        if isinstance(raw, str):
-            try:
-                parsed = json.loads(raw)
-                if isinstance(parsed, dict):
-                    return parsed
-            except (json.JSONDecodeError, ValueError):
-                pass
-        return {}
-
     def _execute_step(self, step: dict) -> tuple[dict, str]:
         """Execute one validated step. Returns (result_dict, route_str)."""
         tool = step.get("tool", "")
         operation = step.get("operation", "")
-        params = self._coerce_params(step.get("params"))
+        params = _coerce_params(step.get("params"))
         if "squawk" in params and params["squawk"] is not None:
             params["squawk"] = str(params["squawk"])
 
