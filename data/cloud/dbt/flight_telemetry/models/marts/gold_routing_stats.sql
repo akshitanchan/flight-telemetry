@@ -22,6 +22,7 @@
   included in the MERGE so corrected route rows remain updateable.
 
   Schema contract (C3 locked):
+    note: timestamp columns land as timestamp_tz on snowflake to match bigquery timestamp
     icao24           STRING    NOT NULL
     callsign         STRING
     window_start     TIMESTAMP NOT NULL

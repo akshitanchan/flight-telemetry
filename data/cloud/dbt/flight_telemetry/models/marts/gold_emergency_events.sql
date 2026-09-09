@@ -24,6 +24,7 @@
   Squawk domain: {"7500", "7600", "7700"} — enforced by schema.yml accepted_values test.
 
   Schema contract (C3 locked):
+    note: timestamp columns land as timestamp_tz on snowflake to match bigquery timestamp
     icao24          STRING    NOT NULL
     callsign        STRING
     squawk          STRING    NOT NULL  -- "7500" | "7600" | "7700"
