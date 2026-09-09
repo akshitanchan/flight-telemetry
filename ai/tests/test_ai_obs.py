@@ -312,6 +312,30 @@ class TestCostCalc(unittest.TestCase):
         usd_upper = self.cost_usd("GPT-4O-MINI", 1000)
         self.assertAlmostEqual(usd_lower, usd_upper, places=10)
 
+    def test_split_gpt4o_mini_input_and_output(self):
+        """1000 input + 1000 output tokens of gpt-4o-mini: 0.000150 + 0.000600."""
+        from ai.obs.costs import cost_split_usd
+        usd = cost_split_usd("gpt-4o-mini", 1000, 1000)
+        self.assertAlmostEqual(usd, 0.00075, places=8)
+
+    def test_split_bedrock_llama_bare_id(self):
+        """Bedrock Llama 3.1 8B, bare id: 1000 in + 1000 out = 0.00044."""
+        from ai.obs.costs import cost_split_usd
+        usd = cost_split_usd("meta.llama3-1-8b-instruct-v1:0", 1000, 1000)
+        self.assertAlmostEqual(usd, 0.00044, places=8)
+
+    def test_split_bedrock_llama_prefixed_id(self):
+        """Bedrock Llama 3.1 8B with the bedrock:us. prefix: same total cost."""
+        from ai.obs.costs import cost_split_usd
+        usd = cost_split_usd("bedrock:us.meta.llama3-1-8b-instruct-v1:0", 1000, 1000)
+        self.assertAlmostEqual(usd, 0.00044, places=8)
+
+    def test_split_unknown_model_returns_zero(self):
+        """Unknown model costs nothing, even with nonzero token counts."""
+        from ai.obs.costs import cost_split_usd
+        usd = cost_split_usd("my-private-model-v99", 1000, 1000)
+        self.assertEqual(usd, 0.0)
+
 
 # ---------------------------------------------------------------------------
 # 5. record()

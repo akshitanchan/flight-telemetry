@@ -12,6 +12,8 @@ Price table (USD per 1 000 tokens, input+output blended rate):
                           blended ~$0.15/1M for routing-heavy workloads)
   - openai:gpt-4o        $0.005000/1K tokens  (input $5/1M, output $15/1M, blended)
   - text-embedding-3-small $0.000020/1K tokens ($0.02/1M)
+  - bedrock:meta.llama3-1-8b-instruct-v1:0 $0.00022/1K tokens (input+output,
+                          $0.22/1M each, on-demand, checked 2026-09-10)
   - ollama:*             $0.000000/1K tokens  (local, no cost)
   - unknown/other        $0.000000/1K tokens  (conservative: do not invent costs)
 
@@ -29,6 +31,9 @@ Public API
 ----------
 ``cost_usd(model: str, tokens: int) -> float``
     Return the estimated USD cost for ``tokens`` tokens on ``model``.
+
+``cost_split_usd(model: str, input_tokens: int, output_tokens: int) -> float``
+    Return the estimated USD cost given separate input/output token counts.
 
 ``record(model: str, tokens: int, strategy: str = "") -> float``
     Record tokens + estimated cost to Prometheus counters (no-op if
@@ -50,50 +55,42 @@ logger = logging.getLogger(__name__)
 # Keys are normalised model strings (lowercase, leading "openai:" stripped for
 # matching).  The lookup normalises the caller-supplied model string before
 # matching so "openai:gpt-4o-mini", "gpt-4o-mini", "GPT-4O-MINI" all match.
+# Values are (input_per_1k, output_per_1k) USD tuples.
 
-_PRICE_PER_1K: dict[str, float] = {
+_PRICE_PER_1K: dict[str, tuple[float, float]] = {
     # OpenAI chat
-    "gpt-4o-mini":             0.000150,   # blended ~$0.15/1M
-    "gpt-4o":                  0.005000,   # blended ~$5/1M
-    "gpt-4-turbo":             0.010000,
-    "gpt-3.5-turbo":           0.000500,
+    "gpt-4o-mini":             (0.000150, 0.000600),   # in $0.15/1M, out $0.60/1M
+    "gpt-4o":                  (0.005000, 0.005000),   # blended ~$5/1M
+    "gpt-4-turbo":             (0.010000, 0.010000),
+    "gpt-3.5-turbo":           (0.000500, 0.000500),
     # OpenAI embeddings
-    "text-embedding-3-small":  0.000020,   # $0.02/1M
-    "text-embedding-3-large":  0.000130,   # $0.13/1M
-    "text-embedding-ada-002":  0.000100,
+    "text-embedding-3-small":  (0.000020, 0.000020),   # $0.02/1M
+    "text-embedding-3-large":  (0.000130, 0.000130),   # $0.13/1M
+    "text-embedding-ada-002":  (0.000100, 0.000100),
     # Ollama (local — always $0)
-    "ollama":                  0.000000,
+    "ollama":                  (0.000000, 0.000000),
+    # AWS Bedrock on-demand, $0.22/1M in+out, checked 2026-09-10.  Both the
+    # bare id and "us." region-prefixed id are listed since the partial-key
+    # scan below won't match one against the other.
+    "meta.llama3-1-8b-instruct-v1:0":    (0.00022, 0.00022),
+    "us.meta.llama3-1-8b-instruct-v1:0": (0.00022, 0.00022),
 }
 
-_DEFAULT_PRICE: float = 0.000000  # unknown models — conservative zero
+_DEFAULT_PRICE: tuple[float, float] = (0.000000, 0.000000)  # unknown models — conservative zero
 
 
 def _normalise_model(model: str) -> str:
     """Lower-case and strip common provider prefixes for table lookup."""
     m = model.lower().strip()
-    for prefix in ("openai:", "ollama:", "anthropic:", "cohere:"):
+    for prefix in ("openai:", "ollama:", "anthropic:", "cohere:", "bedrock:"):
         if m.startswith(prefix):
             m = m[len(prefix):]
             break
     return m
 
 
-def cost_usd(model: str, tokens: int) -> float:
-    """Return the estimated USD cost for ``tokens`` tokens on ``model``.
-
-    Args:
-        model:  Model identifier string (provider-prefixed or bare).
-                Examples: "gpt-4o-mini", "openai:gpt-4o-mini",
-                          "ollama:llama3.2", "text-embedding-3-small".
-        tokens: Total token count (prompt + completion).
-
-    Returns:
-        Estimated cost in USD (float).  Returns 0.0 for unknown models so
-        callers never get inflated phantom costs.
-    """
-    if tokens <= 0:
-        return 0.0
-
+def _lookup_price(model: str) -> tuple[float, float]:
+    # shared by cost_usd and cost_split_usd so both use one lookup path
     norm = _normalise_model(model)
 
     # Exact match first.
@@ -115,7 +112,38 @@ def cost_usd(model: str, tokens: int) -> float:
     if price is None:
         price = _DEFAULT_PRICE
 
-    return (tokens / 1000.0) * price
+    return price
+
+
+def cost_usd(model: str, tokens: int) -> float:
+    """Return the estimated USD cost for ``tokens`` tokens on ``model``.
+
+    Args:
+        model:  Model identifier string (provider-prefixed or bare).
+                Examples: "gpt-4o-mini", "openai:gpt-4o-mini",
+                          "ollama:llama3.2", "text-embedding-3-small".
+        tokens: Total token count (prompt + completion).
+
+    Returns:
+        Estimated cost in USD (float).  Returns 0.0 for unknown models so
+        callers never get inflated phantom costs.
+    """
+    if tokens <= 0:
+        return 0.0
+
+    input_price, _output_price = _lookup_price(model)
+
+    return (tokens / 1000.0) * input_price
+
+
+def cost_split_usd(model: str, input_tokens: int, output_tokens: int) -> float:
+    """Return the estimated USD cost for separate input/output token counts."""
+    in_tok = max(input_tokens, 0)
+    out_tok = max(output_tokens, 0)
+    if in_tok == 0 and out_tok == 0:
+        return 0.0
+    input_price, output_price = _lookup_price(model)
+    return (in_tok / 1000.0) * input_price + (out_tok / 1000.0) * output_price
 
 
 # ---------------------------------------------------------------------------
