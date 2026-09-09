@@ -1,32 +1,18 @@
 version: 2
 
-# ---------------------------------------------------------------------------
-# dbt >= 1.8 Native Unit Tests
+# dbt >= 1.8 native unit tests. fixtures use format: sql so dbt does not need
+# to introspect the destination relation for column types (offline-safe).
 #
-# These tests use format: sql for all fixtures so that dbt does NOT need to
-# introspect the destination relation to infer column types — making every test
-# fully offline (no BigQuery or DuckDB file system access required).
+# unit tests run on whatever adapter the target uses, not always duckdb, so
+# fixtures use bare literals and typed timestamp literals ("timestamp '...'")
+# that parse the same way on duckdb, bigquery, and snowflake.
 #
-# Rationale: dbt's dict-format fixtures call get_fixture_sql(..., None) which
-# falls back to adapter.get_columns_in_relation(this).  When the destination
-# table doesn't exist (offline run), that introspection call fails.  The SQL
-# format bypasses type inference entirely by providing explicit SELECT statements.
-#
-# Every unit test on an incremental model MUST declare:
+# every unit test on an incremental model must declare:
 #   overrides:
 #     macros:
 #       is_incremental: true   # or false for full-refresh simulation
 #
-# Offline run command (from data/cloud/dbt/flight_telemetry/):
-#
-#   BIGQUERY_PROJECT=dummy-project \
-#   dbt test \
-#     --select "test_type:unit" \
-#     --profiles-dir . \
-#     --profile flight_telemetry \
-#     --target duckdb_unit
-#
-# ---------------------------------------------------------------------------
+# run: dbt test --select "test_type:unit" --target duckdb_unit
 
 unit_tests:
 
@@ -47,79 +33,79 @@ unit_tests:
         format: sql
         rows: |
           select
-            CAST('EGLL' AS VARCHAR)                    AS airport_icao,
-            CAST('2024-01-15 09:55:00' AS TIMESTAMP)   AS window_start,
-            CAST('2024-01-15 10:00:00' AS TIMESTAMP)   AS window_end,
-            CAST(12 AS BIGINT)                         AS aircraft_count,
-            CAST(850.5 AS DOUBLE)                      AS avg_altitude_m,
-            CAST(3 AS BIGINT)                          AS ground_count,
-            CAST(9 AS BIGINT)                          AS airborne_count
+            'EGLL' AS airport_icao,
+            timestamp '2024-01-15 09:55:00' AS window_start,
+            timestamp '2024-01-15 10:00:00' AS window_end,
+            12 AS aircraft_count,
+            850.5 AS avg_altitude_m,
+            3 AS ground_count,
+            9 AS airborne_count
           UNION ALL
           select
-            CAST('EGLL' AS VARCHAR),
-            CAST('2024-01-15 10:00:00' AS TIMESTAMP),
-            CAST('2024-01-15 10:05:00' AS TIMESTAMP),
-            CAST(14 AS BIGINT),
-            CAST(NULL AS DOUBLE),
-            CAST(5 AS BIGINT),
-            CAST(9 AS BIGINT)
+            'EGLL',
+            timestamp '2024-01-15 10:00:00',
+            timestamp '2024-01-15 10:05:00',
+            14,
+            NULL,
+            5,
+            9
           UNION ALL
           select
-            CAST('EGLL' AS VARCHAR),
-            CAST('2024-01-15 10:05:00' AS TIMESTAMP),
-            CAST('2024-01-15 10:10:00' AS TIMESTAMP),
-            CAST(11 AS BIGINT),
-            CAST(920.0 AS DOUBLE),
-            CAST(2 AS BIGINT),
-            CAST(9 AS BIGINT)
+            'EGLL',
+            timestamp '2024-01-15 10:05:00',
+            timestamp '2024-01-15 10:10:00',
+            11,
+            920.0,
+            2,
+            9
           UNION ALL
           select
-            CAST('EDDM' AS VARCHAR),
-            CAST('2024-01-15 10:10:00' AS TIMESTAMP),
-            CAST('2024-01-15 10:15:00' AS TIMESTAMP),
-            CAST(7 AS BIGINT),
-            CAST(600.0 AS DOUBLE),
-            CAST(1 AS BIGINT),
-            CAST(6 AS BIGINT)
+            'EDDM',
+            timestamp '2024-01-15 10:10:00',
+            timestamp '2024-01-15 10:15:00',
+            7,
+            600.0,
+            1,
+            6
 
     expect:
       format: sql
       rows: |
         select
-          CAST('EGLL' AS VARCHAR)                   AS airport_icao,
-          CAST('2024-01-15 09:55:00' AS TIMESTAMP)  AS window_start,
-          CAST('2024-01-15 10:00:00' AS TIMESTAMP)  AS window_end,
-          CAST(12 AS BIGINT)                        AS aircraft_count,
-          CAST(850.5 AS DOUBLE)                     AS avg_altitude_m,
-          CAST(3 AS BIGINT)                         AS ground_count,
-          CAST(9 AS BIGINT)                         AS airborne_count
+          'EGLL' AS airport_icao,
+          timestamp '2024-01-15 09:55:00' AS window_start,
+          timestamp '2024-01-15 10:00:00' AS window_end,
+          12 AS aircraft_count,
+          850.5 AS avg_altitude_m,
+          3 AS ground_count,
+          9 AS airborne_count
         UNION ALL
         select
-          CAST('EGLL' AS VARCHAR),
-          CAST('2024-01-15 10:00:00' AS TIMESTAMP),
-          CAST('2024-01-15 10:05:00' AS TIMESTAMP),
-          CAST(14 AS BIGINT),
-          CAST(NULL AS DOUBLE),
-          CAST(5 AS BIGINT),
-          CAST(9 AS BIGINT)
+          'EGLL',
+          timestamp '2024-01-15 10:00:00',
+          timestamp '2024-01-15 10:05:00',
+          14,
+          NULL,
+          5,
+          9
         UNION ALL
         select
-          CAST('EGLL' AS VARCHAR)                   AS airport_icao,
-          CAST('2024-01-15 10:05:00' AS TIMESTAMP)  AS window_start,
-          CAST('2024-01-15 10:10:00' AS TIMESTAMP)  AS window_end,
-          CAST(11 AS BIGINT)                        AS aircraft_count,
-          CAST(920.0 AS DOUBLE)                     AS avg_altitude_m,
-          CAST(2 AS BIGINT)                         AS ground_count,
-          CAST(9 AS BIGINT)                         AS airborne_count
+          'EGLL' AS airport_icao,
+          timestamp '2024-01-15 10:05:00' AS window_start,
+          timestamp '2024-01-15 10:10:00' AS window_end,
+          11 AS aircraft_count,
+          920.0 AS avg_altitude_m,
+          2 AS ground_count,
+          9 AS airborne_count
         UNION ALL
         select
-          CAST('EDDM' AS VARCHAR),
-          CAST('2024-01-15 10:10:00' AS TIMESTAMP),
-          CAST('2024-01-15 10:15:00' AS TIMESTAMP),
-          CAST(7 AS BIGINT),
-          CAST(600.0 AS DOUBLE),
-          CAST(1 AS BIGINT),
-          CAST(6 AS BIGINT)
+          'EDDM',
+          timestamp '2024-01-15 10:10:00',
+          timestamp '2024-01-15 10:15:00',
+          7,
+          600.0,
+          1,
+          6
 
   # =========================================================================
   # gold_airport_congestion — full-refresh (is_incremental = false)
@@ -139,43 +125,43 @@ unit_tests:
         format: sql
         rows: |
           select
-            CAST('KLAX' AS VARCHAR)                   AS airport_icao,
-            CAST('2024-03-01 08:00:00' AS TIMESTAMP)  AS window_start,
-            CAST('2024-03-01 08:05:00' AS TIMESTAMP)  AS window_end,
-            CAST(30 AS BIGINT)                        AS aircraft_count,
-            CAST(NULL AS DOUBLE)                      AS avg_altitude_m,
-            CAST(10 AS BIGINT)                        AS ground_count,
-            CAST(20 AS BIGINT)                        AS airborne_count
+            'KLAX' AS airport_icao,
+            timestamp '2024-03-01 08:00:00' AS window_start,
+            timestamp '2024-03-01 08:05:00' AS window_end,
+            30 AS aircraft_count,
+            NULL AS avg_altitude_m,
+            10 AS ground_count,
+            20 AS airborne_count
           UNION ALL
           select
-            CAST('KLAX' AS VARCHAR),
-            CAST('2024-03-01 08:05:00' AS TIMESTAMP),
-            CAST('2024-03-01 08:10:00' AS TIMESTAMP),
-            CAST(28 AS BIGINT),
-            CAST(1100.0 AS DOUBLE),
-            CAST(8 AS BIGINT),
-            CAST(20 AS BIGINT)
+            'KLAX',
+            timestamp '2024-03-01 08:05:00',
+            timestamp '2024-03-01 08:10:00',
+            28,
+            1100.0,
+            8,
+            20
 
     expect:
       format: sql
       rows: |
         select
-          CAST('KLAX' AS VARCHAR)                   AS airport_icao,
-          CAST('2024-03-01 08:00:00' AS TIMESTAMP)  AS window_start,
-          CAST('2024-03-01 08:05:00' AS TIMESTAMP)  AS window_end,
-          CAST(30 AS BIGINT)                        AS aircraft_count,
-          CAST(NULL AS DOUBLE)                      AS avg_altitude_m,
-          CAST(10 AS BIGINT)                        AS ground_count,
-          CAST(20 AS BIGINT)                        AS airborne_count
+          'KLAX' AS airport_icao,
+          timestamp '2024-03-01 08:00:00' AS window_start,
+          timestamp '2024-03-01 08:05:00' AS window_end,
+          30 AS aircraft_count,
+          NULL AS avg_altitude_m,
+          10 AS ground_count,
+          20 AS airborne_count
         UNION ALL
         select
-          CAST('KLAX' AS VARCHAR),
-          CAST('2024-03-01 08:05:00' AS TIMESTAMP),
-          CAST('2024-03-01 08:10:00' AS TIMESTAMP),
-          CAST(28 AS BIGINT),
-          CAST(1100.0 AS DOUBLE),
-          CAST(8 AS BIGINT),
-          CAST(20 AS BIGINT)
+          'KLAX',
+          timestamp '2024-03-01 08:05:00',
+          timestamp '2024-03-01 08:10:00',
+          28,
+          1100.0,
+          8,
+          20
 
   # =========================================================================
   # gold_sector_load — incremental snapshot
@@ -194,43 +180,43 @@ unit_tests:
         format: sql
         rows: |
           select
-            CAST('8426b47ffffffff' AS VARCHAR)        AS h3_r4,
-            CAST('2024-01-20 12:00:00' AS TIMESTAMP)  AS window_start,
-            CAST('2024-01-20 12:05:00' AS TIMESTAMP)  AS window_end,
-            CAST(4 AS BIGINT)                         AS aircraft_count
+            '8426b47ffffffff' AS h3_r4,
+            timestamp '2024-01-20 12:00:00' AS window_start,
+            timestamp '2024-01-20 12:05:00' AS window_end,
+            4 AS aircraft_count
           UNION ALL
           select
-            CAST('8426b47ffffffff' AS VARCHAR),
-            CAST('2024-01-20 12:05:00' AS TIMESTAMP),
-            CAST('2024-01-20 12:10:00' AS TIMESTAMP),
-            CAST(6 AS BIGINT)
+            '8426b47ffffffff',
+            timestamp '2024-01-20 12:05:00',
+            timestamp '2024-01-20 12:10:00',
+            6
           UNION ALL
           select
-            CAST('8426b4fffffffff' AS VARCHAR),
-            CAST('2024-01-20 12:10:00' AS TIMESTAMP),
-            CAST('2024-01-20 12:15:00' AS TIMESTAMP),
-            CAST(2 AS BIGINT)
+            '8426b4fffffffff',
+            timestamp '2024-01-20 12:10:00',
+            timestamp '2024-01-20 12:15:00',
+            2
 
     expect:
       format: sql
       rows: |
         select
-          CAST('8426b47ffffffff' AS VARCHAR)        AS h3_r4,
-          CAST('2024-01-20 12:00:00' AS TIMESTAMP)  AS window_start,
-          CAST('2024-01-20 12:05:00' AS TIMESTAMP)  AS window_end,
-          CAST(4 AS BIGINT)                         AS aircraft_count
+          '8426b47ffffffff' AS h3_r4,
+          timestamp '2024-01-20 12:00:00' AS window_start,
+          timestamp '2024-01-20 12:05:00' AS window_end,
+          4 AS aircraft_count
         UNION ALL
         select
-          CAST('8426b47ffffffff' AS VARCHAR)        AS h3_r4,
-          CAST('2024-01-20 12:05:00' AS TIMESTAMP)  AS window_start,
-          CAST('2024-01-20 12:10:00' AS TIMESTAMP)  AS window_end,
-          CAST(6 AS BIGINT)                         AS aircraft_count
+          '8426b47ffffffff' AS h3_r4,
+          timestamp '2024-01-20 12:05:00' AS window_start,
+          timestamp '2024-01-20 12:10:00' AS window_end,
+          6 AS aircraft_count
         UNION ALL
         select
-          CAST('8426b4fffffffff' AS VARCHAR),
-          CAST('2024-01-20 12:10:00' AS TIMESTAMP),
-          CAST('2024-01-20 12:15:00' AS TIMESTAMP),
-          CAST(2 AS BIGINT)
+          '8426b4fffffffff',
+          timestamp '2024-01-20 12:10:00',
+          timestamp '2024-01-20 12:15:00',
+          2
 
   # =========================================================================
   # gold_emergency_events — incremental snapshot + squawk pass-through
@@ -249,79 +235,79 @@ unit_tests:
         format: sql
         rows: |
           select
-            CAST('a1b2c3' AS VARCHAR)               AS icao24,
-            CAST('BAW123' AS VARCHAR)               AS callsign,
-            CAST('7700' AS VARCHAR)                 AS squawk,
-            CAST('2024-02-10 14:30:00' AS TIMESTAMP) AS first_seen_ts,
-            CAST('2024-02-10 14:45:00' AS TIMESTAMP) AS last_seen_ts,
-            CAST(51.5 AS DOUBLE)                    AS lat,
-            CAST(-0.1 AS DOUBLE)                    AS lon,
-            CAST('United Kingdom' AS VARCHAR)       AS origin_country,
-            CAST('EGLL' AS VARCHAR)                 AS nearest_airport,
-            CAST(900 AS BIGINT)                     AS duration_s
+            'a1b2c3' AS icao24,
+            'BAW123' AS callsign,
+            '7700' AS squawk,
+            timestamp '2024-02-10 14:30:00' AS first_seen_ts,
+            timestamp '2024-02-10 14:45:00' AS last_seen_ts,
+            51.5 AS lat,
+            -0.1 AS lon,
+            'United Kingdom' AS origin_country,
+            'EGLL' AS nearest_airport,
+            900 AS duration_s
           UNION ALL
           select
-            CAST('d4e5f6' AS VARCHAR),
-            CAST(NULL AS VARCHAR),
-            CAST('7500' AS VARCHAR),
-            CAST('2024-02-10 15:00:00' AS TIMESTAMP),
-            CAST('2024-02-10 15:10:00' AS TIMESTAMP),
-            CAST(48.9 AS DOUBLE),
-            CAST(2.3 AS DOUBLE),
-            CAST('France' AS VARCHAR),
-            CAST(NULL AS VARCHAR),
-            CAST(600 AS BIGINT)
+            'd4e5f6',
+            NULL,
+            '7500',
+            timestamp '2024-02-10 15:00:00',
+            timestamp '2024-02-10 15:10:00',
+            48.9,
+            2.3,
+            'France',
+            NULL,
+            600
           UNION ALL
           select
-            CAST('aabbcc' AS VARCHAR),
-            CAST('DLH456' AS VARCHAR),
-            CAST('7600' AS VARCHAR),
-            CAST('2024-02-10 15:20:00' AS TIMESTAMP),
-            CAST('2024-02-10 15:25:00' AS TIMESTAMP),
-            CAST(52.3 AS DOUBLE),
-            CAST(13.4 AS DOUBLE),
-            CAST('Germany' AS VARCHAR),
-            CAST('EDDB' AS VARCHAR),
-            CAST(300 AS BIGINT)
+            'aabbcc',
+            'DLH456',
+            '7600',
+            timestamp '2024-02-10 15:20:00',
+            timestamp '2024-02-10 15:25:00',
+            52.3,
+            13.4,
+            'Germany',
+            'EDDB',
+            300
 
     expect:
       format: sql
       rows: |
         select
-          CAST('a1b2c3' AS VARCHAR)               AS icao24,
-          CAST('BAW123' AS VARCHAR)               AS callsign,
-          CAST('7700' AS VARCHAR)                 AS squawk,
-          CAST('2024-02-10 14:30:00' AS TIMESTAMP) AS first_seen_ts,
-          CAST('2024-02-10 14:45:00' AS TIMESTAMP) AS last_seen_ts,
-          CAST(51.5 AS DOUBLE)                    AS lat,
-          CAST(-0.1 AS DOUBLE)                    AS lon,
-          CAST('United Kingdom' AS VARCHAR)       AS origin_country,
-          CAST('EGLL' AS VARCHAR)                 AS nearest_airport,
-          CAST(900 AS BIGINT)                     AS duration_s
+          'a1b2c3' AS icao24,
+          'BAW123' AS callsign,
+          '7700' AS squawk,
+          timestamp '2024-02-10 14:30:00' AS first_seen_ts,
+          timestamp '2024-02-10 14:45:00' AS last_seen_ts,
+          51.5 AS lat,
+          -0.1 AS lon,
+          'United Kingdom' AS origin_country,
+          'EGLL' AS nearest_airport,
+          900 AS duration_s
         UNION ALL
         select
-          CAST('d4e5f6' AS VARCHAR)                AS icao24,
-          CAST(NULL AS VARCHAR)                    AS callsign,
-          CAST('7500' AS VARCHAR)                  AS squawk,
-          CAST('2024-02-10 15:00:00' AS TIMESTAMP) AS first_seen_ts,
-          CAST('2024-02-10 15:10:00' AS TIMESTAMP) AS last_seen_ts,
-          CAST(48.9 AS DOUBLE)                     AS lat,
-          CAST(2.3 AS DOUBLE)                      AS lon,
-          CAST('France' AS VARCHAR)                AS origin_country,
-          CAST(NULL AS VARCHAR)                    AS nearest_airport,
-          CAST(600 AS BIGINT)                      AS duration_s
+          'd4e5f6' AS icao24,
+          NULL AS callsign,
+          '7500' AS squawk,
+          timestamp '2024-02-10 15:00:00' AS first_seen_ts,
+          timestamp '2024-02-10 15:10:00' AS last_seen_ts,
+          48.9 AS lat,
+          2.3 AS lon,
+          'France' AS origin_country,
+          NULL AS nearest_airport,
+          600 AS duration_s
         UNION ALL
         select
-          CAST('aabbcc' AS VARCHAR),
-          CAST('DLH456' AS VARCHAR),
-          CAST('7600' AS VARCHAR),
-          CAST('2024-02-10 15:20:00' AS TIMESTAMP),
-          CAST('2024-02-10 15:25:00' AS TIMESTAMP),
-          CAST(52.3 AS DOUBLE),
-          CAST(13.4 AS DOUBLE),
-          CAST('Germany' AS VARCHAR),
-          CAST('EDDB' AS VARCHAR),
-          CAST(300 AS BIGINT)
+          'aabbcc',
+          'DLH456',
+          '7600',
+          timestamp '2024-02-10 15:20:00',
+          timestamp '2024-02-10 15:25:00',
+          52.3,
+          13.4,
+          'Germany',
+          'EDDB',
+          300
 
   # =========================================================================
   # gold_routing_stats — incremental snapshot + nullable columns
@@ -340,82 +326,82 @@ unit_tests:
         format: sql
         rows: |
           select
-            CAST('112233' AS VARCHAR)                AS icao24,
-            CAST('EZY001' AS VARCHAR)                AS callsign,
-            CAST('2024-03-05 06:00:00' AS TIMESTAMP) AS window_start,
-            CAST('2024-03-05 06:30:00' AS TIMESTAMP) AS window_end,
-            CAST(51.1 AS DOUBLE)                     AS origin_lat,
-            CAST(-1.8 AS DOUBLE)                     AS origin_lon,
-            CAST(51.5 AS DOUBLE)                     AS destination_lat,
-            CAST(-0.1 AS DOUBLE)                     AS destination_lon,
-            CAST(10000.0 AS DOUBLE)                  AS max_altitude_m,
-            CAST(220.5 AS DOUBLE)                    AS avg_velocity_mps,
-            CAST(180 AS BIGINT)                      AS ping_count
+            '112233' AS icao24,
+            'EZY001' AS callsign,
+            timestamp '2024-03-05 06:00:00' AS window_start,
+            timestamp '2024-03-05 06:30:00' AS window_end,
+            51.1 AS origin_lat,
+            -1.8 AS origin_lon,
+            51.5 AS destination_lat,
+            -0.1 AS destination_lon,
+            10000.0 AS max_altitude_m,
+            220.5 AS avg_velocity_mps,
+            180 AS ping_count
           UNION ALL
           select
-            CAST('445566' AS VARCHAR),
-            CAST(NULL AS VARCHAR),
-            CAST('2024-03-05 07:00:00' AS TIMESTAMP),
-            CAST('2024-03-05 07:45:00' AS TIMESTAMP),
-            CAST(48.4 AS DOUBLE),
-            CAST(11.8 AS DOUBLE),
-            CAST(50.0 AS DOUBLE),
-            CAST(8.6 AS DOUBLE),
-            CAST(NULL AS DOUBLE),
-            CAST(NULL AS DOUBLE),
-            CAST(12 AS BIGINT)
+            '445566',
+            NULL,
+            timestamp '2024-03-05 07:00:00',
+            timestamp '2024-03-05 07:45:00',
+            48.4,
+            11.8,
+            50.0,
+            8.6,
+            NULL,
+            NULL,
+            12
           UNION ALL
           select
-            CAST('778899' AS VARCHAR),
-            CAST('RYR202' AS VARCHAR),
-            CAST('2024-03-05 08:00:00' AS TIMESTAMP),
-            CAST('2024-03-05 08:55:00' AS TIMESTAMP),
-            CAST(53.4 AS DOUBLE),
-            CAST(-6.3 AS DOUBLE),
-            CAST(40.5 AS DOUBLE),
-            CAST(-3.6 AS DOUBLE),
-            CAST(11200.0 AS DOUBLE),
-            CAST(245.0 AS DOUBLE),
-            CAST(324 AS BIGINT)
+            '778899',
+            'RYR202',
+            timestamp '2024-03-05 08:00:00',
+            timestamp '2024-03-05 08:55:00',
+            53.4,
+            -6.3,
+            40.5,
+            -3.6,
+            11200.0,
+            245.0,
+            324
 
     expect:
       format: sql
       rows: |
         select
-          CAST('112233' AS VARCHAR)                AS icao24,
-          CAST('EZY001' AS VARCHAR)                AS callsign,
-          CAST('2024-03-05 06:00:00' AS TIMESTAMP) AS window_start,
-          CAST('2024-03-05 06:30:00' AS TIMESTAMP) AS window_end,
-          CAST(51.1 AS DOUBLE)                     AS origin_lat,
-          CAST(-1.8 AS DOUBLE)                     AS origin_lon,
-          CAST(51.5 AS DOUBLE)                     AS destination_lat,
-          CAST(-0.1 AS DOUBLE)                     AS destination_lon,
-          CAST(10000.0 AS DOUBLE)                  AS max_altitude_m,
-          CAST(220.5 AS DOUBLE)                    AS avg_velocity_mps,
-          CAST(180 AS BIGINT)                      AS ping_count
+          '112233' AS icao24,
+          'EZY001' AS callsign,
+          timestamp '2024-03-05 06:00:00' AS window_start,
+          timestamp '2024-03-05 06:30:00' AS window_end,
+          51.1 AS origin_lat,
+          -1.8 AS origin_lon,
+          51.5 AS destination_lat,
+          -0.1 AS destination_lon,
+          10000.0 AS max_altitude_m,
+          220.5 AS avg_velocity_mps,
+          180 AS ping_count
         UNION ALL
         select
-          CAST('445566' AS VARCHAR)                AS icao24,
-          CAST(NULL AS VARCHAR)                    AS callsign,
-          CAST('2024-03-05 07:00:00' AS TIMESTAMP) AS window_start,
-          CAST('2024-03-05 07:45:00' AS TIMESTAMP) AS window_end,
-          CAST(48.4 AS DOUBLE)                     AS origin_lat,
-          CAST(11.8 AS DOUBLE)                     AS origin_lon,
-          CAST(50.0 AS DOUBLE)                     AS destination_lat,
-          CAST(8.6 AS DOUBLE)                      AS destination_lon,
-          CAST(NULL AS DOUBLE)                     AS max_altitude_m,
-          CAST(NULL AS DOUBLE)                     AS avg_velocity_mps,
-          CAST(12 AS BIGINT)                       AS ping_count
+          '445566' AS icao24,
+          NULL AS callsign,
+          timestamp '2024-03-05 07:00:00' AS window_start,
+          timestamp '2024-03-05 07:45:00' AS window_end,
+          48.4 AS origin_lat,
+          11.8 AS origin_lon,
+          50.0 AS destination_lat,
+          8.6 AS destination_lon,
+          NULL AS max_altitude_m,
+          NULL AS avg_velocity_mps,
+          12 AS ping_count
         UNION ALL
         select
-          CAST('778899' AS VARCHAR),
-          CAST('RYR202' AS VARCHAR),
-          CAST('2024-03-05 08:00:00' AS TIMESTAMP),
-          CAST('2024-03-05 08:55:00' AS TIMESTAMP),
-          CAST(53.4 AS DOUBLE),
-          CAST(-6.3 AS DOUBLE),
-          CAST(40.5 AS DOUBLE),
-          CAST(-3.6 AS DOUBLE),
-          CAST(11200.0 AS DOUBLE),
-          CAST(245.0 AS DOUBLE),
-          CAST(324 AS BIGINT)
+          '778899',
+          'RYR202',
+          timestamp '2024-03-05 08:00:00',
+          timestamp '2024-03-05 08:55:00',
+          53.4,
+          -6.3,
+          40.5,
+          -3.6,
+          11200.0,
+          245.0,
+          324
