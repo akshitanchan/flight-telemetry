@@ -49,6 +49,23 @@ class TestCassette(unittest.TestCase):
                 c.fetch({"question": "how far is the diversion airport"})
             self.assertIn("how far is the diversion airport", str(ctx.exception))
 
+    def test_provider_payload_miss_names_the_user_question_not_the_system_prompt(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "cassette.json"
+            c = Cassette(path, record=False)
+            payload = {
+                "provider": "openai",
+                "model": "gpt-4o-mini",
+                "messages": [
+                    {"role": "system", "content": "top secret system prompt instructions"},
+                    {"role": "user", "content": "which aircraft squawked 7700?"},
+                ],
+            }
+            with self.assertRaises(CassetteMiss) as ctx:
+                c.fetch(payload)
+            self.assertIn("which aircraft squawked 7700?", str(ctx.exception))
+            self.assertNotIn("top secret system prompt instructions", str(ctx.exception))
+
     def test_record_mode_allows_a_miss(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "cassette.json"

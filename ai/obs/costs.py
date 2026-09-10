@@ -133,6 +133,8 @@ def cost_usd(model: str, tokens: int) -> float:
 
     input_price, _output_price = _lookup_price(model)
 
+    # charges the whole token count at the input rate; use cost_split_usd for
+    # a mix of input/output tokens priced at their own rates
     return (tokens / 1000.0) * input_price
 
 

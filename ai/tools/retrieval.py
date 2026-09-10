@@ -71,7 +71,7 @@ class RetrievalTool:
                 ],
             }
         """
-        if self._vector_backend_available():
+        if self.vector_backend_available():
             try:
                 return self._vector_search(query, top_k)
             except Exception as exc:  # noqa: BLE001
@@ -88,7 +88,7 @@ class RetrievalTool:
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _vector_backend_available() -> bool:
+    def vector_backend_available() -> bool:
         """Return True only when BOTH embeddings and Postgres are ready.
 
         Evaluated lazily at search-time so that:

@@ -13,7 +13,7 @@ Coverage targets:
   4. ``embeddings.index_corpus()`` raises when OPENAI_API_KEY is absent.
   5. ``embeddings.index_corpus()`` executes the expected SQL when services are up
      (fully mocked: no real HTTP, no real DB).
-  6. ``RetrievalTool._vector_backend_available()`` returns False when key absent.
+  6. ``RetrievalTool.vector_backend_available()`` returns False when key absent.
   7. ``RetrievalTool.search()`` uses the keyword fallback in offline CI conditions.
   8. ``RetrievalTool._vector_search()`` maps pgvector rows back to correct doc ids
      and returns the ``{answer, sources, results}`` shape.
@@ -215,16 +215,16 @@ class TestRetrievalToolVectorBackend(unittest.TestCase):
         cls.tool = RetrievalTool(CORPUS)
 
     def test_vector_backend_unavailable_without_key(self):
-        """_vector_backend_available() must return False when API key is absent."""
+        """vector_backend_available() must return False when API key is absent."""
         env = dict(__import__("os").environ)
         env.pop("OPENAI_API_KEY", None)
         with unittest.mock.patch.dict("os.environ", env, clear=True):
-            self.assertFalse(RetrievalTool._vector_backend_available())
+            self.assertFalse(RetrievalTool.vector_backend_available())
 
     def test_keyword_fallback_used_in_offline_ci(self):
         """search() uses keyword fallback when vector backend is unavailable."""
         with unittest.mock.patch.object(
-            RetrievalTool, "_vector_backend_available", return_value=False
+            RetrievalTool, "vector_backend_available", return_value=False
         ):
             result = self.tool.search("METAR EHAM Amsterdam Schiphol decode")
 
@@ -309,7 +309,7 @@ class TestRetrievalToolVectorBackend(unittest.TestCase):
 
         # Make the backend appear available but raise during _vector_search.
         with unittest.mock.patch.object(
-            RetrievalTool, "_vector_backend_available", return_value=True
+            RetrievalTool, "vector_backend_available", return_value=True
         ):
             with unittest.mock.patch.object(
                 self.tool, "_vector_search", side_effect=RuntimeError("DB unavailable")

@@ -325,6 +325,57 @@ class TestEvalMatrixDryRun(unittest.TestCase):
         )
 
 
+class TestEvalMatrixDuplicateQuestions(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = tempfile.TemporaryDirectory()
+        tmp = Path(cls._tmp.name)
+        cls.fixtures_dir = tmp / "llm"
+        cls.fixtures_dir.mkdir()
+        cls.injections_path = tmp / "injections.json"
+        cls.questions, cls.probe_question = _build_fixtures(cls.fixtures_dir)
+        _write_injections(cls.injections_path, cls.probe_question)
+
+        # golden file with the first fixture question duplicated under a second id;
+        # the duplicate needs no cassette entry of its own since it is served from
+        # the semantic cache without ever reaching the provider
+        first = dict(cls.questions[0])
+        duplicate = dict(first, id=f"{first['id']}-dup")
+        cls.golden_path = tmp / "golden_with_duplicate.json"
+        cls.golden_path.write_text(json.dumps({"questions": [first, duplicate]}))
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._tmp.cleanup()
+
+    def test_duplicate_question_hits_cache_and_is_named_in_the_header(self):
+        out_dir = Path(self._tmp.name) / "out_dup"
+        argv = [
+            "--dry-run",
+            "--providers", "openai",
+            "--out", str(out_dir),
+            "--fixtures-dir", str(self.fixtures_dir),
+            "--gold", str(GOLD),
+            "--corpus", str(CORPUS),
+            "--golden", str(self.golden_path),
+            "--injections", str(self.injections_path),
+        ]
+        rc = matrix.main(argv)
+        self.assertEqual(rc, 0)
+
+        data = json.loads((out_dir / "results.json").read_text())
+        self.assertEqual(data["header"]["duplicate_questions"]["count"], 1)
+        self.assertIn("1", data["header"]["duplicate_questions"]["note"])
+
+        for arch_name in _ARCH_STRATEGIES:
+            cell = data["architectures"][arch_name]["openai"]
+            self.assertNotIn("unavailable", cell)
+            self.assertEqual(cell["cache_hits"], 1)
+
+        markdown = (out_dir / "results.md").read_text()
+        self.assertIn(data["header"]["duplicate_questions"]["note"], markdown)
+
+
 class TestEvalMatrixBaselineGate(unittest.TestCase):
     @unittest.skipUnless(BASELINE.exists(), "ai/eval/baseline.json has not been recorded yet")
     def test_dry_run_meets_or_beats_baseline(self):

@@ -27,7 +27,16 @@ def _key(payload):
 
 
 def _describe(payload):
-    return payload.get("question") or payload.get("query") or repr(payload)
+    described = payload.get("question") or payload.get("query")
+    if described:
+        return described
+    messages = payload.get("messages")
+    if messages:
+        # last user turn only, so a provider-payload miss never dumps the system prompt
+        for msg in reversed(messages):
+            if msg.get("role") == "user":
+                return msg.get("content")
+    return repr(payload)
 
 
 class Cassette:

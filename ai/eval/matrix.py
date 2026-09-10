@@ -69,15 +69,25 @@ PRICE_PER_1K = {
 HOST_STRING = f"Apple M2, macOS, Python {sys.version_info.major}.{sys.version_info.minor} in ~/.venvs/flight-telemetry"
 
 
+def _duplicate_count(questions):
+    # extra occurrences of an exact-duplicate question string in this question list
+    distinct = {q["question"] for q in questions}
+    return len(questions) - len(distinct)
+
+
+def _duplicate_sentence(count):
+    if count == 0:
+        return "No question in the set is an exact duplicate."
+    if count == 1:
+        return ("1 question in the golden set is an exact duplicate and was served from "
+                "the semantic cache on its second occurrence at zero provider cost.")
+    return (f"{count} questions in the golden set are exact duplicates and were served from "
+            "the semantic cache on their second occurrence at zero provider cost.")
+
+
+# stand-in for a live provider in dry-run replay; never actually invoked,
+# since every question must be served by a cassette hit or CassetteMiss fires first
 class _CassetteProviderIdentity:
-    """Credential-free stand-in for a live Provider, sourced from cassette meta.
-
-    Used only in dry-run replay so wrap_provider() has a name/model/label to
-    key on without ever calling ai.providers.build(). It is never actually
-    invoked: every question in dry-run must be served by a cassette hit, and
-    a miss raises CassetteMiss before this would be called.
-    """
-
     def __init__(self, name, model):
         self.name = name
         self.model = model
@@ -91,14 +101,8 @@ class _CassetteProviderIdentity:
 
 
 def _resolve_provider(cassette, name, max_tokens, dry_run):
-    """Return (provider_identity, unavailable_reason).
-
-    Exactly one of the two return values is not None. In dry-run the identity
-    comes from the cassette's own recorded meta and no credentials are ever
-    checked. In live mode ai.providers.build() is the source of truth; a
-    RuntimeError from missing credentials is turned into the reason string
-    instead of propagating, so the caller can record it and keep going.
-    """
+    # returns (identity, reason) with exactly one set; a missing-credentials
+    # RuntimeError becomes the reason string so the caller can record it and continue
     if dry_run:
         model = cassette.meta.get("model")
         if not model:
@@ -117,12 +121,7 @@ def _resolve_provider(cassette, name, max_tokens, dry_run):
 
 
 def _run_cell(strategy_cls, max_tokens, provider_name, cassette, retrieval, analytics, questions, dry_run):
-    """Run one architecture x provider cell. Returns a results dict.
-
-    On a missing provider the dict is ``{"unavailable": reason}``; otherwise
-    it carries n, accuracy, citation_rate, cost_per_query_usd, p50_latency_s,
-    and the resolved provider_label for the header.
-    """
+    # on a missing provider this returns {"unavailable": reason} instead of the metrics dict below
     identity, reason = _resolve_provider(cassette, provider_name, max_tokens, dry_run)
     if identity is None:
         return {"unavailable": reason}
@@ -156,11 +155,12 @@ def _run_cell(strategy_cls, max_tokens, provider_name, cassette, retrieval, anal
         })
 
     hits = cache.stats()["hits"]
-    if hits:
+    expected_hits = _duplicate_count(questions)
+    if hits != expected_hits:
         raise RuntimeError(
-            f"{strategy_cls.name}/{provider_name}: cache reported {hits} hit(s) "
-            "over a run that asks each question once; this points to a keying "
-            "bug that would understate cost and latency"
+            f"{strategy_cls.name}/{provider_name}: cache reported {hits} hit(s), "
+            f"expected {expected_hits} exact-duplicate hit(s) among {len(questions)} "
+            "question(s); this points to a keying bug that would understate cost and latency"
         )
 
     n = len(rows)
@@ -171,12 +171,13 @@ def _run_cell(strategy_cls, max_tokens, provider_name, cassette, retrieval, anal
         "citation_rate": round(sum(r["cited"] for r in rows) / n, 4) if n else 0.0,
         "cost_per_query_usd": round(sum(r["cost_usd"] for r in rows) / n, 8) if n else 0.0,
         "p50_latency_s": round(_percentile(latencies, 50), 4),
+        "cache_hits": hits,
         "provider_label": llm.label,
     }
 
 
 def _run_reference(retrieval, analytics, questions):
-    """rule_based_v1 over the same questions: no LLM, no cost, no latency claim."""
+    # rule_based_v1 over the same questions: no llm, no cost, no latency claim
     strategy = RuleBasedStrategy(analytics, retrieval)
     passed = cited = 0
     for q in questions:
@@ -225,7 +226,7 @@ def _fmt_latency(val):
 
 
 def _cell_columns(cell):
-    """Return the four (accuracy, citation, cost, p50) markdown cell strings."""
+    # four markdown cell strings, in header order: accuracy, citation, cost, p50
     if "unavailable" in cell:
         return [cell["unavailable"], "-", "-", "-"]
     return [
@@ -258,7 +259,7 @@ def _recorded_at_line(cassettes):
 
 
 def _render_markdown(command, cassettes, golden_size, used_size, backend,
-                      provider_names, results, reference, injection):
+                      provider_names, results, reference, injection, duplicate_note):
     lines = []
     lines.append("# AI architecture x provider eval matrix")
     lines.append("")
@@ -266,6 +267,7 @@ def _render_markdown(command, cassettes, golden_size, used_size, backend,
     lines.append(f"Cassettes recorded at: {_recorded_at_line(cassettes)}.")
     lines.append(f"Host: {HOST_STRING}.")
     lines.append(f"Golden set has {golden_size} questions; this run used {used_size}.")
+    lines.append(duplicate_note)
     lines.append(f"Retrieval backend actually used: {backend}.")
     for name in provider_names:
         lines.append(f"Model ({name}): {_model_line(name, results, provider_names)}.")
@@ -355,10 +357,12 @@ def main(argv=None):
     with open(args.golden) as f:
         all_questions = json.load(f).get("questions", [])
     questions = all_questions[: args.limit] if args.limit else all_questions
+    duplicate_count = _duplicate_count(questions)
+    duplicate_note = _duplicate_sentence(duplicate_count)
 
     analytics = AnalyticsTool(args.gold)
     raw_retrieval = RetrievalTool(args.corpus)
-    backend = "pgvector" if raw_retrieval._vector_backend_available() else "keyword fallback"
+    backend = "pgvector" if raw_retrieval.vector_backend_available() else "keyword fallback"
 
     args.fixtures_dir.mkdir(parents=True, exist_ok=True)
     retrieval_cassette = Cassette(args.fixtures_dir / "retrieval.json", record=not args.dry_run)
@@ -393,7 +397,7 @@ def main(argv=None):
     args.out.mkdir(parents=True, exist_ok=True)
     markdown = _render_markdown(
         command.strip(), all_cassettes, len(all_questions), len(questions), backend,
-        provider_names, results, reference, injection,
+        provider_names, results, reference, injection, duplicate_note,
     )
     (args.out / "results.md").write_text(markdown)
 
@@ -404,6 +408,7 @@ def main(argv=None):
             "host": HOST_STRING,
             "golden_set_size": len(all_questions),
             "questions_used": len(questions),
+            "duplicate_questions": {"count": duplicate_count, "note": duplicate_note},
             "retrieval_backend": backend,
             "models": {name: _model_line(name, results, provider_names) for name in provider_names},
             "price_per_1k_usd": {
