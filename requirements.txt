@@ -45,9 +45,9 @@ streamlit>=1.30
 # dbt (ds-06, W4.3) — BigQuery + Snowflake incremental models
 # dbt-core 1.12.4 and the 1.12 adapters install on Python 3.14; no version
 # markers needed.
-dbt-core>=1.8,<2.0
-dbt-bigquery>=1.8,<2.0
-dbt-snowflake>=1.8,<2.0
+dbt-core>=1.12,<2.0
+dbt-bigquery>=1.12,<2.0
+dbt-snowflake>=1.12,<2.0
 # dbt-duckdb: required for offline native unit test execution (--target duckdb_unit).
 # dbt unit tests use DuckDB locally; the duckdb_unit profile avoids the
 # BigQuery adapter's mandatory relation-cache call that requires live credentials.
