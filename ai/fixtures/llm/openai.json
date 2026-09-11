@@ -2048,6 +2048,7 @@
     }
   },
   "meta": {
+    "host": "Apple M2, macOS, Python 3.14 in ~/.venvs/flight-telemetry",
     "model": "gpt-4o-mini",
     "provider": "openai"
   },

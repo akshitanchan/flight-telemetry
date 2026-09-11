@@ -131,7 +131,9 @@ def _resolve_provider(cassette, name, max_tokens, dry_run):
             return None, str(exc)
         recorded_name = cassette.meta.get("provider", name)
         return _CassetteProviderIdentity(recorded_name, model), None
-    cassette.meta = {"provider": provider.name, "model": provider.model}
+    # recording live: stamp the host alongside provider/model so a later
+    # replay can reproduce this header without asking the replaying interpreter
+    cassette.meta = {"provider": provider.name, "model": provider.model, "host": HOST_STRING}
     return provider, None
 
 
@@ -266,6 +268,19 @@ def _model_line(provider_name, results, provider_names):
     return provider_name
 
 
+def _resolved_host(provider_cassettes, provider_names, dry_run):
+    # live run: the host is wherever this interpreter is running right now.
+    # replay must reproduce the recorded header, so the host comes from the
+    # cassette instead, not from whatever interpreter is doing the replaying
+    if not dry_run:
+        return HOST_STRING
+    for name in provider_names:
+        host = provider_cassettes[name].meta.get("host")
+        if host:
+            return host
+    return HOST_STRING
+
+
 def _recorded_at_line(cassettes):
     dates = {name: c.recorded_at for name, c in cassettes.items()}
     distinct = sorted(set(dates.values()))
@@ -275,13 +290,13 @@ def _recorded_at_line(cassettes):
 
 
 def _render_markdown(command, cassettes, golden_size, used_size, backend,
-                      provider_names, results, reference, injection, duplicate_note):
+                      provider_names, results, reference, injection, duplicate_note, host):
     lines = []
     lines.append("# AI architecture x provider eval matrix")
     lines.append("")
     lines.append(f"Generated with: `{command}`")
     lines.append(f"Cassettes recorded at: {_recorded_at_line(cassettes)}.")
-    lines.append(f"Host: {HOST_STRING}.")
+    lines.append(f"Host: {host}.")
     lines.append(f"Golden set has {golden_size} questions; this run used {used_size}.")
     lines.append(duplicate_note)
     lines.append(CACHE_KEYING_NOTE)
@@ -425,11 +440,12 @@ def main(argv=None):
 
     command = _canonical_command(provider_names, args.limit)
     all_cassettes = dict(provider_cassettes, retrieval=retrieval_cassette)
+    host = _resolved_host(provider_cassettes, provider_names, args.dry_run)
 
     args.out.mkdir(parents=True, exist_ok=True)
     markdown = _render_markdown(
         command, all_cassettes, len(all_questions), len(questions), backend,
-        provider_names, results, reference, injection, duplicate_note,
+        provider_names, results, reference, injection, duplicate_note, host,
     )
     (args.out / "results.md").write_text(markdown)
 
@@ -437,7 +453,7 @@ def main(argv=None):
         "header": {
             "command": command,
             "recorded_at": {name: c.recorded_at for name, c in all_cassettes.items()},
-            "host": HOST_STRING,
+            "host": host,
             "golden_set_size": len(all_questions),
             "questions_used": len(questions),
             "duplicate_questions": {"count": duplicate_count, "note": duplicate_note},

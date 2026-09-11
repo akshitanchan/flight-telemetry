@@ -412,6 +412,61 @@ class TestEvalMatrixDuplicateQuestions(unittest.TestCase):
         self.assertIn(data["header"]["duplicate_questions"]["note"], markdown)
 
 
+class TestEvalMatrixHostReplay(unittest.TestCase):
+    """The host line describes where the numbers were recorded, so a replay
+    must reproduce it from the cassette even on a different interpreter."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = tempfile.TemporaryDirectory()
+        tmp = Path(cls._tmp.name)
+        cls.fixtures_dir = tmp / "llm"
+        cls.fixtures_dir.mkdir()
+        cls.injections_path = tmp / "injections.json"
+        cls.questions, cls.probe_question = _build_fixtures(cls.fixtures_dir)
+        _write_injections(cls.injections_path, cls.probe_question)
+
+        # stamp a recorded host distinct from matrix.HOST_STRING onto both
+        # provider cassettes, as a live run would, so the assertion below
+        # cannot pass by coincidence
+        cls.recorded_host = "Recorded Host, Python 9.9 in ~/elsewhere"
+        for provider_name in _PROVIDER_MODELS:
+            path = cls.fixtures_dir / f"{provider_name}.json"
+            data = json.loads(path.read_text())
+            data["meta"]["host"] = cls.recorded_host
+            path.write_text(json.dumps(data, sort_keys=True, indent=2))
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._tmp.cleanup()
+
+    def test_dry_run_replays_the_recorded_host_not_the_running_interpreter(self):
+        out_dir = Path(self._tmp.name) / "out_host"
+        argv = [
+            "--dry-run",
+            "--providers", "openai,bedrock",
+            "--limit", "2",
+            "--out", str(out_dir),
+            "--fixtures-dir", str(self.fixtures_dir),
+            "--gold", str(GOLD),
+            "--corpus", str(CORPUS),
+            "--golden", str(GOLDEN),
+            "--injections", str(self.injections_path),
+        ]
+        # pretend the replaying interpreter reports a different host; the
+        # replay must still show what was recorded, not where it replayed
+        with mock.patch.object(matrix, "HOST_STRING", "Other Host, Python 3.12 in ~/elsewhere"):
+            rc = matrix.main(argv)
+        self.assertEqual(rc, 0)
+
+        markdown = (out_dir / "results.md").read_text()
+        self.assertIn(f"Host: {self.recorded_host}.", markdown)
+        self.assertNotIn("Python 3.12", markdown)
+
+        data = json.loads((out_dir / "results.json").read_text())
+        self.assertEqual(data["header"]["host"], self.recorded_host)
+
+
 class TestEvalMatrixCanonicalCommand(unittest.TestCase):
     """The header command names how to reproduce the file, not the literal
     argv, so it reads the same whether or not the run used --dry-run/--out."""

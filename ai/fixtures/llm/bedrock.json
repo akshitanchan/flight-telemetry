@@ -2048,6 +2048,7 @@
     }
   },
   "meta": {
+    "host": "Apple M2, macOS, Python 3.14 in ~/.venvs/flight-telemetry",
     "model": "us.meta.llama3-1-8b-instruct-v1:0",
     "provider": "bedrock"
   },
