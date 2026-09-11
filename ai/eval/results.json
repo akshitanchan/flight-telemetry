@@ -1,0 +1,118 @@
+{
+  "architectures": {
+    "langgraph_plan_execute": {
+      "bedrock": {
+        "accuracy": 0.7212,
+        "cache_hits": 1,
+        "citation_rate": 0.9327,
+        "cost_per_query_usd": 0.00012531,
+        "n": 104,
+        "p50_latency_s": 0.7772,
+        "provider_label": "bedrock:us.meta.llama3-1-8b-instruct-v1:0"
+      },
+      "openai": {
+        "accuracy": 0.8269,
+        "cache_hits": 1,
+        "citation_rate": 0.9135,
+        "cost_per_query_usd": 0.00011258,
+        "n": 104,
+        "p50_latency_s": 1.8435,
+        "provider_label": "openai:gpt-4o-mini"
+      }
+    },
+    "plan_execute": {
+      "bedrock": {
+        "accuracy": 0.7212,
+        "cache_hits": 1,
+        "citation_rate": 0.9327,
+        "cost_per_query_usd": 0.00012531,
+        "n": 104,
+        "p50_latency_s": 0.7772,
+        "provider_label": "bedrock:us.meta.llama3-1-8b-instruct-v1:0"
+      },
+      "openai": {
+        "accuracy": 0.8269,
+        "cache_hits": 1,
+        "citation_rate": 0.9135,
+        "cost_per_query_usd": 0.00011258,
+        "n": 104,
+        "p50_latency_s": 1.8435,
+        "provider_label": "openai:gpt-4o-mini"
+      }
+    },
+    "single_shot_rag": {
+      "bedrock": {
+        "accuracy": 0.7115,
+        "cache_hits": 1,
+        "citation_rate": 0.9904,
+        "cost_per_query_usd": 7.923e-05,
+        "n": 104,
+        "p50_latency_s": 0.3742,
+        "provider_label": "bedrock:us.meta.llama3-1-8b-instruct-v1:0"
+      },
+      "openai": {
+        "accuracy": 0.9423,
+        "cache_hits": 1,
+        "citation_rate": 0.9712,
+        "cost_per_query_usd": 6.715e-05,
+        "n": 104,
+        "p50_latency_s": 0.8748,
+        "provider_label": "openai:gpt-4o-mini"
+      }
+    }
+  },
+  "header": {
+    "cache_keying_note": "The semantic cache ran in exact-match keying, so the live run and its replay follow the same code path. In embedding mode, five paraphrased questions in the golden set would also have been served from cache.",
+    "command": "make eval",
+    "duplicate_questions": {
+      "count": 1,
+      "note": "1 question in the golden set is an exact duplicate and was served from the semantic cache on its second occurrence at zero provider cost."
+    },
+    "golden_set_size": 104,
+    "host": "Apple M2, macOS, Python 3.14 in ~/.venvs/flight-telemetry",
+    "latency_note": "p50 latency covers provider call latency only; it excludes local tool and guardrail time.",
+    "models": {
+      "bedrock": "bedrock:us.meta.llama3-1-8b-instruct-v1:0",
+      "openai": "openai:gpt-4o-mini"
+    },
+    "price_per_1k_usd": {
+      "bedrock": [
+        0.00022,
+        0.00022
+      ],
+      "checked": "2026-09-10",
+      "openai": [
+        0.00015,
+        0.0006
+      ]
+    },
+    "questions_used": 104,
+    "recorded_at": {
+      "bedrock": "2026-09-11",
+      "openai": "2026-09-11",
+      "retrieval": "2026-09-11"
+    },
+    "retrieval_backend": "keyword fallback"
+  },
+  "injection": {
+    "bedrock": {
+      "block_rate": 0.8,
+      "blocked_at_input": 19,
+      "probes": 25,
+      "rejected_at_output": 1
+    },
+    "openai": {
+      "block_rate": 0.84,
+      "blocked_at_input": 19,
+      "probes": 25,
+      "rejected_at_output": 2
+    }
+  },
+  "reference": {
+    "accuracy": 0.9038,
+    "citation_rate": 1.0,
+    "cost_usd": 0.0,
+    "n": 104,
+    "strategy": "rule_based_v1"
+  }
+}
