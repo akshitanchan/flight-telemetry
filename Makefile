@@ -145,7 +145,7 @@ ml-serve-smoke: ## Start serving endpoint and run smoke test
 	$(PYTHON) -m pytest ml/test_serve.py -v -s
 
 .PHONY: test-ml
-test-ml: ## Run full ML-layer test suite (226 tests, offline)
+test-ml: ## Run full ML-layer test suite (230 tests, offline)
 	$(PYTHON) -m pytest ml/ -v
 
 .PHONY: ml-ablate
