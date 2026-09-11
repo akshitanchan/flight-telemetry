@@ -1,6 +1,6 @@
 I built this Astro project to orchestrate the flight-telemetry lakehouse pipeline in Airflow. The DAG that lives here walks the medallion hops from bronze to gold, checking each hop's output against the repo's data contracts before it moves on, then runs dbt build and dbt test against Snowflake to refresh the marts.
 
-I run `astro dev start` from this directory to bring up the local scheduler, triggerer, dag processor, and API server. The API server answers on port 8090 and Postgres on 5440, so they do not collide with the kind cluster and the local Postgres I run alongside.
+I source airflow/.env in my shell first (`set -a; source .env; set +a`), because docker compose substitutes the key file path from the shell environment rather than from the file, then run `astro dev start` from this directory to bring up the local scheduler, triggerer, dag processor, and API server. The API server answers on port 8090 and Postgres on 5440, so they do not collide with the kind cluster and the local Postgres I run alongside.
 
 The repo root is mounted read-write into the scheduler, triggerer, and dag processor containers at /usr/local/airflow/repo, so the DAG imports the repo's own Python modules directly and runs dbt against the profile checked into data/cloud/dbt/flight_telemetry.
 
