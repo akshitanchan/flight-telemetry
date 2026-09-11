@@ -93,7 +93,7 @@ test-data: ## Run data-layer tests
 	$(PYTHON) -m pytest data/tests/ -v 2>/dev/null || $(PYTHON) -m unittest discover -s data/tests -v
 
 .PHONY: test-cloud
-test-cloud: ## Run cloud data-layer tests (237 tests, offline)
+test-cloud: ## Run cloud data-layer tests (242 tests, offline)
 	$(PYTHON) -m pytest data/cloud/ -v
 
 .PHONY: airflow-test
