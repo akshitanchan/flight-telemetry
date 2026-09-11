@@ -23,7 +23,7 @@ Fuel burn: an early model scored a suspiciously good 395 kg, which turned out to
 
 Refresh benchmark, full recompute against an incremental MERGE of a 10 percent batch at one million rows: 3.0x on the local DuckDB harness and 0.98x on a Snowflake X-Small warehouse, both measured on 2026-09-11. Both targets pass `dbt build` with 63 nodes (4 models, 54 data tests, 5 unit tests); see bench/results.md for commands and hardware.
 
-AI agent on gpt-4o-mini: single-shot RAG scores 76% accuracy, 100% citation, $0.0015 per question; plan-execute 60%, 100%, $0.0023; ReAct 20%, 40%, $0.0074. Golden set: 104 questions split between deterministic core (100% accuracy gate) and open-ended tier.
+AI agent, full 104-question golden set, recorded on 2026-09-11 and replayed offline by `make eval DRY_RUN=1`: single-shot RAG scores 0.942 accuracy and 0.971 citation on gpt-4o-mini against 0.712 and 0.990 on Llama 3.1 8B through Bedrock; plan-execute scores 0.827 and 0.913 against 0.721 and 0.933, and the LangGraph version of plan-execute reproduces those numbers exactly because it sends the same prompts to the same tools; the deterministic router scores 0.904 with full citation at no cost, and the 25-probe injection suite blocks 0.84 on OpenAI and 0.80 on Bedrock. Cost per query, p50 latency, and the per-provider injection table are in ai/eval/results.md, and CI fails if any cell drops below ai/eval/baseline.json. An earlier extended-tier run put ReAct at 20% accuracy and 40% citation at five times the cost, which is why it is not in the matrix.
 
 ## Limitations
 
