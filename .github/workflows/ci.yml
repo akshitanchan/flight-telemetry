@@ -47,6 +47,12 @@ jobs:
       - name: AI tests
         run: make test-ai
 
+      - name: AI eval replay
+        run: make eval DRY_RUN=1
+
+      - name: AI eval is reproducible
+        run: git diff --exit-code ai/eval/results.md ai/eval/results.json
+
       - name: Cloud tests
         run: make test-cloud
 

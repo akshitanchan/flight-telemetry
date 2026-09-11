@@ -1,0 +1,35 @@
+{
+  "architectures": {
+    "langgraph_plan_execute": {
+      "bedrock": {
+        "accuracy": 0.7212,
+        "citation_rate": 0.9327
+      },
+      "openai": {
+        "accuracy": 0.8269,
+        "citation_rate": 0.9135
+      }
+    },
+    "plan_execute": {
+      "bedrock": {
+        "accuracy": 0.7212,
+        "citation_rate": 0.9327
+      },
+      "openai": {
+        "accuracy": 0.8269,
+        "citation_rate": 0.9135
+      }
+    },
+    "single_shot_rag": {
+      "bedrock": {
+        "accuracy": 0.7115,
+        "citation_rate": 0.9904
+      },
+      "openai": {
+        "accuracy": 0.9423,
+        "citation_rate": 0.9712
+      }
+    }
+  },
+  "recorded_at": "2026-09-11"
+}
