@@ -366,8 +366,10 @@ def train(args: argparse.Namespace) -> None:
         if best_state is not None:
             model.load_state_dict(best_state)
 
-        # Log the PyTorch model
-        mlflow.pytorch.log_model(model, "model")
+        # Log the PyTorch model.
+        # pickle keeps the artifact loadable as an nn.Module by serve.py and
+        # score_rank.py; mlflow >= 3.14 defaults to the pt2 traced-graph format.
+        mlflow.pytorch.log_model(model, "model", serialization_format="pickle")
 
 
 # ---------------------------------------------------------------------------

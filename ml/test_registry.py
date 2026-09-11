@@ -122,7 +122,7 @@ def _log_model_run(
         # Suppress the pickle/CloudPickle advisory for test output cleanliness.
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            mlflow.pytorch.log_model(model, "model")
+            mlflow.pytorch.log_model(model, "model", serialization_format="pickle")
         mlflow.log_metric(metric_key, rmse)
         if extra_tags:
             for k, v in extra_tags.items():

@@ -145,7 +145,9 @@ def _log_full_run(
             model = _TinyModel()
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                mlflow.pytorch.log_model(model, EXPECTED_ARTIFACT_PATH)
+                mlflow.pytorch.log_model(
+                    model, EXPECTED_ARTIFACT_PATH, serialization_format="pickle"
+                )
 
         if extra_tags:
             for k, v in extra_tags.items():
