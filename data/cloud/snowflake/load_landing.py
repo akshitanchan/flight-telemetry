@@ -130,6 +130,8 @@ def load(parquet_dir: Path) -> dict[str, int]:
     try:
         cursor = conn.cursor()
         try:
+            # the parquet loader applied the session zone to utc timestamps until logical types were switched on
+            cursor.execute("alter session set timezone = 'UTC'")
             for table in TABLE_COLUMNS:
                 base = table[: -len("_landing")]
                 parquet_path = (parquet_dir / f"{base}.parquet").resolve().as_posix()
@@ -140,7 +142,7 @@ def load(parquet_dir: Path) -> dict[str, int]:
                 )
                 cursor.execute(
                     f"copy into {table} from @%{table} "
-                    f"file_format = (type = parquet) "
+                    f"file_format = (type = parquet, use_logical_type = true) "
                     f"match_by_column_name = case_insensitive purge = true"
                 )
                 rows = cursor.fetchall()
