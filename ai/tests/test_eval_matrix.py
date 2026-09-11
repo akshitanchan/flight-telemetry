@@ -199,6 +199,22 @@ class TestEvalMatrixDryRun(unittest.TestCase):
         ]
         return matrix.main(argv)
 
+    def _record_run(self, out_dir, limit=2, providers="openai,bedrock"):
+        # no --dry-run: exercises the recording path, but the fixtures cassettes
+        # already hold every entry this run needs, so no live call happens and
+        # no credentials are required (see _resolve_provider's cassette fallback)
+        argv = [
+            "--providers", providers,
+            "--limit", str(limit),
+            "--out", str(out_dir),
+            "--fixtures-dir", str(self.fixtures_dir),
+            "--gold", str(GOLD),
+            "--corpus", str(CORPUS),
+            "--golden", str(GOLDEN),
+            "--injections", str(self.injections_path),
+        ]
+        return matrix.main(argv)
+
     def test_writes_one_row_per_architecture_and_one_column_group_per_provider(self):
         out_dir = Path(self._tmp.name) / "out_shape"
         rc = self._dry_run(out_dir)
@@ -248,6 +264,26 @@ class TestEvalMatrixDryRun(unittest.TestCase):
 
         self.assertEqual(first_md, second_md)
         self.assertEqual(first_json, second_json)
+
+    def test_recording_run_and_dry_run_replay_are_byte_identical(self):
+        # a live smoke run (recording mode, no --dry-run) and its --dry-run
+        # replay into a different --out must match byte for byte: that's what
+        # the CI gate checks with `make eval DRY_RUN=1` plus `git diff`
+        record_dir = Path(self._tmp.name) / "out_record"
+        replay_dir = Path(self._tmp.name) / "out_record_replay"
+
+        rc = self._record_run(record_dir)
+        self.assertEqual(rc, 0)
+        rc = self._dry_run(replay_dir)
+        self.assertEqual(rc, 0)
+
+        record_md = (record_dir / "results.md").read_bytes()
+        replay_md = (replay_dir / "results.md").read_bytes()
+        record_json = (record_dir / "results.json").read_bytes()
+        replay_json = (replay_dir / "results.json").read_bytes()
+
+        self.assertEqual(record_md, replay_md)
+        self.assertEqual(record_json, replay_json)
 
     def test_cassette_miss_names_the_question(self):
         out_dir = Path(self._tmp.name) / "out_miss"
@@ -374,6 +410,23 @@ class TestEvalMatrixDuplicateQuestions(unittest.TestCase):
 
         markdown = (out_dir / "results.md").read_text()
         self.assertIn(data["header"]["duplicate_questions"]["note"], markdown)
+
+
+class TestEvalMatrixCanonicalCommand(unittest.TestCase):
+    """The header command names how to reproduce the file, not the literal
+    argv, so it reads the same whether or not the run used --dry-run/--out."""
+
+    def test_default_run_reads_make_eval(self):
+        self.assertEqual(
+            matrix._canonical_command(matrix.ALL_PROVIDERS, None),
+            "make eval",
+        )
+
+    def test_limited_run_reads_make_eval_with_eval_args(self):
+        self.assertEqual(
+            matrix._canonical_command(matrix.ALL_PROVIDERS, 2),
+            'make eval EVAL_ARGS="--limit 2"',
+        )
 
 
 class TestEvalMatrixBaselineGate(unittest.TestCase):

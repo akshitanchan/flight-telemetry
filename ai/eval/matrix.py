@@ -85,7 +85,8 @@ def _duplicate_sentence(count):
             "the semantic cache on their second occurrence at zero provider cost.")
 
 
-# stand-in for a live provider in dry-run replay; never actually invoked,
+# stand-in for a live provider when replaying from a cassette, whether that's
+# --dry-run or a recording run with no live credentials; never actually invoked,
 # since every question must be served by a cassette hit or CassetteMiss fires first
 class _CassetteProviderIdentity:
     def __init__(self, name, model):
@@ -95,7 +96,7 @@ class _CassetteProviderIdentity:
 
     def __call__(self, messages):
         raise RuntimeError(
-            f"dry-run stub for {self.label} was invoked directly; "
+            f"cassette stub for {self.label} was invoked directly; "
             "the cassette should have raised CassetteMiss first"
         )
 
@@ -115,7 +116,14 @@ def _resolve_provider(cassette, name, max_tokens, dry_run):
     try:
         provider = providers.build(name, max_tokens=max_tokens)
     except RuntimeError as exc:
-        return None, str(exc)
+        # no live credentials: fall back to the identity this cassette already
+        # recorded, same stand-in as --dry-run, so a recording run over a fully
+        # cached cassette still works (e.g. replaying synthetic fixtures in tests)
+        model = cassette.meta.get("model")
+        if not model:
+            return None, str(exc)
+        recorded_name = cassette.meta.get("provider", name)
+        return _CassetteProviderIdentity(recorded_name, model), None
     cassette.meta = {"provider": provider.name, "model": provider.model}
     return provider, None
 
@@ -328,6 +336,21 @@ def _render_markdown(command, cassettes, golden_size, used_size, backend,
     return "\n".join(lines)
 
 
+def _canonical_command(provider_names, limit):
+    # the header must record how to reproduce this file, not the literal argv,
+    # so a --dry-run replay into a different --out still matches the live run
+    # byte for byte; --dry-run, --out and --fixtures-dir are execution details
+    # and never appear here
+    flags = []
+    if provider_names != ALL_PROVIDERS:
+        flags.append(f"--providers {','.join(provider_names)}")
+    if limit is not None:
+        flags.append(f"--limit {limit}")
+    if not flags:
+        return "make eval"
+    return f'make eval EVAL_ARGS="{" ".join(flags)}"'
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description="Run the architecture x provider eval matrix"
@@ -391,19 +414,19 @@ def main(argv=None):
         for name in provider_names
     }
 
-    command = "python -m ai.eval.matrix " + " ".join(sys.argv[1:] if argv is None else argv)
+    command = _canonical_command(provider_names, args.limit)
     all_cassettes = dict(provider_cassettes, retrieval=retrieval_cassette)
 
     args.out.mkdir(parents=True, exist_ok=True)
     markdown = _render_markdown(
-        command.strip(), all_cassettes, len(all_questions), len(questions), backend,
+        command, all_cassettes, len(all_questions), len(questions), backend,
         provider_names, results, reference, injection, duplicate_note,
     )
     (args.out / "results.md").write_text(markdown)
 
     output = {
         "header": {
-            "command": command.strip(),
+            "command": command,
             "recorded_at": {name: c.recorded_at for name, c in all_cassettes.items()},
             "host": HOST_STRING,
             "golden_set_size": len(all_questions),
