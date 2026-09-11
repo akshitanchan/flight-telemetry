@@ -1,0 +1,2219 @@
+{
+  "entries": {
+    "016bf79e8279ad6fc6deb8c6c8ff8f3b8a41dfee8929e90e48f433092c3cfb47": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.875,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.875,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "ntsb-fuel-exhaustion",
+          "score": 0.625,
+          "snippet": "Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+          "title": "NTSB-style incident report: fuel exhaustion and forced landing"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-eng-failure",
+        "ntsb-fuel-exhaustion"
+      ]
+    },
+    "055dc3ace33189107af8f9f0c26da9989db6b50fa30f41e4ca8d8444161fe6d4": {
+      "answer": "Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+      "results": [
+        {
+          "id": "ntsb-fuel-exhaustion",
+          "score": 0.308,
+          "snippet": "Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+          "title": "NTSB-style incident report: fuel exhaustion and forced landing"
+        },
+        {
+          "id": "ref-altimeter-settings",
+          "score": 0.308,
+          "snippet": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+          "title": "Altimeter settings QNH QFE QNE and transition altitude"
+        },
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.308,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        }
+      ],
+      "sources": [
+        "ntsb-fuel-exhaustion",
+        "ref-altimeter-settings",
+        "ref-squawk-codes"
+      ]
+    },
+    "07191750b2f641ba2f7d85dfc86cfed195aa2d2cee286541af660829148e326a": {
+      "answer": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+      "results": [
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.75,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        },
+        {
+          "id": "metar-eham",
+          "score": 0.25,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.25,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        }
+      ],
+      "sources": [
+        "ref-squawk-codes",
+        "metar-eham",
+        "ntsb-bird-strike"
+      ]
+    },
+    "07bfa3f02f149f392b695e75b7d7fada8e19b293b1be2968e0457b3ae857ca2d": {
+      "answer": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+      "results": [
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.4,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.2,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-icing",
+          "score": 0.2,
+          "snippet": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+          "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect"
+        }
+      ],
+      "sources": [
+        "ref-squawk-codes",
+        "ntsb-bird-strike",
+        "ntsb-icing"
+      ]
+    },
+    "092e94ec9eb5466616db310eeab9c1f2ea214074b130a4f5cd525c5b099c4134": {
+      "answer": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+      "results": [
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.667,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.333,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-icing",
+          "score": 0.333,
+          "snippet": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+          "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect"
+        }
+      ],
+      "sources": [
+        "ref-squawk-codes",
+        "ntsb-bird-strike",
+        "ntsb-icing"
+      ]
+    },
+    "09f2a49023b69ecfb1feb22ffcfa9b64dc2295d1b7f635de1fd6818bd2503839": {
+      "answer": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+      "results": [
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.571,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.286,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-icing",
+          "score": 0.286,
+          "snippet": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+          "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect"
+        }
+      ],
+      "sources": [
+        "ref-squawk-codes",
+        "ntsb-bird-strike",
+        "ntsb-icing"
+      ]
+    },
+    "09f82b43e3489d00572796ee7ffc25a5261d10925be949501552a10188fb4571": {
+      "answer": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+      "results": [
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.667,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.333,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-icing",
+          "score": 0.333,
+          "snippet": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+          "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect"
+        }
+      ],
+      "sources": [
+        "ref-squawk-codes",
+        "ntsb-bird-strike",
+        "ntsb-icing"
+      ]
+    },
+    "1749d546cbf436464d979a43b021fe843307b9feba15c59e5a20516c49871a79": {
+      "answer": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+      "results": [
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.667,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.333,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-icing",
+          "score": 0.333,
+          "snippet": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+          "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect"
+        }
+      ],
+      "sources": [
+        "ref-squawk-codes",
+        "ntsb-bird-strike",
+        "ntsb-icing"
+      ]
+    },
+    "18df0febed59d4db40f1966e99246bcad5983878456e0eb849d303d6f150bb05": {
+      "answer": "",
+      "results": [],
+      "sources": []
+    },
+    "1fc2547c969f27cb2664767ad04ffd7b8f5816715fdfe63d688438c15217e50c": {
+      "answer": "LOWW 031150Z 14006KT CAVOK 21/09 Q1020 NOSIG. Decoded: ICAO station LOWW Vienna Schwechat International Airport Austria, wind 140 degrees at 6 knots, CAVOK ceiling and visibility OK (visibility greate EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+      "results": [
+        {
+          "id": "metar-loww",
+          "score": 1.0,
+          "snippet": "LOWW 031150Z 14006KT CAVOK 21/09 Q1020 NOSIG. Decoded: ICAO station LOWW Vienna Schwechat International Airport Austria, wind 140 degrees at 6 knots, CAVOK ceiling and visibility OK (visibility greate",
+          "title": "METAR LOWW Vienna International Airport"
+        },
+        {
+          "id": "metar-ebbr",
+          "score": 0.5,
+          "snippet": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+          "title": "METAR EBBR Brussels Airport"
+        },
+        {
+          "id": "metar-eddf",
+          "score": 0.5,
+          "snippet": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+          "title": "METAR EDDF Frankfurt am Main Airport"
+        }
+      ],
+      "sources": [
+        "metar-loww",
+        "metar-ebbr",
+        "metar-eddf"
+      ]
+    },
+    "26c027bc26c3bba542ac571533c506cd0757e419563fc404f9aa8696dc07d471": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft ",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.333,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.333,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "ntsb-loss-sep",
+          "score": 0.333,
+          "snippet": "Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft ",
+          "title": "NTSB-style incident report: loss of separation on crossing tracks"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-eng-failure",
+        "ntsb-loss-sep"
+      ]
+    },
+    "2851e7a2cdb01c6a76a7f56a5b1e8c5886361b3b51d87acf22dfce5771f3dd26": {
+      "answer": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+      "results": [
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.75,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        },
+        {
+          "id": "metar-eham",
+          "score": 0.25,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.25,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        }
+      ],
+      "sources": [
+        "ref-squawk-codes",
+        "metar-eham",
+        "ntsb-bird-strike"
+      ]
+    },
+    "29b1279704a787b7a9628708ca2d764dcdb31ada47d45c88a4edb7ea3eb5c1c0": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.667,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.667,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "ntsb-fuel-exhaustion",
+          "score": 0.333,
+          "snippet": "Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+          "title": "NTSB-style incident report: fuel exhaustion and forced landing"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-eng-failure",
+        "ntsb-fuel-exhaustion"
+      ]
+    },
+    "2d957aee8197b13a0f5a07a0bd5cdb740e8fbc88fcf4ecb432d94466c7897698": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.333,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-icing",
+          "score": 0.333,
+          "snippet": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+          "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect"
+        },
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.333,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-icing",
+        "ref-squawk-codes"
+      ]
+    },
+    "2de0cb757a65b7d3a091f160179698bd7d8be4fba23143babbf9cc322da4dc72": {
+      "answer": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+      "results": [
+        {
+          "id": "metar-eddf",
+          "score": 0.667,
+          "snippet": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+          "title": "METAR EDDF Frankfurt am Main Airport"
+        },
+        {
+          "id": "ref-altimeter-settings",
+          "score": 0.5,
+          "snippet": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+          "title": "Altimeter settings QNH QFE QNE and transition altitude"
+        },
+        {
+          "id": "metar-ebbr",
+          "score": 0.333,
+          "snippet": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+          "title": "METAR EBBR Brussels Airport"
+        }
+      ],
+      "sources": [
+        "metar-eddf",
+        "ref-altimeter-settings",
+        "metar-ebbr"
+      ]
+    },
+    "2e589da6a890e6ff16dc526f8f28c5137e9a069b03974457e1f269e8732cb898": {
+      "answer": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+      "results": [
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.4,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.2,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-icing",
+          "score": 0.2,
+          "snippet": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+          "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect"
+        }
+      ],
+      "sources": [
+        "ref-squawk-codes",
+        "ntsb-bird-strike",
+        "ntsb-icing"
+      ]
+    },
+    "3133a4fd01c5d4f8bb7469b819c48a1a59fc74de24f44b7ce875aaded5631a93": {
+      "answer": "Incident summary: A regional turboprop aircraft holding short of runway 28L received a conditional line-up clearance that was misunderstood as an unconditional take-off clearance. The crew lined up an Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A freighter aircraft flew an unstabilised instrument approach in mountainous terrain at night under instrument meteorological conditions. The Enhanced Ground Proximity Warning System",
+      "results": [
+        {
+          "id": "ntsb-runway-incursion",
+          "score": 0.5,
+          "snippet": "Incident summary: A regional turboprop aircraft holding short of runway 28L received a conditional line-up clearance that was misunderstood as an unconditional take-off clearance. The crew lined up an",
+          "title": "NTSB-style incident report: runway incursion during low-visibility operations"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.417,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-controlled-flight",
+          "score": 0.417,
+          "snippet": "Incident summary: A freighter aircraft flew an unstabilised instrument approach in mountainous terrain at night under instrument meteorological conditions. The Enhanced Ground Proximity Warning System",
+          "title": "NTSB-style incident report: controlled flight into terrain warning during approach"
+        }
+      ],
+      "sources": [
+        "ntsb-runway-incursion",
+        "ntsb-bird-strike",
+        "ntsb-controlled-flight"
+      ]
+    },
+    "3594f411160810b5bab3869404862be05bc2575e71a76ada9f5d34a462e77b21": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 1.0,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 1.0,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "ntsb-fuel-exhaustion",
+          "score": 0.75,
+          "snippet": "Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+          "title": "NTSB-style incident report: fuel exhaustion and forced landing"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-eng-failure",
+        "ntsb-fuel-exhaustion"
+      ]
+    },
+    "36f407bfda372585a8bb2558ffd492b0626593f1fbfd7430ca39171d6dae1a39": {
+      "answer": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+      "results": [
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.75,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        },
+        {
+          "id": "metar-eham",
+          "score": 0.25,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.25,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        }
+      ],
+      "sources": [
+        "ref-squawk-codes",
+        "metar-eham",
+        "ntsb-bird-strike"
+      ]
+    },
+    "3ab98a246e771d20b06dc960d68fe1b4cac370d2e243ae62f9d6f3c278ac3fbc": {
+      "answer": "Incident summary: A freighter aircraft flew an unstabilised instrument approach in mountainous terrain at night under instrument meteorological conditions. The Enhanced Ground Proximity Warning System Flight rules reference: Visual Flight Rules (VFR) require pilots to maintain visual separation from clouds and terrain. Basic VFR minima in controlled airspace (Class C, D, E): flight visibility 5 km, EGLL 031120Z 22015KT 190V250 6000 -SHRA FEW010 SCT018 BKN030 14/10 Q1008 TEMPO 3000 SHRA BKN010. Decoded: ICAO station EGLL London Heathrow Airport United Kingdom, wind 220 degrees at 15 knots variabl",
+      "results": [
+        {
+          "id": "ntsb-controlled-flight",
+          "score": 0.429,
+          "snippet": "Incident summary: A freighter aircraft flew an unstabilised instrument approach in mountainous terrain at night under instrument meteorological conditions. The Enhanced Ground Proximity Warning System",
+          "title": "NTSB-style incident report: controlled flight into terrain warning during approach"
+        },
+        {
+          "id": "ref-flight-rules",
+          "score": 0.429,
+          "snippet": "Flight rules reference: Visual Flight Rules (VFR) require pilots to maintain visual separation from clouds and terrain. Basic VFR minima in controlled airspace (Class C, D, E): flight visibility 5 km,",
+          "title": "VFR and IFR flight rules visibility and cloud clearance minima"
+        },
+        {
+          "id": "metar-egll",
+          "score": 0.286,
+          "snippet": "EGLL 031120Z 22015KT 190V250 6000 -SHRA FEW010 SCT018 BKN030 14/10 Q1008 TEMPO 3000 SHRA BKN010. Decoded: ICAO station EGLL London Heathrow Airport United Kingdom, wind 220 degrees at 15 knots variabl",
+          "title": "METAR EGLL London Heathrow Airport"
+        }
+      ],
+      "sources": [
+        "ntsb-controlled-flight",
+        "ref-flight-rules",
+        "metar-egll"
+      ]
+    },
+    "3ae7bf374d123b38c8728c04ae129f502fe4889b61a501936bf9fdf3dce4a2ec": {
+      "answer": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+      "results": [
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.571,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.429,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-icing",
+          "score": 0.429,
+          "snippet": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+          "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect"
+        }
+      ],
+      "sources": [
+        "ref-squawk-codes",
+        "ntsb-bird-strike",
+        "ntsb-icing"
+      ]
+    },
+    "3d4a222475559a739068be33729fcdf858f05a5f30e478eef2527487c5719622": {
+      "answer": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+      "results": [
+        {
+          "id": "metar-eham",
+          "score": 1.0,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "metar-ebbr",
+          "score": 0.333,
+          "snippet": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+          "title": "METAR EBBR Brussels Airport"
+        },
+        {
+          "id": "metar-eddf",
+          "score": 0.333,
+          "snippet": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+          "title": "METAR EDDF Frankfurt am Main Airport"
+        }
+      ],
+      "sources": [
+        "metar-eham",
+        "metar-ebbr",
+        "metar-eddf"
+      ]
+    },
+    "4246ee15230e589f98a654f77fb917b59a434588482b0998f6d7c8760ffcd04f": {
+      "answer": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+      "results": [
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.444,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "ntsb-fuel-exhaustion",
+          "score": 0.444,
+          "snippet": "Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+          "title": "NTSB-style incident report: fuel exhaustion and forced landing"
+        },
+        {
+          "id": "ref-altimeter-settings",
+          "score": 0.444,
+          "snippet": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+          "title": "Altimeter settings QNH QFE QNE and transition altitude"
+        }
+      ],
+      "sources": [
+        "ntsb-eng-failure",
+        "ntsb-fuel-exhaustion",
+        "ref-altimeter-settings"
+      ]
+    },
+    "441318bbb192755700b11f1a49e22c61d22163a76a4613a1d7c6a54ac3308ef2": {
+      "answer": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M Incident summary: A freighter aircraft flew an unstabilised instrument approach in mountainous terrain at night under instrument meteorological conditions. The Enhanced Ground Proximity Warning System Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+      "results": [
+        {
+          "id": "ref-altimeter-settings",
+          "score": 0.5,
+          "snippet": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+          "title": "Altimeter settings QNH QFE QNE and transition altitude"
+        },
+        {
+          "id": "ntsb-controlled-flight",
+          "score": 0.417,
+          "snippet": "Incident summary: A freighter aircraft flew an unstabilised instrument approach in mountainous terrain at night under instrument meteorological conditions. The Enhanced Ground Proximity Warning System",
+          "title": "NTSB-style incident report: controlled flight into terrain warning during approach"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.417,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        }
+      ],
+      "sources": [
+        "ref-altimeter-settings",
+        "ntsb-controlled-flight",
+        "ntsb-eng-failure"
+      ]
+    },
+    "4ad1f71fb0cc71cf02dc12600bb9076fe25866a9d5d04e1afb86bf8ea6802a38": {
+      "answer": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+      "results": [
+        {
+          "id": "metar-eham",
+          "score": 0.6,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "metar-ebbr",
+          "score": 0.2,
+          "snippet": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+          "title": "METAR EBBR Brussels Airport"
+        },
+        {
+          "id": "metar-eddf",
+          "score": 0.2,
+          "snippet": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+          "title": "METAR EDDF Frankfurt am Main Airport"
+        }
+      ],
+      "sources": [
+        "metar-eham",
+        "metar-ebbr",
+        "metar-eddf"
+      ]
+    },
+    "4d62f73370a12ca3110c3e204d5ba68731b19b8158d8943a1f7ec106e2c00eaa": {
+      "answer": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+      "results": [
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.625,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.375,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.375,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        }
+      ],
+      "sources": [
+        "ref-squawk-codes",
+        "ntsb-bird-strike",
+        "ntsb-eng-failure"
+      ]
+    },
+    "504e326c41d95e094731db9b35cbf0a7e62f5a484c03f449b44b4ebf8429161a": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.667,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-icing",
+          "score": 0.667,
+          "snippet": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+          "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect"
+        },
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.667,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-icing",
+        "ref-squawk-codes"
+      ]
+    },
+    "51bc760bfd6ae250bae7d73a3e96979169e8105530a7d208b9635be8e0c76a0a": {
+      "answer": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr Incident summary: A long-haul widebody aircraft cruising at FL380 experienced a loss of cabin pressurization due to a failed outflow valve actuator. The cabin altitude climbed above 10 000 ft and oxyg",
+      "results": [
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.556,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "ntsb-fuel-exhaustion",
+          "score": 0.556,
+          "snippet": "Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+          "title": "NTSB-style incident report: fuel exhaustion and forced landing"
+        },
+        {
+          "id": "ntsb-pressurization",
+          "score": 0.556,
+          "snippet": "Incident summary: A long-haul widebody aircraft cruising at FL380 experienced a loss of cabin pressurization due to a failed outflow valve actuator. The cabin altitude climbed above 10 000 ft and oxyg",
+          "title": "NTSB-style incident report: pressurization failure and emergency descent"
+        }
+      ],
+      "sources": [
+        "ntsb-eng-failure",
+        "ntsb-fuel-exhaustion",
+        "ntsb-pressurization"
+      ]
+    },
+    "5c58a81e316af2ff14aa551b9e54c528eb540a27a5393c6d0b47132cc06d0fb8": {
+      "answer": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+      "results": [
+        {
+          "id": "metar-eham",
+          "score": 0.375,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "metar-eddf",
+          "score": 0.25,
+          "snippet": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+          "title": "METAR EDDF Frankfurt am Main Airport"
+        },
+        {
+          "id": "ref-altimeter-settings",
+          "score": 0.25,
+          "snippet": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+          "title": "Altimeter settings QNH QFE QNE and transition altitude"
+        }
+      ],
+      "sources": [
+        "metar-eham",
+        "metar-eddf",
+        "ref-altimeter-settings"
+      ]
+    },
+    "6057bedbde428cf484511e4c1e8024937f291f13a92266e2e6126f9d0361a26c": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.25,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-icing",
+          "score": 0.25,
+          "snippet": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+          "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect"
+        },
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.25,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-icing",
+        "ref-squawk-codes"
+      ]
+    },
+    "6135b871bfe34fac875869e6b07c78621346aab0e54733c98c5bcd8848fccaa6": {
+      "answer": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg Traffic Collision Avoidance System (TCAS II) resolution advisory reference: TCAS issues Traffic Advisories (TA) as caution alerts and Resolution Advisories (RA) as corrective commands. RA types: Climb EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+      "results": [
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.3,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        },
+        {
+          "id": "ref-tcas-ra",
+          "score": 0.3,
+          "snippet": "Traffic Collision Avoidance System (TCAS II) resolution advisory reference: TCAS issues Traffic Advisories (TA) as caution alerts and Resolution Advisories (RA) as corrective commands. RA types: Climb",
+          "title": "TCAS II resolution advisory types and pilot response"
+        },
+        {
+          "id": "metar-ebbr",
+          "score": 0.2,
+          "snippet": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+          "title": "METAR EBBR Brussels Airport"
+        }
+      ],
+      "sources": [
+        "ref-squawk-codes",
+        "ref-tcas-ra",
+        "metar-ebbr"
+      ]
+    },
+    "636b3e74c18e429bea4c3b976b5fe3333c19525f0ca2ec272036ad6bbfd9809e": {
+      "answer": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG EGLL 031120Z 22015KT 190V250 6000 -SHRA FEW010 SCT018 BKN030 14/10 Q1008 TEMPO 3000 SHRA BKN010. Decoded: ICAO station EGLL London Heathrow Airport United Kingdom, wind 220 degrees at 15 knots variabl",
+      "results": [
+        {
+          "id": "metar-eham",
+          "score": 0.4,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "metar-ebbr",
+          "score": 0.3,
+          "snippet": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+          "title": "METAR EBBR Brussels Airport"
+        },
+        {
+          "id": "metar-egll",
+          "score": 0.3,
+          "snippet": "EGLL 031120Z 22015KT 190V250 6000 -SHRA FEW010 SCT018 BKN030 14/10 Q1008 TEMPO 3000 SHRA BKN010. Decoded: ICAO station EGLL London Heathrow Airport United Kingdom, wind 220 degrees at 15 knots variabl",
+          "title": "METAR EGLL London Heathrow Airport"
+        }
+      ],
+      "sources": [
+        "metar-eham",
+        "metar-ebbr",
+        "metar-egll"
+      ]
+    },
+    "64f3ebf3c48e3cb156ab87ac64dc999a0b117e804987435b57b77287d31fd247": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.2,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-icing",
+          "score": 0.2,
+          "snippet": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+          "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect"
+        },
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.2,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-icing",
+        "ref-squawk-codes"
+      ]
+    },
+    "6d3f46fc814f32095dd52fb2a2591b9dc8e2a11339f7b72c21aea995231ee702": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft ",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.833,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.833,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "ntsb-loss-sep",
+          "score": 0.667,
+          "snippet": "Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft ",
+          "title": "NTSB-style incident report: loss of separation on crossing tracks"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-eng-failure",
+        "ntsb-loss-sep"
+      ]
+    },
+    "71a6ffea7a1d2ae9018e656c73113d4503bc608c043cc5046eaf86990ba758a7": {
+      "answer": "",
+      "results": [],
+      "sources": []
+    },
+    "77a35251a19c11664b760cd4f93d155a0514aa1a6850e9fabd1a736fda413f32": {
+      "answer": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+      "results": [
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.75,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.5,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-icing",
+          "score": 0.5,
+          "snippet": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+          "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect"
+        }
+      ],
+      "sources": [
+        "ref-squawk-codes",
+        "ntsb-bird-strike",
+        "ntsb-icing"
+      ]
+    },
+    "77beb3f8cd95306ebf1c09b656293d6e53468580f732225839b9c4a2fe467739": {
+      "answer": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 METAR weather phenomena intensity prefixes: minus (-) for light intensity, no prefix for moderate, plus (+) for heavy intensity. Precipitation descriptors: DZ drizzle, RA rain, SN snow, SG snow grains",
+      "results": [
+        {
+          "id": "metar-eham",
+          "score": 0.667,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "ref-icao-weather-codes",
+          "score": 0.333,
+          "snippet": "METAR weather phenomena intensity prefixes: minus (-) for light intensity, no prefix for moderate, plus (+) for heavy intensity. Precipitation descriptors: DZ drizzle, RA rain, SN snow, SG snow grains",
+          "title": "ICAO METAR weather phenomena codes reference"
+        }
+      ],
+      "sources": [
+        "metar-eham",
+        "ref-icao-weather-codes"
+      ]
+    },
+    "79010aa3ae92ae54948213162170672db30791f444e71e3300f61456b3ce29a8": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.667,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-icing",
+          "score": 0.667,
+          "snippet": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+          "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect"
+        },
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.667,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-icing",
+        "ref-squawk-codes"
+      ]
+    },
+    "7948e950a94384a2810da2510efd27f061352596097ef688813e88b09cec9cd4": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.4,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-icing",
+          "score": 0.4,
+          "snippet": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+          "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect"
+        },
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.4,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-icing",
+        "ref-squawk-codes"
+      ]
+    },
+    "7ab3fe1f7f43340eea06d7f0f7b266b65253a4d4093c4a71d11af180cd8352c2": {
+      "answer": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+      "results": [
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.571,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.286,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-icing",
+          "score": 0.286,
+          "snippet": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+          "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect"
+        }
+      ],
+      "sources": [
+        "ref-squawk-codes",
+        "ntsb-bird-strike",
+        "ntsb-icing"
+      ]
+    },
+    "809f52a1f4e8429c3b47c003a7bab0cbae4fba242b19ee3fd2ca89b818c7b3ad": {
+      "answer": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+      "results": [
+        {
+          "id": "metar-eham",
+          "score": 0.667,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "metar-eddf",
+          "score": 0.333,
+          "snippet": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+          "title": "METAR EDDF Frankfurt am Main Airport"
+        },
+        {
+          "id": "ref-altimeter-settings",
+          "score": 0.333,
+          "snippet": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+          "title": "Altimeter settings QNH QFE QNE and transition altitude"
+        }
+      ],
+      "sources": [
+        "metar-eham",
+        "metar-eddf",
+        "ref-altimeter-settings"
+      ]
+    },
+    "82e74d2d8ef1769a257f8989de5e1717a3f25bed153d82cc2c2dcb464c974b30": {
+      "answer": "Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft  Incident summary: A long-haul widebody aircraft cruising at FL380 experienced a loss of cabin pressurization due to a failed outflow valve actuator. The cabin altitude climbed above 10 000 ft and oxyg Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+      "results": [
+        {
+          "id": "ntsb-loss-sep",
+          "score": 0.6,
+          "snippet": "Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft ",
+          "title": "NTSB-style incident report: loss of separation on crossing tracks"
+        },
+        {
+          "id": "ntsb-pressurization",
+          "score": 0.6,
+          "snippet": "Incident summary: A long-haul widebody aircraft cruising at FL380 experienced a loss of cabin pressurization due to a failed outflow valve actuator. The cabin altitude climbed above 10 000 ft and oxyg",
+          "title": "NTSB-style incident report: pressurization failure and emergency descent"
+        },
+        {
+          "id": "ref-altimeter-settings",
+          "score": 0.6,
+          "snippet": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+          "title": "Altimeter settings QNH QFE QNE and transition altitude"
+        }
+      ],
+      "sources": [
+        "ntsb-loss-sep",
+        "ntsb-pressurization",
+        "ref-altimeter-settings"
+      ]
+    },
+    "869a4b08ba43440480a47ac3217bf51c37a037b0981524b2a64f27de00cfe0a8": {
+      "answer": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 METAR weather phenomena intensity prefixes: minus (-) for light intensity, no prefix for moderate, plus (+) for heavy intensity. Precipitation descriptors: DZ drizzle, RA rain, SN snow, SG snow grains",
+      "results": [
+        {
+          "id": "metar-eham",
+          "score": 0.5,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "ref-icao-weather-codes",
+          "score": 0.25,
+          "snippet": "METAR weather phenomena intensity prefixes: minus (-) for light intensity, no prefix for moderate, plus (+) for heavy intensity. Precipitation descriptors: DZ drizzle, RA rain, SN snow, SG snow grains",
+          "title": "ICAO METAR weather phenomena codes reference"
+        }
+      ],
+      "sources": [
+        "metar-eham",
+        "ref-icao-weather-codes"
+      ]
+    },
+    "8e420a6585b52324ba86a0aa40900e7e28efd983eec679a06c0c7af4746753ec": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft ",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 1.0,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 1.0,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "ntsb-loss-sep",
+          "score": 0.833,
+          "snippet": "Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft ",
+          "title": "NTSB-style incident report: loss of separation on crossing tracks"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-eng-failure",
+        "ntsb-loss-sep"
+      ]
+    },
+    "9269685c6af65d553e4663eb08c16b32f21c71426ad636000218ca3ee06787f6": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A freighter aircraft flew an unstabilised instrument approach in mountainous terrain at night under instrument meteorological conditions. The Enhanced Ground Proximity Warning System Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.4,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-controlled-flight",
+          "score": 0.4,
+          "snippet": "Incident summary: A freighter aircraft flew an unstabilised instrument approach in mountainous terrain at night under instrument meteorological conditions. The Enhanced Ground Proximity Warning System",
+          "title": "NTSB-style incident report: controlled flight into terrain warning during approach"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.4,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-controlled-flight",
+        "ntsb-eng-failure"
+      ]
+    },
+    "9302d4be014f74e4b0102330089147b515979dfbeb5f874ae4d54970565b841b": {
+      "answer": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+      "results": [
+        {
+          "id": "metar-eham",
+          "score": 1.0,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "metar-ebbr",
+          "score": 0.5,
+          "snippet": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+          "title": "METAR EBBR Brussels Airport"
+        },
+        {
+          "id": "metar-eddf",
+          "score": 0.5,
+          "snippet": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+          "title": "METAR EDDF Frankfurt am Main Airport"
+        }
+      ],
+      "sources": [
+        "metar-eham",
+        "metar-ebbr",
+        "metar-eddf"
+      ]
+    },
+    "96ddc6cffd0b1c4152e1aa7f0d0744830f51dace8c66a33034525f45645c78a3": {
+      "answer": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+      "results": [
+        {
+          "id": "metar-eham",
+          "score": 1.0,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "metar-ebbr",
+          "score": 0.333,
+          "snippet": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+          "title": "METAR EBBR Brussels Airport"
+        },
+        {
+          "id": "metar-eddf",
+          "score": 0.333,
+          "snippet": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+          "title": "METAR EDDF Frankfurt am Main Airport"
+        }
+      ],
+      "sources": [
+        "metar-eham",
+        "metar-ebbr",
+        "metar-eddf"
+      ]
+    },
+    "9842af720f8aa0c88eea7fa4d73fb1cfb74500719a5432dd77482e7ecd5409de": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.4,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-icing",
+          "score": 0.4,
+          "snippet": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+          "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect"
+        },
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.4,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-icing",
+        "ref-squawk-codes"
+      ]
+    },
+    "986c5fd72290a36a67af67c9031bd082f4df2b5d0f9908cbc322b83f8c0e4b48": {
+      "answer": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+      "results": [
+        {
+          "id": "metar-eddf",
+          "score": 0.667,
+          "snippet": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+          "title": "METAR EDDF Frankfurt am Main Airport"
+        },
+        {
+          "id": "ref-altimeter-settings",
+          "score": 0.5,
+          "snippet": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+          "title": "Altimeter settings QNH QFE QNE and transition altitude"
+        },
+        {
+          "id": "metar-ebbr",
+          "score": 0.333,
+          "snippet": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+          "title": "METAR EBBR Brussels Airport"
+        }
+      ],
+      "sources": [
+        "metar-eddf",
+        "ref-altimeter-settings",
+        "metar-ebbr"
+      ]
+    },
+    "a2185133fb7529eafe03bbcaa77be8b621b8f7944eb08942d4d46162677c827e": {
+      "answer": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG EDDM 031150Z 08014KT 9000 -TSRA FEW030CB SCT045 BKN090 17/14 Q1010 RETS TEMPO 2000 TSRA. Decoded: ICAO station EDDM Munich Franz Josef Strauss Airport Germany, wind 080 degrees at 14 knots, visibility",
+      "results": [
+        {
+          "id": "metar-eddf",
+          "score": 1.0,
+          "snippet": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+          "title": "METAR EDDF Frankfurt am Main Airport"
+        },
+        {
+          "id": "metar-ebbr",
+          "score": 0.5,
+          "snippet": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+          "title": "METAR EBBR Brussels Airport"
+        },
+        {
+          "id": "metar-eddm",
+          "score": 0.5,
+          "snippet": "EDDM 031150Z 08014KT 9000 -TSRA FEW030CB SCT045 BKN090 17/14 Q1010 RETS TEMPO 2000 TSRA. Decoded: ICAO station EDDM Munich Franz Josef Strauss Airport Germany, wind 080 degrees at 14 knots, visibility",
+          "title": "METAR EDDM Munich Airport"
+        }
+      ],
+      "sources": [
+        "metar-eddf",
+        "metar-ebbr",
+        "metar-eddm"
+      ]
+    },
+    "a39bdef4696b42749f88de3e5bfde920963ba14d18065c0f0a077dee8e651afa": {
+      "answer": "Traffic Collision Avoidance System (TCAS II) resolution advisory reference: TCAS issues Traffic Advisories (TA) as caution alerts and Resolution Advisories (RA) as corrective commands. RA types: Climb Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr Incident summary: A long-haul widebody aircraft cruising at FL380 experienced a loss of cabin pressurization due to a failed outflow valve actuator. The cabin altitude climbed above 10 000 ft and oxyg",
+      "results": [
+        {
+          "id": "ref-tcas-ra",
+          "score": 0.444,
+          "snippet": "Traffic Collision Avoidance System (TCAS II) resolution advisory reference: TCAS issues Traffic Advisories (TA) as caution alerts and Resolution Advisories (RA) as corrective commands. RA types: Climb",
+          "title": "TCAS II resolution advisory types and pilot response"
+        },
+        {
+          "id": "ntsb-fuel-exhaustion",
+          "score": 0.333,
+          "snippet": "Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+          "title": "NTSB-style incident report: fuel exhaustion and forced landing"
+        },
+        {
+          "id": "ntsb-pressurization",
+          "score": 0.333,
+          "snippet": "Incident summary: A long-haul widebody aircraft cruising at FL380 experienced a loss of cabin pressurization due to a failed outflow valve actuator. The cabin altitude climbed above 10 000 ft and oxyg",
+          "title": "NTSB-style incident report: pressurization failure and emergency descent"
+        }
+      ],
+      "sources": [
+        "ref-tcas-ra",
+        "ntsb-fuel-exhaustion",
+        "ntsb-pressurization"
+      ]
+    },
+    "a50a46f0df2d5d273806ba04995f1c2c9f11102cda4e8e3687095878c3d5f4a3": {
+      "answer": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+      "results": [
+        {
+          "id": "metar-eham",
+          "score": 0.75,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "metar-eddf",
+          "score": 0.5,
+          "snippet": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+          "title": "METAR EDDF Frankfurt am Main Airport"
+        },
+        {
+          "id": "ref-altimeter-settings",
+          "score": 0.5,
+          "snippet": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+          "title": "Altimeter settings QNH QFE QNE and transition altitude"
+        }
+      ],
+      "sources": [
+        "metar-eham",
+        "metar-eddf",
+        "ref-altimeter-settings"
+      ]
+    },
+    "a5232ae20c71a45b5b0e518d3f2c24d4c162600fd4c4942b2ab67bb7f030d47c": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft ",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.833,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.833,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "ntsb-loss-sep",
+          "score": 0.667,
+          "snippet": "Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft ",
+          "title": "NTSB-style incident report: loss of separation on crossing tracks"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-eng-failure",
+        "ntsb-loss-sep"
+      ]
+    },
+    "a6053948bf8df59908607060895c530d23b5b2dec8ac363fd0b3a67553318514": {
+      "answer": "LOWW 031150Z 14006KT CAVOK 21/09 Q1020 NOSIG. Decoded: ICAO station LOWW Vienna Schwechat International Airport Austria, wind 140 degrees at 6 knots, CAVOK ceiling and visibility OK (visibility greate Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+      "results": [
+        {
+          "id": "metar-loww",
+          "score": 0.667,
+          "snippet": "LOWW 031150Z 14006KT CAVOK 21/09 Q1020 NOSIG. Decoded: ICAO station LOWW Vienna Schwechat International Airport Austria, wind 140 degrees at 6 knots, CAVOK ceiling and visibility OK (visibility greate",
+          "title": "METAR LOWW Vienna International Airport"
+        },
+        {
+          "id": "ref-altimeter-settings",
+          "score": 0.5,
+          "snippet": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+          "title": "Altimeter settings QNH QFE QNE and transition altitude"
+        },
+        {
+          "id": "metar-ebbr",
+          "score": 0.333,
+          "snippet": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+          "title": "METAR EBBR Brussels Airport"
+        }
+      ],
+      "sources": [
+        "metar-loww",
+        "ref-altimeter-settings",
+        "metar-ebbr"
+      ]
+    },
+    "ab38b2650fc5c30265bba0534992d832489cf0b8469b50d4743ba481ff7c611b": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.571,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.571,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "ntsb-fuel-exhaustion",
+          "score": 0.429,
+          "snippet": "Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+          "title": "NTSB-style incident report: fuel exhaustion and forced landing"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-eng-failure",
+        "ntsb-fuel-exhaustion"
+      ]
+    },
+    "ad77bafde0977987dcd97ca0262d0ad501cdac4baac74611e95a891519810373": {
+      "answer": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+      "results": [
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.667,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.333,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-fuel-exhaustion",
+          "score": 0.333,
+          "snippet": "Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+          "title": "NTSB-style incident report: fuel exhaustion and forced landing"
+        }
+      ],
+      "sources": [
+        "ref-squawk-codes",
+        "ntsb-bird-strike",
+        "ntsb-fuel-exhaustion"
+      ]
+    },
+    "b4d0ed133afaf22ac1186dc23dc4dfaa82f67355f5e8f562c29dc72e343bb400": {
+      "answer": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+      "results": [
+        {
+          "id": "metar-eham",
+          "score": 0.4,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "metar-ebbr",
+          "score": 0.2,
+          "snippet": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+          "title": "METAR EBBR Brussels Airport"
+        },
+        {
+          "id": "metar-eddf",
+          "score": 0.2,
+          "snippet": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+          "title": "METAR EDDF Frankfurt am Main Airport"
+        }
+      ],
+      "sources": [
+        "metar-eham",
+        "metar-ebbr",
+        "metar-eddf"
+      ]
+    },
+    "bcb4b1aa39e01018c82aa50780a446d8226a67327a719e2812e07b740c8af67c": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 1.0,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 1.0,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "ntsb-fuel-exhaustion",
+          "score": 0.667,
+          "snippet": "Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+          "title": "NTSB-style incident report: fuel exhaustion and forced landing"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-eng-failure",
+        "ntsb-fuel-exhaustion"
+      ]
+    },
+    "bf111d19ef22088a126ac9ed3b9ed2161cc2ce0908c7b2babd125fd1d2a7d9bf": {
+      "answer": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+      "results": [
+        {
+          "id": "metar-eham",
+          "score": 1.0,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "metar-ebbr",
+          "score": 0.5,
+          "snippet": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+          "title": "METAR EBBR Brussels Airport"
+        },
+        {
+          "id": "metar-eddf",
+          "score": 0.5,
+          "snippet": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+          "title": "METAR EDDF Frankfurt am Main Airport"
+        }
+      ],
+      "sources": [
+        "metar-eham",
+        "metar-ebbr",
+        "metar-eddf"
+      ]
+    },
+    "c0b5cad68a2e8bc6e587e34d67009982247ed6315625e572de7070aaeb63d2d0": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A freighter aircraft flew an unstabilised instrument approach in mountainous terrain at night under instrument meteorological conditions. The Enhanced Ground Proximity Warning System Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.333,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-controlled-flight",
+          "score": 0.333,
+          "snippet": "Incident summary: A freighter aircraft flew an unstabilised instrument approach in mountainous terrain at night under instrument meteorological conditions. The Enhanced Ground Proximity Warning System",
+          "title": "NTSB-style incident report: controlled flight into terrain warning during approach"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.333,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-controlled-flight",
+        "ntsb-eng-failure"
+      ]
+    },
+    "c36a43e93a7bb9e43ac448aa0f42075b926864dc582682641c46ea75a64b4913": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.4,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-icing",
+          "score": 0.4,
+          "snippet": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+          "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect"
+        },
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.4,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-icing",
+        "ref-squawk-codes"
+      ]
+    },
+    "c4d7c695ee48fa5c7ff49f3323fac4af6648ad07416dc3344a3ae3e4dbb09c48": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.25,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-icing",
+          "score": 0.25,
+          "snippet": "Incident summary: A twin turboprop commuter aircraft encountered severe airframe icing conditions while flying through a cumulonimbus cloud layer at FL160. Ice accumulated on the wing leading edges fa",
+          "title": "NTSB-style incident report: airframe icing encounter and autopilot disconnect"
+        },
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.25,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-icing",
+        "ref-squawk-codes"
+      ]
+    },
+    "c61d4377ee7e76ab81231e7abfea2bb61a94c12df4badae20681a26269737ee8": {
+      "answer": "Incident summary: A long-haul widebody aircraft cruising at FL380 experienced a loss of cabin pressurization due to a failed outflow valve actuator. The cabin altitude climbed above 10 000 ft and oxyg Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+      "results": [
+        {
+          "id": "ntsb-pressurization",
+          "score": 0.556,
+          "snippet": "Incident summary: A long-haul widebody aircraft cruising at FL380 experienced a loss of cabin pressurization due to a failed outflow valve actuator. The cabin altitude climbed above 10 000 ft and oxyg",
+          "title": "NTSB-style incident report: pressurization failure and emergency descent"
+        },
+        {
+          "id": "ref-altimeter-settings",
+          "score": 0.556,
+          "snippet": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+          "title": "Altimeter settings QNH QFE QNE and transition altitude"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.444,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        }
+      ],
+      "sources": [
+        "ntsb-pressurization",
+        "ref-altimeter-settings",
+        "ntsb-bird-strike"
+      ]
+    },
+    "c9a147469ebdc6224a4364c86024e2e11af492bad0b00800f0a330e85283391e": {
+      "answer": "LOWW 031150Z 14006KT CAVOK 21/09 Q1020 NOSIG. Decoded: ICAO station LOWW Vienna Schwechat International Airport Austria, wind 140 degrees at 6 knots, CAVOK ceiling and visibility OK (visibility greate Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+      "results": [
+        {
+          "id": "metar-loww",
+          "score": 0.667,
+          "snippet": "LOWW 031150Z 14006KT CAVOK 21/09 Q1020 NOSIG. Decoded: ICAO station LOWW Vienna Schwechat International Airport Austria, wind 140 degrees at 6 knots, CAVOK ceiling and visibility OK (visibility greate",
+          "title": "METAR LOWW Vienna International Airport"
+        },
+        {
+          "id": "ref-altimeter-settings",
+          "score": 0.5,
+          "snippet": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+          "title": "Altimeter settings QNH QFE QNE and transition altitude"
+        },
+        {
+          "id": "metar-ebbr",
+          "score": 0.333,
+          "snippet": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+          "title": "METAR EBBR Brussels Airport"
+        }
+      ],
+      "sources": [
+        "metar-loww",
+        "ref-altimeter-settings",
+        "metar-ebbr"
+      ]
+    },
+    "d0fda327d8eb6f56ddd7e92d5a7ce079ce06a6995835d94c80210006647c7b10": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft ",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 1.0,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 1.0,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "ntsb-loss-sep",
+          "score": 0.75,
+          "snippet": "Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft ",
+          "title": "NTSB-style incident report: loss of separation on crossing tracks"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-eng-failure",
+        "ntsb-loss-sep"
+      ]
+    },
+    "d3e220ef59f96da89b7fbf54acb478e250f4b67968f9b28a26def24aa4132d4c": {
+      "answer": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr Incident summary: During cruise at FL280 a transport aircraft lost hydraulic system B pressure following rupture of a hydraulic line in the rear equipment bay. Hydraulic system B provides power to pri",
+      "results": [
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.375,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "ntsb-fuel-exhaustion",
+          "score": 0.375,
+          "snippet": "Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+          "title": "NTSB-style incident report: fuel exhaustion and forced landing"
+        },
+        {
+          "id": "ntsb-hydraulic-failure",
+          "score": 0.375,
+          "snippet": "Incident summary: During cruise at FL280 a transport aircraft lost hydraulic system B pressure following rupture of a hydraulic line in the rear equipment bay. Hydraulic system B provides power to pri",
+          "title": "NTSB-style incident report: hydraulic system failure affecting flight controls"
+        }
+      ],
+      "sources": [
+        "ntsb-eng-failure",
+        "ntsb-fuel-exhaustion",
+        "ntsb-hydraulic-failure"
+      ]
+    },
+    "d7e58fa41b4b2a1304fa439623ba6acdaa06fcb17573eeef1f15adf405e40250": {
+      "answer": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+      "results": [
+        {
+          "id": "metar-eham",
+          "score": 0.667,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "metar-ebbr",
+          "score": 0.333,
+          "snippet": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+          "title": "METAR EBBR Brussels Airport"
+        },
+        {
+          "id": "metar-eddf",
+          "score": 0.333,
+          "snippet": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+          "title": "METAR EDDF Frankfurt am Main Airport"
+        }
+      ],
+      "sources": [
+        "metar-eham",
+        "metar-ebbr",
+        "metar-eddf"
+      ]
+    },
+    "da806d28fc4a3d533509c6a0097e57cc1f3914e47c22d6217022b6ff004e7795": {
+      "answer": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+      "results": [
+        {
+          "id": "metar-eham",
+          "score": 0.571,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "ref-altimeter-settings",
+          "score": 0.571,
+          "snippet": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+          "title": "Altimeter settings QNH QFE QNE and transition altitude"
+        },
+        {
+          "id": "metar-ebbr",
+          "score": 0.429,
+          "snippet": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+          "title": "METAR EBBR Brussels Airport"
+        }
+      ],
+      "sources": [
+        "metar-eham",
+        "ref-altimeter-settings",
+        "metar-ebbr"
+      ]
+    },
+    "daa22cca37ec5b6f3411816eb32a690a78c224f162714bbb606cbb10dd8d0874": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.8,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.8,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "ntsb-fuel-exhaustion",
+          "score": 0.6,
+          "snippet": "Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+          "title": "NTSB-style incident report: fuel exhaustion and forced landing"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-eng-failure",
+        "ntsb-fuel-exhaustion"
+      ]
+    },
+    "db711ee151615c15e2acc6acd81f6a90ad5462dba4380bea0492f6c0ba3fe410": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft ",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 1.0,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 1.0,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "ntsb-loss-sep",
+          "score": 0.833,
+          "snippet": "Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft ",
+          "title": "NTSB-style incident report: loss of separation on crossing tracks"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-eng-failure",
+        "ntsb-loss-sep"
+      ]
+    },
+    "dd96687a41cd95c944b7ba9191c4aa83bfa53614bf1bdc43765f24650b56ca9f": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr Incident summary: A freighter aircraft flew an unstabilised instrument approach in mountainous terrain at night under instrument meteorological conditions. The Enhanced Ground Proximity Warning System",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.556,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-fuel-exhaustion",
+          "score": 0.556,
+          "snippet": "Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+          "title": "NTSB-style incident report: fuel exhaustion and forced landing"
+        },
+        {
+          "id": "ntsb-controlled-flight",
+          "score": 0.444,
+          "snippet": "Incident summary: A freighter aircraft flew an unstabilised instrument approach in mountainous terrain at night under instrument meteorological conditions. The Enhanced Ground Proximity Warning System",
+          "title": "NTSB-style incident report: controlled flight into terrain warning during approach"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-fuel-exhaustion",
+        "ntsb-controlled-flight"
+      ]
+    },
+    "ddea44ae335319f1f46ef41c2623c1910fc0924ec20741e757c551ac2d220cd6": {
+      "answer": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+      "results": [
+        {
+          "id": "ref-squawk-codes",
+          "score": 0.8,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.4,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.4,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        }
+      ],
+      "sources": [
+        "ref-squawk-codes",
+        "ntsb-bird-strike",
+        "ntsb-eng-failure"
+      ]
+    },
+    "df0fa4c17a5a322345ec22d6601e721fcf973c8749f183a5c28b1f0f63267722": {
+      "answer": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+      "results": [
+        {
+          "id": "ref-squawk-codes",
+          "score": 1.0,
+          "snippet": "Emergency transponder squawk codes: squawk 7700 general emergency, squawk 7500 unlawful interference (hijacking), squawk 7600 radio failure (lost communications). Squawk 7700 indicates a general emerg",
+          "title": "Emergency transponder squawk codes reference guide"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.4,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.4,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        }
+      ],
+      "sources": [
+        "ref-squawk-codes",
+        "ntsb-bird-strike",
+        "ntsb-eng-failure"
+      ]
+    },
+    "df68ed8cff422ff0f220cefc6ffb8dad461a63b5c6786ae5f7f450b36a494921": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.333,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.333,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "metar-eddf",
+          "score": 0.222,
+          "snippet": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+          "title": "METAR EDDF Frankfurt am Main Airport"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-eng-failure",
+        "metar-eddf"
+      ]
+    },
+    "e23de377a9ce89ac79ff0a082890f705c66518dda0253106cc1216a3972d6327": {
+      "answer": "",
+      "results": [],
+      "sources": []
+    },
+    "e437e97d678002b6bee5416a95db4b7a54c0b99c9e2b534a034aa77f2d28c201": {
+      "answer": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M Flight rules reference: Visual Flight Rules (VFR) require pilots to maintain visual separation from clouds and terrain. Basic VFR minima in controlled airspace (Class C, D, E): flight visibility 5 km, EGLL 031120Z 22015KT 190V250 6000 -SHRA FEW010 SCT018 BKN030 14/10 Q1008 TEMPO 3000 SHRA BKN010. Decoded: ICAO station EGLL London Heathrow Airport United Kingdom, wind 220 degrees at 15 knots variabl",
+      "results": [
+        {
+          "id": "ref-altimeter-settings",
+          "score": 0.5,
+          "snippet": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+          "title": "Altimeter settings QNH QFE QNE and transition altitude"
+        },
+        {
+          "id": "ref-flight-rules",
+          "score": 0.5,
+          "snippet": "Flight rules reference: Visual Flight Rules (VFR) require pilots to maintain visual separation from clouds and terrain. Basic VFR minima in controlled airspace (Class C, D, E): flight visibility 5 km,",
+          "title": "VFR and IFR flight rules visibility and cloud clearance minima"
+        },
+        {
+          "id": "metar-egll",
+          "score": 0.375,
+          "snippet": "EGLL 031120Z 22015KT 190V250 6000 -SHRA FEW010 SCT018 BKN030 14/10 Q1008 TEMPO 3000 SHRA BKN010. Decoded: ICAO station EGLL London Heathrow Airport United Kingdom, wind 220 degrees at 15 knots variabl",
+          "title": "METAR EGLL London Heathrow Airport"
+        }
+      ],
+      "sources": [
+        "ref-altimeter-settings",
+        "ref-flight-rules",
+        "metar-egll"
+      ]
+    },
+    "eb12789292549c6d542388d94c3b23a6a535fafb01cc05008ab3eba793fe6920": {
+      "answer": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft ",
+      "results": [
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.8,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.7,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-loss-sep",
+          "score": 0.7,
+          "snippet": "Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft ",
+          "title": "NTSB-style incident report: loss of separation on crossing tracks"
+        }
+      ],
+      "sources": [
+        "ntsb-eng-failure",
+        "ntsb-bird-strike",
+        "ntsb-loss-sep"
+      ]
+    },
+    "f32cfaefb07bf4fe6c9ff1d166db1aecdf7b192bbbda38ef692b92b202b9410c": {
+      "answer": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+      "results": [
+        {
+          "id": "ntsb-bird-strike",
+          "score": 0.833,
+          "snippet": "Incident summary: A twin-engine widebody aircraft departed a coastal airport and struck a flock of large birds at 800 ft AGL during initial climb. The left engine ingested multiple birds, causing a co",
+          "title": "NTSB-style incident report: bird strike on departure causing engine ingestion"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.833,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "ntsb-fuel-exhaustion",
+          "score": 0.667,
+          "snippet": "Incident summary: A single-engine light aircraft experienced fuel exhaustion and was forced to land in a field after the engine stopped during cruise. The private pilot had not performed a thorough pr",
+          "title": "NTSB-style incident report: fuel exhaustion and forced landing"
+        }
+      ],
+      "sources": [
+        "ntsb-bird-strike",
+        "ntsb-eng-failure",
+        "ntsb-fuel-exhaustion"
+      ]
+    },
+    "f35b63f53d954129e9030599e8ea052cbd26b1a441d6d398c307d7d881cd0f3a": {
+      "answer": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+      "results": [
+        {
+          "id": "metar-eham",
+          "score": 0.625,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "ref-altimeter-settings",
+          "score": 0.375,
+          "snippet": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+          "title": "Altimeter settings QNH QFE QNE and transition altitude"
+        },
+        {
+          "id": "metar-ebbr",
+          "score": 0.25,
+          "snippet": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+          "title": "METAR EBBR Brussels Airport"
+        }
+      ],
+      "sources": [
+        "metar-eham",
+        "ref-altimeter-settings",
+        "metar-ebbr"
+      ]
+    },
+    "f392beb3fffe51e87eaf76638f53c3b5d5d9722c07719e093124d38a97ae5685": {
+      "answer": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+      "results": [
+        {
+          "id": "metar-eham",
+          "score": 0.5,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "ref-altimeter-settings",
+          "score": 0.5,
+          "snippet": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+          "title": "Altimeter settings QNH QFE QNE and transition altitude"
+        },
+        {
+          "id": "metar-ebbr",
+          "score": 0.333,
+          "snippet": "EBBR 031120Z 25009KT 9999 FEW030 SCT080 15/09 Q1017 NOSIG. Decoded: ICAO station EBBR Brussels Zaventem Airport Belgium, wind 250 degrees at 9 knots, visibility 10 km or more, few clouds at 3000 ft AG",
+          "title": "METAR EBBR Brussels Airport"
+        }
+      ],
+      "sources": [
+        "metar-eham",
+        "ref-altimeter-settings",
+        "metar-ebbr"
+      ]
+    },
+    "f9edec44b5adde3ee81f59ea70ab5cd55f95944b0f0777e074f2a5adc5c8a19d": {
+      "answer": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999 Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+      "results": [
+        {
+          "id": "metar-eddf",
+          "score": 0.5,
+          "snippet": "EDDF 031150Z 24012G22KT 8000 -RA BKN012 15/13 Q1014 TEMPO 4000 RA. Decoded: ICAO station EDDF Frankfurt am Main Airport Germany, wind 240 degrees at 12 gusting 22 knots, visibility 8000 metres in ligh",
+          "title": "METAR EDDF Frankfurt am Main Airport"
+        },
+        {
+          "id": "metar-eham",
+          "score": 0.5,
+          "snippet": "EHAM 031155Z 27010KT 9999 FEW025 SCT040 18/11 Q1019 NOSIG. Decoded: ICAO station EHAM Amsterdam Schiphol Airport, observation time 0311 UTC, wind 270 degrees at 10 knots, visibility 10 km or more (999",
+          "title": "METAR EHAM Amsterdam Schiphol decode"
+        },
+        {
+          "id": "ref-altimeter-settings",
+          "score": 0.5,
+          "snippet": "Altimeter settings reference: QNH is the altimeter setting that makes the altimeter read field elevation on the ground \u2014 used below the transition altitude for altitude references to mean sea level (M",
+          "title": "Altimeter settings QNH QFE QNE and transition altitude"
+        }
+      ],
+      "sources": [
+        "metar-eddf",
+        "metar-eham",
+        "ref-altimeter-settings"
+      ]
+    },
+    "ffc1c7566be045d220a5ee9037454873a8672ca358f9f0ba385703795cf6481b": {
+      "answer": "Incident summary: A long-haul widebody aircraft cruising at FL380 experienced a loss of cabin pressurization due to a failed outflow valve actuator. The cabin altitude climbed above 10 000 ft and oxyg Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft ",
+      "results": [
+        {
+          "id": "ntsb-pressurization",
+          "score": 0.7,
+          "snippet": "Incident summary: A long-haul widebody aircraft cruising at FL380 experienced a loss of cabin pressurization due to a failed outflow valve actuator. The cabin altitude climbed above 10 000 ft and oxyg",
+          "title": "NTSB-style incident report: pressurization failure and emergency descent"
+        },
+        {
+          "id": "ntsb-eng-failure",
+          "score": 0.6,
+          "snippet": "Incident summary: During initial climb after departure, the flight crew of a twin-engine narrow-body aircraft reported a loss of thrust from the right engine at approximately 4000 ft AGL. The crew exe",
+          "title": "NTSB-style incident report: engine failure during climb phase of flight"
+        },
+        {
+          "id": "ntsb-loss-sep",
+          "score": 0.6,
+          "snippet": "Incident summary: Two aircraft on crossing tracks at FL350 experienced a loss of standard separation after a level-off clearance was read back incorrectly by the flight crew of one aircraft. Aircraft ",
+          "title": "NTSB-style incident report: loss of separation on crossing tracks"
+        }
+      ],
+      "sources": [
+        "ntsb-pressurization",
+        "ntsb-eng-failure",
+        "ntsb-loss-sep"
+      ]
+    }
+  },
+  "meta": {},
+  "recorded_at": "2026-09-11"
+}
