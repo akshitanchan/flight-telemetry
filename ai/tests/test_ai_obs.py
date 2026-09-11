@@ -318,25 +318,21 @@ class TestCostCalc(unittest.TestCase):
         self.assertAlmostEqual(usd_lower, usd_upper, places=10)
 
     def test_split_gpt4o_mini_input_and_output(self):
-        """1000 input + 1000 output tokens of gpt-4o-mini: 0.000150 + 0.000600."""
         from ai.obs.costs import cost_split_usd
         usd = cost_split_usd("gpt-4o-mini", 1000, 1000)
         self.assertAlmostEqual(usd, 0.00075, places=8)
 
     def test_split_bedrock_llama_bare_id(self):
-        """Bedrock Llama 3.1 8B, bare id: 1000 in + 1000 out = 0.00044."""
         from ai.obs.costs import cost_split_usd
         usd = cost_split_usd("meta.llama3-1-8b-instruct-v1:0", 1000, 1000)
         self.assertAlmostEqual(usd, 0.00044, places=8)
 
     def test_split_bedrock_llama_prefixed_id(self):
-        """Bedrock Llama 3.1 8B with the bedrock:us. prefix: same total cost."""
         from ai.obs.costs import cost_split_usd
         usd = cost_split_usd("bedrock:us.meta.llama3-1-8b-instruct-v1:0", 1000, 1000)
         self.assertAlmostEqual(usd, 0.00044, places=8)
 
     def test_split_unknown_model_returns_zero(self):
-        """Unknown model costs nothing, even with nonzero token counts."""
         from ai.obs.costs import cost_split_usd
         usd = cost_split_usd("my-private-model-v99", 1000, 1000)
         self.assertEqual(usd, 0.0)
@@ -506,11 +502,6 @@ class TestSemanticCacheExact(unittest.TestCase):
         self.assertIsNone(cache.get("question C"))
 
     def test_exact_keying_never_calls_embed_and_reports_exact_in_stats(self):
-        """keying="exact" must never touch the embeddings module, even when a
-        fake OPENAI_API_KEY is set and _embeddings_available() would say yes.
-        This is the eval matrix's guarantee that a live run and its offline
-        replay take the same cache path.
-        """
         from ai.obs.cache import SemanticCache
 
         with unittest.mock.patch.dict(os.environ, {"OPENAI_API_KEY": "sk-fake-test-key"}), \
