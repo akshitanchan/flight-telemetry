@@ -68,6 +68,13 @@ PRICE_PER_1K = {
 
 HOST_STRING = f"Apple M2, macOS, Python {sys.version_info.major}.{sys.version_info.minor} in ~/.venvs/flight-telemetry"
 
+# shared between the markdown header and the json header so both say the same thing
+CACHE_KEYING_NOTE = (
+    "The semantic cache ran in exact-match keying, so the live run and its replay "
+    "follow the same code path. In embedding mode, five paraphrased questions in "
+    "the golden set would also have been served from cache."
+)
+
 
 def _duplicate_count(questions):
     # extra occurrences of an exact-duplicate question string in this question list
@@ -137,7 +144,8 @@ def _run_cell(strategy_cls, max_tokens, provider_name, cassette, retrieval, anal
     llm = wrap_provider(identity, cassette)
     strategy = strategy_cls(analytics, retrieval, llm=llm)
     guarded = GuardedStrategy(strategy, corpus_path=DEFAULT_CORPUS)
-    cache = SemanticCache()
+    # exact keying so a live run and its --dry-run replay take the same cache path
+    cache = SemanticCache(keying="exact")
 
     rows = []
     for q in questions:
@@ -276,6 +284,7 @@ def _render_markdown(command, cassettes, golden_size, used_size, backend,
     lines.append(f"Host: {HOST_STRING}.")
     lines.append(f"Golden set has {golden_size} questions; this run used {used_size}.")
     lines.append(duplicate_note)
+    lines.append(CACHE_KEYING_NOTE)
     lines.append(f"Retrieval backend actually used: {backend}.")
     for name in provider_names:
         lines.append(f"Model ({name}): {_model_line(name, results, provider_names)}.")
@@ -432,6 +441,7 @@ def main(argv=None):
             "golden_set_size": len(all_questions),
             "questions_used": len(questions),
             "duplicate_questions": {"count": duplicate_count, "note": duplicate_note},
+            "cache_keying_note": CACHE_KEYING_NOTE,
             "retrieval_backend": backend,
             "models": {name: _model_line(name, results, provider_names) for name in provider_names},
             "price_per_1k_usd": {

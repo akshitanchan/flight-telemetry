@@ -36,6 +36,10 @@ Coverage:
         same entry.
      f. clear() flushes all entries.
      g. stats() returns correct counts.
+     h. keying="exact" never calls the embeddings module, even with a fake
+        OPENAI_API_KEY set, and stats() reports "exact".
+     i. keying="embedding" raises at construction when embeddings are
+        unavailable; an invalid keying value raises ValueError.
   7. SemanticCache — embedding path (mocked):
      a. When embeddings are available (mocked), a semantically similar query
         (cosine similarity >= threshold) returns a cache hit.
@@ -46,6 +50,7 @@ Coverage:
      served from cache does not invoke the stub again.
 """
 
+import os
 import sys
 import unittest
 import unittest.mock
@@ -499,6 +504,39 @@ class TestSemanticCacheExact(unittest.TestCase):
         self.assertEqual(cache.get("question A"), "answer A")
         self.assertEqual(cache.get("question B"), "answer B")
         self.assertIsNone(cache.get("question C"))
+
+    def test_exact_keying_never_calls_embed_and_reports_exact_in_stats(self):
+        """keying="exact" must never touch the embeddings module, even when a
+        fake OPENAI_API_KEY is set and _embeddings_available() would say yes.
+        This is the eval matrix's guarantee that a live run and its offline
+        replay take the same cache path.
+        """
+        from ai.obs.cache import SemanticCache
+
+        with unittest.mock.patch.dict(os.environ, {"OPENAI_API_KEY": "sk-fake-test-key"}), \
+                unittest.mock.patch("ai.obs.cache._embeddings_available", return_value=True), \
+                unittest.mock.patch("ai.tools.embeddings.embed") as mock_embed:
+            mock_embed.side_effect = RuntimeError("embed must not be called in exact mode")
+
+            cache = SemanticCache(max_size=8, keying="exact")
+            cache.put("how many emergency events", "42")
+            result = cache.get("how many emergency events")
+
+            self.assertEqual(result, "42")
+            mock_embed.assert_not_called()
+            self.assertEqual(cache.stats()["keying"], "exact")
+
+    def test_embedding_keying_raises_when_unavailable(self):
+        """keying="embedding" fails fast at construction if embeddings aren't available."""
+        from ai.obs.cache import SemanticCache
+        # class setUp already forces _embeddings_available() to False
+        with self.assertRaises(RuntimeError):
+            SemanticCache(keying="embedding")
+
+    def test_invalid_keying_value_raises(self):
+        from ai.obs.cache import SemanticCache
+        with self.assertRaises(ValueError):
+            SemanticCache(keying="bogus")
 
 
 # ---------------------------------------------------------------------------

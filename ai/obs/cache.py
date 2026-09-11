@@ -46,8 +46,10 @@ Offline discipline
 
 Public API
 ----------
-``SemanticCache(max_size=256, threshold=0.92)``
-    The main cache class.
+``SemanticCache(max_size=256, threshold=0.92, keying="auto")``
+    The main cache class.  ``keying`` is ``"auto"`` (embeddings when
+    available, else exact), ``"exact"`` (never embed) or ``"embedding"``
+    (require embeddings; raises at construction time if unavailable).
 
     ``get(query) -> Any | None``
         Return the cached value for ``query``, or None on a miss.
@@ -207,11 +209,27 @@ class SemanticCache:
         Queries whose embedding is this similar to a stored entry are
         considered equivalent.  Default 0.92 is intentionally high to avoid
         false positives on aviation queries.
+    keying:
+        ``"auto"`` (default): embeddings when available, else exact-match.
+        ``"exact"``: always exact-match, never calls the embeddings module.
+        ``"embedding"``: always embeds; raises ``RuntimeError`` at
+        construction time if embeddings are unavailable.
     """
 
-    def __init__(self, max_size: int = 256, threshold: float = 0.92) -> None:
+    def __init__(
+        self, max_size: int = 256, threshold: float = 0.92, keying: str = "auto"
+    ) -> None:
+        if keying not in ("auto", "exact", "embedding"):
+            raise ValueError(f"keying must be 'auto', 'exact', or 'embedding'; got {keying!r}")
+        if keying == "embedding" and not _embeddings_available():
+            raise RuntimeError(
+                "SemanticCache(keying='embedding') requires OPENAI_API_KEY and numpy, "
+                "neither of which is available in this environment"
+            )
+
         self.max_size = max_size
         self.threshold = threshold
+        self.keying = keying
         self._lock = threading.Lock()
 
         # Ordered dict for FIFO eviction.  Each value is a dict:
@@ -240,7 +258,7 @@ class SemanticCache:
                 return None
 
             # --- Embedding path (preferred when available) ---
-            if _embeddings_available():
+            if self._use_embeddings():
                 try:
                     query_vec = _embed_query(query)
                     if query_vec is not None:
@@ -274,7 +292,7 @@ class SemanticCache:
         norm = _normalise(query)
         embedding: Optional[list[float]] = None
 
-        if _embeddings_available():
+        if self._use_embeddings():
             try:
                 embedding = _embed_query(query)
             except Exception as exc:  # noqa: BLE001
@@ -297,7 +315,7 @@ class SemanticCache:
     def stats(self) -> dict:
         """Return ``{hits, misses, size, keying}`` diagnostics."""
         with self._lock:
-            keying = "embedding" if _embeddings_available() else "exact"
+            keying = "embedding" if self._use_embeddings() else "exact"
             return {
                 "hits": self._hits,
                 "misses": self._misses,
@@ -315,6 +333,15 @@ class SemanticCache:
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
+
+    def _use_embeddings(self) -> bool:
+        """Return True when this instance should attempt the embedding path."""
+        if self.keying == "exact":
+            # exact exists so an eval that must replay offline takes the same cache path live and in replay
+            return False
+        if self.keying == "embedding":
+            return True
+        return _embeddings_available()
 
     def _best_embedding_match(
         self, query_vec: list[float]
