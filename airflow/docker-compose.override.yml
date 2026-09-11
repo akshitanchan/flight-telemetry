@@ -5,11 +5,14 @@
 # of appending to it.
 
 x-repo-mount: &repo-mount
+  # the host path comes from airflow/.env; the container always sees the fixed path below
   volumes:
     - ../:/usr/local/airflow/repo:rw
+    - ${SNOWFLAKE_PRIVATE_KEY_PATH}:/usr/local/airflow/snowflake_rsa_key.p8:ro
   environment:
     PYTHONPATH: /usr/local/airflow/repo
     DBT_PROFILES_DIR: /usr/local/airflow/repo/data/cloud/dbt/flight_telemetry
+    SNOWFLAKE_PRIVATE_KEY_PATH: /usr/local/airflow/snowflake_rsa_key.p8
 
 services:
   api-server:

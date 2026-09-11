@@ -15,7 +15,7 @@ CONTRACTS_DIR = THIS_FILE.parents[3] / "shared" / "contracts"
 REQUIRED_ENV_VARS = [
     "SNOWFLAKE_ACCOUNT",
     "SNOWFLAKE_USER",
-    "SNOWFLAKE_PASSWORD",
+    "SNOWFLAKE_PRIVATE_KEY_PATH",
     "SNOWFLAKE_ROLE",
     "SNOWFLAKE_WAREHOUSE",
     "SNOWFLAKE_DATABASE",
@@ -110,10 +110,11 @@ def connect():
         )
     import snowflake.connector
 
+    # the trial enforces mfa on passwords, so a service user with a key pair is the only non-interactive login
     return snowflake.connector.connect(
         account=os.environ["SNOWFLAKE_ACCOUNT"],
         user=os.environ["SNOWFLAKE_USER"],
-        password=os.environ["SNOWFLAKE_PASSWORD"],
+        private_key_file=os.environ["SNOWFLAKE_PRIVATE_KEY_PATH"],
         role=os.environ["SNOWFLAKE_ROLE"],
         warehouse=os.environ["SNOWFLAKE_WAREHOUSE"],
         database=os.environ["SNOWFLAKE_DATABASE"],
